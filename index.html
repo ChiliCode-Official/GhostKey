@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Footprint | Material Design Edition</title>
+    <meta name="description"
+        content="Descubre las mejores ofertas en V-Bucks, Cuentas OG y suscripciones de Streaming.">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Digital Footprint | Tu Tienda Gaming Premium">
+    <meta property="og:description"
+        content="Descubre las mejores ofertas en V-Bucks, Cuentas OG y Streaming. Calidad Premium.">
+    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
+    <meta property="og:url" content="index.html">
+    <meta property="og:type" content="website">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+
+    <!-- Material You Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Gooey Filter for Navbar -->
+    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                    result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav">
+            <!-- Segment 1: Logo & Cart -->
+            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="logo-img">
+                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+            </div>
+
+            <!-- Segment 2: Links -->
+            <div class="nav-segment segment-links">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="active nav-blue">
+                            <span class="material-symbols-rounded">home</span>
+                            <span>Inicio</span>
+                        </a></li>
+                    <li><a href="catalogo.html" class="nav-green">
+                            <span class="material-symbols-rounded">category</span>
+                            <span>Catálogo</span>
+                        </a></li>
+                    <li><a href="metodos.html" class="nav-yellow">
+                            <span class="material-symbols-rounded">payments</span>
+                            <span>Métodos</span>
+                        </a></li>
+                    <li><a href="comprar.html" class="nav-red">
+                            <span class="material-symbols-rounded">help</span>
+                            <span>Ayuda</span>
+                        </a></li>
+                </ul>
+            </div>
+
+            <!-- Segment 3: Action -->
+            <div class="nav-segment segment-action" id="installSegment">
+                <button class="btn-install" id="installApp">
+                    <span class="material-symbols-rounded">download_for_offline</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Full Immersive 3D Hero -->
+        <section class="hero-3d">
+            <div class="spline-full-container">
+                <div class="spline-wrapper">
+                    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.90/build/spline-viewer.js"></script>
+                    <spline-viewer url="https://prod.spline.design/h75YifN31oZtzhS0/scene.splinecode"></spline-viewer>
+                </div>
+            </div>
+            <div class="container hero-3d-content">
+                <div class="hero-text-box">
+                    <h1 class="hero-title">Tu universo digital, <span style="color: var(--google-blue);">optimizado.</span></h1>
+                    <p class="hero-subtitle">Experimenta la mejor selección de servicios gaming y suscripciones con la garantía y el diseño que te mereces.</p>
+                    <div class="hero-btns">
+                        <a href="catalogo.html" class="btn btn-primary">
+                            <span class="material-symbols-rounded">shopping_bag</span>
+                            Explorar Catálogo
+                        </a>
+                        <a href="metodos.html" class="btn btn-outline">
+                            <span class="material-symbols-rounded">payments</span>
+                            Métodos de Pago
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="section-padding">
+            <div class="container">
+                <div style="margin-bottom: 48px;">
+                    <h2 style="margin-bottom: 12px;">Categorías</h2>
+                    <p style="color: var(--md-sys-color-on-surface-variant);">Todo lo que necesitas para tu setup
+                        digital.</p>
+                </div>
+                <div class="featured-grid">
+                    <div class="card card-fortnite" onclick="window.location.href='catalogo.html?filter=fortnite'"
+                        style="cursor: pointer;">
+                        <div class="card-icon">
+                            <span class="material-symbols-rounded">videogame_asset</span>
+                        </div>
+                        <h3>Fortnite & Gaming</h3>
+                        <p>Cuentas exclusivas, V-Bucks y pavos legales para tu cuenta principal.</p>
+                        <a href="catalogo.html?filter=fortnite" class="btn btn-secondary">Ver más</a>
+                    </div>
+
+                    <div class="card card-consoles" onclick="window.location.href='catalogo.html?filter=mayoreo'"
+                        style="cursor: pointer;">
+                        <div class="card-icon">
+                            <span class="material-symbols-rounded">groups</span>
+                        </div>
+                        <h3>Ventas al Mayoreo</h3>
+                        <p>Mejores precios para revendedores en cuentas y activaciones de Fortnite.</p>
+                        <a href="catalogo.html?filter=mayoreo" class="btn btn-secondary">Explorar</a>
+                    </div>
+
+                    <div class="card card-streaming" onclick="window.location.href='catalogo.html?filter=streaming'"
+                        style="cursor: pointer;">
+                        <div class="card-icon">
+                            <span class="material-symbols-rounded">movie</span>
+                        </div>
+                        <h3>Streaming & Diseño</h3>
+                        <p>Netflix, Disney+, Canva Pro, Adobe y más. Perfiles y cuentas completas.</p>
+                        <a href="catalogo.html?filter=streaming" class="btn btn-secondary">Ver ofertas</a>
+                    </div>
+                </div>
+            </div>
+        <!-- Testimonials Section -->
+        <section class="section-padding" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(5px);">
+            <div class="container">
+                <div style="margin-bottom: 48px; text-align: center;">
+                    <h2 style="margin-bottom: 12px;">Lo que dicen nuestros clientes</h2>
+                    <p style="color: var(--md-sys-color-on-surface-variant);">La confianza de nuestra comunidad es nuestra mayor garantía.</p>
+                </div>
+                <div class="featured-grid">
+                    <div class="card">
+                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                        </div>
+                        <p>"Excelente servicio, compré 5000 pavos y me llegaron en menos de 10 minutos. 100% confiable."</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--md-sys-color-primary-container); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--md-sys-color-on-primary-container);">JD</div>
+                            <div>
+                                <h4 style="font-size: 0.9rem;">Juan Diego</h4>
+                                <p style="font-size: 0.8rem; margin: 0;">Cliente Verificado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                        </div>
+                        <p>"La cuenta OG que compré está increíble. Todo tal cual la descripción y el soporte por Discord fue muy rápido."</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e6f4ea; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--google-green);">AR</div>
+                            <div>
+                                <h4 style="font-size: 0.9rem;">Alex Rodriguez</h4>
+                                <p style="font-size: 0.8rem; margin: 0;">Cliente VIP</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                            <span class="material-symbols-rounded">star</span>
+                        </div>
+                        <p>"Llevo meses comprando mis suscripciones de Netflix aquí y nunca he tenido una sola caída. El mejor precio."</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #fce8e6; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--google-red);">MS</div>
+                            <div>
+                                <h4 style="font-size: 0.9rem;">Maria Sanchez</h4>
+                                <p style="font-size: 0.8rem; margin: 0;">Cliente Verificado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fortnite V-Bucks Star Section -->
+        <section class="container star-product">
+            <div class="cta-card">
+                <div class="cta-card-visual">
+                </div>
+                <div class="cta-card-content">
+                    <span class="top-product-badge">PRODUCTO TOP</span>
+                    <h2>V-Bucks <br><span style="color: var(--google-yellow);">Regalos Directos</span></h2>
+                    <p>Obtén los cosméticos más nuevos sin esperas. 100% legales y seguros para tu cuenta principal.</p>
+                    <ul class="cta-features">
+                        <li><span class="material-symbols-rounded">check_circle</span> Recibe regalos en minutos</li>
+                        <li><span class="material-symbols-rounded">check_circle</span> Sin riesgo de baneo</li>
+                    </ul>
+                    <div class="cta-price-action">
+                        <span class="cta-price">Desde $78 <small>MXN</small></span>
+                        <a href="catalogo.html?filter=fortnite" class="btn btn-primary cta-btn">Ver Catálogo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <section class="section-padding">
+            <div class="container">
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <span class="material-symbols-rounded benefit-icon"
+                            style="color: var(--google-blue);">verified_user</span>
+                        <h3>Garantía Total</h3>
+                        <p>Todos nuestros servicios cuentan con soporte y garantía durante el tiempo contratado.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="material-symbols-rounded benefit-icon"
+                            style="color: var(--google-red);">bolt</span>
+                        <h3>Entrega Instantánea</h3>
+                        <p>Recibe tus accesos en minutos después de confirmar tu pago vía Discord o WhatsApp.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="material-symbols-rounded benefit-icon"
+                            style="color: var(--google-green);">support_agent</span>
+                        <h3>Soporte 24/7</h3>
+                        <p>Estamos disponibles en todo momento para resolver tus dudas y ayudarte con tu compra.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="logo" style="margin-bottom: 24px;">
+                        <span class="material-symbols-rounded" style="color: var(--google-blue);">fingerprint</span>
+                        DIGITAL<span>FOOTPRINT</span>
+                    </div>
+                    <p style="color: var(--md-sys-color-on-surface-variant);">Tu puerta al universo digital. Calidad
+                        Google, servicio premium.</p>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 16px;">Tienda</h4>
+                    <ul style="list-style: none; display: grid; gap: 8px;">
+                        <li><a href="catalogo.html?filter=fortnite">Fortnite</a></li>
+                        <li><a href="catalogo.html?filter=mayoreo">Mayoreo</a></li>
+                        <li><a href="catalogo.html?filter=streaming">Streaming</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 16px;">Ayuda</h4>
+                    <ul style="list-style: none; display: grid; gap: 8px;">
+                        <li><a href="metodos.html">Métodos de Pago</a></li>
+                        <li><a href="comprar.html">Cómo Comprar</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 16px;">Comunidad</h4>
+                    <a href="https://discord.gg/Aq3TjM4tJT" class="btn btn-secondary" style="width: 100%;">Unirse al
+                        Discord</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Digital Footprint. Designed with Material You principles.</p>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
+        <i class="fab fa-discord"></i>
+    </a>
+
+    <script>
+        // Simple header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+    <script src="products.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

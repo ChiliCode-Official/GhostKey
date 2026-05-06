@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto | Digital Footprint</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Rajdhani:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <a href="index.html">
+                    <span class="logo-text">DIGITAL<span>FOOTPRINT</span></span>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="catalogo.html">Catálogo</a></li>
+                <li><a href="metodos.html">Métodos</a></li>
+                <li><a href="comprar.html">Cómo Comprar</a></li>
+                <li><a href="discord.html">Discord</a></li>
+                <li><a href="contacto.html" class="active">Contacto</a></li>
+            </ul>
+            <button class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="page-header container">
+            <h1 class="text-gradient">¿Necesitas Ayuda?</h1>
+            <p>Estamos disponibles 24/7 para atender tus dudas o pedidos.</p>
+        </section>
+
+        <section class="contact-methods container section-padding">
+            <div class="contact-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="contact-card"
+                    style="background: var(--dark-card); padding: 3rem; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border);">
+                    <i class="fab fa-whatsapp" style="font-size: 3rem; color: #25d366; margin-bottom: 1.5rem;"></i>
+                    <h3>WhatsApp</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Alternativa para quienes no tienen
+                        Discord. Compra y soporte rápido.</p>
+                    <a href="https://wa.me/525574123521" class="btn btn-primary">Chatear Ahora</a>
+                </div>
+                <div class="contact-card"
+                    style="background: var(--dark-card); padding: 3rem; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border);">
+                    <i class="fab fa-discord" style="font-size: 3rem; color: #5865F2; margin-bottom: 1.5rem;"></i>
+                    <h3>Discord</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Soporte por Tickets y Comunidad.</p>
+                    <a href="discord.html" class="btn btn-secondary">Abrir Ticket</a>
+                </div>
+            </div>
+
+            <div class="contact-form-container"
+                style="max-width: 600px; margin: 4rem auto 0; background: var(--glass-bg); padding: 3rem; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center;">
+                <h3 class="white-glow" style="margin-bottom: 2rem;">¿Necesitas ayuda inmediata?</h3>
+                <p style="margin-bottom: 2rem;">No utilizamos formularios lentos. Haz clic en el botón de abajo para
+                    unirte a nuestro servidor de Discord y abrir un ticket de soporte. ¡Estamos listos para atenderte!
+                </p>
+                <a href="https://discord.gg/Aq3TjM4tJT" class="btn btn-primary btn-glow btn-lg"
+                    style="padding: 1rem 3rem;"><i class="fab fa-discord"></i> Soporte vía Discord</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Digital Footprint. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Discord Floating Button -->
+    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
+        <i class="fab fa-discord"></i>
+    </a>
+
+    <script src="products.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

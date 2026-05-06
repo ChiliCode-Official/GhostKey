@@ -1,0 +1,398 @@
+:root {
+    /* Reverted to Original Material You - Google Design System (Light Theme) */
+    --md-sys-color-primary: #0b57d0;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-primary-container: #d3e3fd;
+    --md-sys-color-on-primary-container: #041e49;
+    --md-sys-color-secondary: #006391;
+    --md-sys-color-on-secondary: #ffffff;
+    --md-sys-color-secondary-container: #c2e7ff;
+    --md-sys-color-on-secondary-container: #001d35;
+    --md-sys-color-tertiary: #b9322d;
+    --md-sys-color-on-tertiary: #ffffff;
+    --md-sys-color-tertiary-container: #f9d8d6;
+    --md-sys-color-on-tertiary-container: #3d0001;
+    --md-sys-color-surface: rgba(248, 249, fa, 0.8);
+    --md-sys-color-on-surface: #1f1f1f;
+    --md-sys-color-surface-variant: rgba(225, 227, 225, 0.8);
+    --md-sys-color-on-surface-variant: #444746;
+    --md-sys-color-outline: #747775;
+    --md-sys-color-outline-variant: #c4c7c5;
+    --md-sys-color-inverse-surface: #2f3130;
+    --md-sys-color-inverse-on-surface: #f1f1f1;
+    
+    /* Google Brand Colors */
+    --google-blue: #4285F4;
+    --google-red: #EA4335;
+    --google-yellow: #FBBC05;
+    --google-green: #34A853;
+
+    /* Elevation */
+    --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --md-sys-elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+
+    /* Shapes */
+    --md-sys-shape-corner-extra-small: 4px;
+    --md-sys-shape-corner-small: 8px;
+    --md-sys-shape-corner-medium: 12px;
+    --md-sys-shape-corner-large: 16px;
+    --md-sys-shape-corner-extra-large: 28px;
+    --md-sys-shape-corner-full: 100px;
+
+    /* Fonts */
+    --md-sys-typescale-font: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-font);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Glass effect to make content readable over the background */
+main, section, .header {
+    position: relative;
+    z-index: 1;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.section-padding {
+    padding: 80px 0;
+}
+
+/* Reverted Navbar Styles */
+.header {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    width: 95%;
+    max-width: 450px;
+    display: flex;
+    justify-content: center;
+}
+
+@media (min-width: 992px) {
+    .header {
+        position: sticky;
+        top: 24px;
+        bottom: auto;
+        transform: none;
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 40px;
+    }
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    filter: url('#goo');
+    padding: 8px;
+    width: auto;
+}
+
+.nav-segment {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--md-sys-elevation-2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.segment-logo { width: 64px; height: 64px; border-radius: 20px; position: relative; }
+.segment-links { padding: 6px; border-radius: 24px; }
+.segment-action { width: 64px; height: 64px; border-radius: 20px; }
+
+.logo-img { width: 28px; height: 28px; object-fit: contain; }
+
+.nav-list { display: flex; gap: 4px; list-style: none; margin: 0; }
+.nav-list li a {
+    padding: 10px 18px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-list li a.active.nav-blue { background: #e8f0fe; color: var(--google-blue); }
+.nav-list li a.active.nav-green { background: #e6f4ea; color: var(--google-green); }
+.nav-list li a.active.nav-yellow { background: #fef7e0; color: #b06000; }
+.nav-list li a.active.nav-red { background: #fce8e6; color: var(--google-red); }
+
+/* V-Bucks Star Section - FIXED FOR MOBILE */
+.cta-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(15px);
+    border-radius: 40px;
+    padding: 60px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: var(--md-sys-elevation-3);
+}
+
+.cta-card-visual {
+    flex: 1;
+    min-height: 380px;
+    background-image: url('https://i.imgur.com/3XpcBuu.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.cta-card-content { flex: 1; }
+.top-product-badge {
+    background: var(--google-blue);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+    display: inline-block;
+}
+
+.cta-card h2 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; color: var(--md-sys-color-on-surface); }
+.cta-card p { font-size: 1.1rem; color: var(--md-sys-color-on-surface-variant); margin-bottom: 32px; }
+
+@media (max-width: 992px) {
+    .cta-card {
+        flex-direction: column;
+        padding: 40px 24px;
+        text-align: center;
+    }
+    .cta-card-visual {
+        min-height: 250px;
+        width: 100%;
+        order: -1;
+    }
+}
+
+/* Cards & Grid */
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    padding: 24px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--md-sys-elevation-3);
+}
+
+.card-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--md-sys-color-primary-container);
+    border-radius: var(--md-sys-shape-corner-large);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+/* Hero Section - Full 3D Immersion */
+.hero-3d {
+    position: relative;
+    height: 92vh;
+    min-height: 750px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    overflow: hidden;
+    padding: 0;
+    text-align: center;
+}
+
+.spline-full-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.spline-wrapper {
+    width: 100%;
+    height: calc(100% + 70px);
+    margin-bottom: -70px;
+    overflow: hidden;
+    pointer-events: auto; /* Restored for mouse follow */
+}
+
+spline-viewer {
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y; /* Crucial: allows scrolling on mobile */
+}
+
+.hero-3d-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    pointer-events: none; /* Let clicks pass to Spline unless on text box */
+}
+
+.hero-text-box {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px;
+    /* We push text up slightly so robot at bottom is visible */
+    transform: translateY(-80px);
+    pointer-events: none; /* Allow mouse to pass through to Spline */
+    animation: heroReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes heroReveal {
+    from { opacity: 0; transform: translateY(-40px); }
+    to { opacity: 1; transform: translateY(-80px); }
+}
+
+.hero-title {
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    color: var(--md-sys-color-on-surface);
+    letter-spacing: -0.04em;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--md-sys-color-on-surface-variant);
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    max-width: 650px;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    pointer-events: auto; /* Enable clicks for buttons */
+}
+
+@media (max-width: 992px) {
+    .hero-3d { height: 100vh; min-height: 800px; }
+    .hero-text-box { transform: translateY(-120px); padding: 24px; }
+    @keyframes heroReveal {
+        from { opacity: 0; transform: translateY(-80px); }
+        to { opacity: 1; transform: translateY(-120px); }
+    }
+    .hero-title { font-size: 3.5rem; }
+    .hero-subtitle { font-size: 1.15rem; }
+    .hero-btns { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 24px; border-radius: 100px; font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.2s;
+}
+
+.btn-primary { background: var(--md-sys-color-primary); color: white; }
+.btn-outline { background: transparent; border: 1px solid var(--md-sys-color-outline); color: var(--md-sys-color-primary); }
+.btn-secondary { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+
+/* PWA Install Button Modern Style */
+.btn-install {
+    background: var(--google-blue);
+    color: white;
+    border: none;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-install:hover {
+    background: #1a73e8;
+    transform: scale(1.1);
+}
+
+.btn-install .material-symbols-rounded {
+    font-size: 28px;
+}
+
+
+/* Footer */
+.footer {
+    background: rgba(225, 227, 225, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 80px 0 40px;
+    border-radius: 32px 32px 0 0;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 48px;
+}
+
+/* Floating Discord */
+.discord-float {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: #5865F2;
+    color: white;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: var(--md-sys-elevation-3);
+    z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .nav-list li a span:not(.material-symbols-rounded) { display: none; }
+}

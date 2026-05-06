@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto | Digital Footprint Material</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Digital Footprint | Producto">
+    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SVG Gooey Filter (Required for Navbar across all pages) -->
+    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+    <style>
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+        .product-image-card {
+            background: white;
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: var(--md-sys-elevation-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-image-card img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        @media (max-width: 992px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .product-image-card {
+                padding: 20px;
+            }
+        }
+
+        .product-info-detail h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .product-price-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--google-blue);
+            margin-bottom: 24px;
+        }
+
+        .product-description {
+            font-size: 1.125rem;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .material-input {
+            background: var(--md-sys-color-surface-variant);
+            border: none;
+            border-bottom: 2px solid var(--md-sys-color-outline);
+            padding: 16px;
+            border-radius: 12px 12px 0 0;
+            width: 100%;
+            font-size: 1.25rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .chip-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 8px 20px;
+            border-radius: 100px;
+            border: 1px solid var(--md-sys-color-outline);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .chip.active {
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            border-color: transparent;
+        }
+
+        @media (max-width: 968px) {
+            .product-detail-container { grid-template-columns: 1fr; gap: 40px; }
+            .product-image-large { height: 350px; position: static; }
+            .product-info-detail h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav">
+            <!-- Segment 1: Logo & Cart -->
+            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
+                <span class="material-symbols-rounded">shopping_cart</span>
+                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+            </div>
+
+            <!-- Segment 2: Links -->
+            <div class="nav-segment segment-links">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-blue">
+                        <span class="material-symbols-rounded">home</span>
+                        <span>Inicio</span>
+                    </a></li>
+                    <li><a href="catalogo.html" class="active nav-green">
+                        <span class="material-symbols-rounded">category</span>
+                        <span>Catálogo</span>
+                    </a></li>
+                    <li><a href="metodos.html" class="nav-yellow">
+                        <span class="material-symbols-rounded">payments</span>
+                        <span>Métodos</span>
+                    </a></li>
+                    <li><a href="comprar.html" class="nav-red">
+                        <span class="material-symbols-rounded">help</span>
+                        <span>Ayuda</span>
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Segment 3: Action -->
+            <div class="nav-segment segment-action" id="installSegment">
+                <button class="btn-install" id="installApp">
+                    <span class="material-symbols-rounded">download_for_offline</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-content" style="padding-top: 40px;">
+        <div class="container" id="productDetail">
+            <!-- Content loaded via JS -->
+            <div style="text-align: center; padding: 100px 0;">
+                <span class="material-symbols-rounded" style="font-size: 64px; color: var(--google-blue); animation: spin 1s linear infinite;">progress_activity</span>
+                <p style="margin-top: 24px;">Configurando tu experiencia...</p>
+            </div>
+        </div>
+
+        <section class="container section-padding" style="margin-top: 80px; border-top: 1px solid var(--md-sys-color-outline-variant);">
+            <h2 style="margin-bottom: 32px;">También te puede interesar</h2>
+            <div class="products-grid" id="relatedGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+                <!-- Suggested products loaded via JS -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Digital Footprint. Material Design.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="products.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const productId = parseInt(params.get('id'));
+            const fromFilter = params.get('from') || 'all';
+            const product = products.find(p => p.id === productId);
+            const container = document.getElementById('productDetail');
+
+            if (product) {
+                const backUrl = `catalogo.html?filter=${fromFilter}`;
+
+                if (product.type === 'calculator') {
+                    const unitName = product.unitName || 'Unidades';
+                    const hasGuarantee = product.priceWithGuarantee !== undefined;
+
+                    container.innerHTML = `
+                        <div class="product-detail-container">
+                            <div class="product-image-large">
+                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
+                            </div>
+                            <div class="product-info-detail">
+                                ${product.badge ? `<span style="background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); padding: 4px 16px; border-radius: 100px; font-weight: 600; font-size: 0.8rem; margin-bottom: 16px; display: inline-block;">${product.badge}</span>` : ''}
+                                <h1>${product.name}</h1>
+                                <p class="product-description">${product.description}</p>
+                                
+                                <div style="background: #ffffff; padding: 32px; border-radius: 28px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 32px;">
+                                    ${hasGuarantee ? `
+                                        <div style="margin-bottom: 24px;">
+                                            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Modalidad de servicio</label>
+                                            <div class="chip-group">
+                                                <div class="chip active" data-price="${product.price}">Sin Garantía</div>
+                                                <div class="chip" data-price="${product.priceWithGuarantee}">Con Garantía (+Seguro)</div>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+
+                                    <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Cantidad de ${unitName}</label>
+                                    <div class="qty-selector-large" style="display: flex; align-items: center; gap: 12px; background: var(--md-sys-color-surface-variant); padding: 8px; border-radius: 20px; margin-bottom: 24px;">
+                                        <button id="calcMinus" class="btn-icon" style="width: 48px; height: 48px; border-radius: 16px; border: none; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                            <span class="material-symbols-rounded">remove</span>
+                                        </button>
+                                        <input type="number" id="calcAmount" value="${product.minAmount || 1}" min="${product.minAmount || 1}" step="${product.step || 1}" class="material-input" style="flex: 1; text-align: center; border: none; background: transparent; font-size: 1.5rem; font-weight: 700; padding: 0;">
+                                        <button id="calcPlus" class="btn-icon" style="width: 48px; height: 48px; border-radius: 16px; border: none; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                            <span class="material-symbols-rounded">add</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="product-price-large" id="calculatedPrice" style="margin-top: 32px;">
+                                        $${product.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
+                                    </div>
+                                    <p id="unitCostDesc" style="font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 16px;">
+                                    <button id="addCalculatedBtn" class="btn btn-primary" style="flex: 2; padding: 18px;">
+                                        <span class="material-symbols-rounded">shopping_cart</span>
+                                        Añadir al carrito
+                                    </button>
+                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Calculator Logic
+                    const amountInput = document.getElementById('calcAmount');
+                    const priceDisplay = document.getElementById('calculatedPrice');
+                    const addBtn = document.getElementById('addCalculatedBtn');
+                    const unitCostDesc = document.getElementById('unitCostDesc');
+                    const minusBtn = document.getElementById('calcMinus');
+                    const plusBtn = document.getElementById('calcPlus');
+                    
+                    let currentPrice = product.price;
+                    let currentMode = hasGuarantee ? "Sin Garantía" : "";
+
+                    // Identify if it's "per 1000" (like followers) or "per unit" (like wholesale)
+                    const isPerThousand = product.id === 90; 
+
+                    const updatePrice = () => {
+                        let amount = parseInt(amountInput.value) || 0;
+                        const min = parseInt(amountInput.min) || 1;
+                        
+                        // Force minimum quantity
+                        if (amount < min) {
+                            amount = min;
+                            amountInput.value = min;
+                        }
+
+                        const total = isPerThousand ? (amount * (currentPrice / 1000)) : (amount * currentPrice);
+                        priceDisplay.innerHTML = `$${total.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>`;
+                        
+                        if (isPerThousand) {
+                            unitCostDesc.textContent = `Precio por mil: $${currentPrice.toFixed(2)}`;
+                        } else {
+                            unitCostDesc.textContent = `Precio por unidad: $${currentPrice.toFixed(2)}`;
+                        }
+                        
+                        return { amount, total };
+                    };
+
+                    const chips = document.querySelectorAll('.chip');
+                    chips.forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            chips.forEach(c => c.classList.remove('active'));
+                            chip.classList.add('active');
+                            currentPrice = parseFloat(chip.dataset.price);
+                            currentMode = chip.textContent;
+                            updatePrice();
+                        });
+                    });
+
+                    minusBtn.addEventListener('click', () => {
+                        const step = parseInt(amountInput.step) || 1;
+                        amountInput.value = Math.max(parseInt(amountInput.min), (parseInt(amountInput.value) || 0) - step);
+                        updatePrice();
+                    });
+
+                    plusBtn.addEventListener('click', () => {
+                        const step = parseInt(amountInput.step) || 1;
+                        amountInput.value = (parseInt(amountInput.value) || 0) + step;
+                        updatePrice();
+                    });
+
+                    amountInput.addEventListener('input', updatePrice);
+                    
+                    // Initial calculation
+                    updatePrice();
+
+                    addBtn.addEventListener('click', () => {
+                        const { amount, total } = updatePrice();
+                        addToCartCalculated(product.id, amount, total, unitName, currentMode);
+                    });
+
+                } else if (product.type === 'selectable') {
+                    container.innerHTML = `
+                        <div class="product-detail-container">
+                            <div class="product-image-large">
+                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
+                            </div>
+                            <div class="product-info-detail">
+                                <h1>${product.name}</h1>
+                                <p class="product-description">${product.description}</p>
+                                
+                                <div style="background: #ffffff; padding: 32px; border-radius: 28px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 32px;">
+                                    <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Elige una opción</label>
+                                    <div class="chip-group" id="variantOptions">
+                                        ${product.variants.map((v, i) => `
+                                            <div class="chip ${i === 0 ? 'active' : ''}" data-price="${v.price}" data-name="${v.name}">${v.name}</div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="product-price-large" id="selectedPrice" style="margin-top: 32px;">
+                                        $${product.variants[0].price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 16px;">
+                                    <button id="addVariantBtn" class="btn btn-primary" style="flex: 2; padding: 18px;">
+                                        <span class="material-symbols-rounded">shopping_cart</span>
+                                        Añadir al carrito
+                                    </button>
+                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    const variantChips = document.querySelectorAll('.chip');
+                    const priceDisplay = document.getElementById('selectedPrice');
+                    let currentVariant = product.variants[0];
+
+                    variantChips.forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            variantChips.forEach(c => c.classList.remove('active'));
+                            chip.classList.add('active');
+                            currentVariant = { name: chip.dataset.name, price: parseFloat(chip.dataset.price) };
+                            priceDisplay.innerHTML = `$${currentVariant.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>`;
+                        });
+                    });
+
+                    document.getElementById('addVariantBtn').addEventListener('click', () => {
+                        addToCartCalculated(product.id, currentVariant.name, currentVariant.price, '', '');
+                    });
+                } else {
+                    container.innerHTML = `
+                        <div class="product-detail-container">
+                            <div class="product-image-large">
+                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
+                            </div>
+                            <div class="product-info-detail">
+                                <h1>${product.name}</h1>
+                                <div class="product-price-large">
+                                    $${product.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
+                                </div>
+                                <p class="product-description">${product.description}</p>
+                                <div style="display: flex; gap: 16px;">
+                                    <button onclick="addToCart(${product.id})" class="btn btn-primary" style="flex: 2; padding: 18px;">
+                                        <span class="material-symbols-rounded">shopping_cart</span>
+                                        Añadir al carrito
+                                    </button>
+                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Render Suggestions
+                const relatedGrid = document.getElementById('relatedGrid');
+                const suggestions = products
+                    .filter(p => p.id !== product.id && (p.category === product.category))
+                    .slice(0, 4);
+
+                relatedGrid.innerHTML = suggestions.map(p => `
+                    <div class="card animate-reveal active" onclick="window.location.href='producto.html?id=${p.id}'" style="cursor: pointer;">
+                        <div style="height: 160px; background: #f1f3f4; border-radius: 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center;">
+                             ${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">` : `<span class="material-symbols-rounded">inventory_2</span>`}
+                        </div>
+                        <h3 style="font-size: 1rem; margin-bottom: 4px;">${p.name}</h3>
+                        <p style="font-weight:700; color:var(--google-blue);">$${p.price.toFixed(2)}</p>
+                    </div>
+                `).join('');
+            }
+        });
+    </script>
+</body>
+
+</html>

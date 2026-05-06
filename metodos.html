@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos de Pago | Digital Footprint Material</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Digital Footprint | Métodos de Pago">
+    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://imgur.com/S00u4EI">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SVG Gooey Filter (Required for Navbar across all pages) -->
+    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="nav">
+            <!-- Segment 1: Logo & Cart -->
+            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
+                <span class="material-symbols-rounded">shopping_cart</span>
+                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+            </div>
+
+            <!-- Segment 2: Links -->
+            <div class="nav-segment segment-links">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-blue">
+                        <span class="material-symbols-rounded">home</span>
+                        <span>Inicio</span>
+                    </a></li>
+                    <li><a href="catalogo.html" class="nav-green">
+                        <span class="material-symbols-rounded">category</span>
+                        <span>Catálogo</span>
+                    </a></li>
+                    <li><a href="metodos.html" class="active nav-yellow">
+                        <span class="material-symbols-rounded">payments</span>
+                        <span>Métodos</span>
+                    </a></li>
+                    <li><a href="comprar.html" class="nav-red">
+                        <span class="material-symbols-rounded">help</span>
+                        <span>Ayuda</span>
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Segment 3: Action -->
+            <div class="nav-segment segment-action" id="installSegment">
+                <button class="btn-install" id="installApp">
+                    <span class="material-symbols-rounded">download_for_offline</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="section-padding" style="background: var(--md-sys-color-primary-container); border-radius: 0 0 40px 40px;">
+            <div class="container">
+                <h1 style="color: var(--md-sys-color-on-primary-container);">Pagos Seguros</h1>
+                <p style="color: var(--md-sys-color-on-primary-container); opacity: 0.8; max-width: 600px;">Aceptamos transferencias bancarias nacionales y depósitos en efectivo para tu comodidad.</p>
+            </div>
+        </section>
+
+        <section class="container section-padding">
+            <div class="benefits-grid">
+                <div class="card">
+                    <span class="material-symbols-rounded" style="font-size: 40px; color: var(--google-blue);">account_balance</span>
+                    <h3>Transferencia (SPEI)</h3>
+                    <p>Transferencias inmediatas desde cualquier aplicación bancaria en México. Sin comisiones.</p>
+                </div>
+                <div class="card">
+                    <span class="material-symbols-rounded" style="font-size: 40px; color: var(--google-red);">payments</span>
+                    <h3>Efectivo (OXXO/Tiendas)</h3>
+                    <p>Realiza tu depósito en efectivo en cualquier OXXO, 7-Eleven o ventanilla bancaria.</p>
+                </div>
+            </div>
+
+            <div class="cta-card" style="margin-top: 60px; background: #e8f0fe; border: none; flex-direction: column; align-items: start; gap: 24px; color: #041e49;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <i class="fab fa-discord" style="font-size: 48px; color: #5865F2;"></i>
+                    <h2 style="color: #041e49;">¿Por qué preferimos Discord?</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; width: 100%;">
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 8px;">Sistema de Tickets</h4>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Atención privada y organizada. Nada se pierde.</p>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 8px;">Garantía Real</h4>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">El historial del ticket valida tu compra al instante.</p>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 8px;">Referencias</h4>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Miles de clientes reales han dejado su opinión.</p>
+                    </div>
+                </div>
+                <a href="https://discord.gg/Aq3TjM4tJT" class="btn btn-primary" style="background: #5865F2;">Unirse al Servidor</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Digital Footprint. Secure Payments.</p>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
+        <i class="fab fa-discord"></i>
+    </a>
+
+    <script src="products.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
