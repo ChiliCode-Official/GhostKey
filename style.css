@@ -12,7 +12,7 @@
     --md-sys-color-on-tertiary: #ffffff;
     --md-sys-color-tertiary-container: #f9d8d6;
     --md-sys-color-on-tertiary-container: #3d0001;
-    --md-sys-color-surface: rgba(248, 249, fa, 0.8);
+    --md-sys-color-surface: rgba(248, 249, 250, 0.8);
     --md-sys-color-on-surface: #1f1f1f;
     --md-sys-color-surface-variant: rgba(225, 227, 225, 0.8);
     --md-sys-color-on-surface-variant: #444746;
@@ -395,4 +395,202 @@ spline-viewer {
 
 @media (max-width: 768px) {
     .nav-list li a span:not(.material-symbols-rounded) { display: none; }
+}
+
+/* Agency Promotion Section */
+.agency-promo-section {
+    background: linear-gradient(135deg, #0b57d0 0%, #4285f4 50%, #34a853 100%);
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.agency-promo-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/cubes.png');
+    opacity: 0.1;
+}
+
+.agency-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 50px;
+    padding: 80px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 2;
+    transition: transform 0.4s ease;
+}
+
+.agency-card:hover {
+    transform: scale(1.02);
+}
+
+.agency-content {
+    flex: 1.5;
+}
+
+.agency-badge {
+    background: var(--google-yellow);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(251, 188, 5, 0.4);
+}
+
+.agency-card h2 {
+    font-size: 4rem;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: #1f1f1f;
+    font-weight: 900;
+}
+
+.agency-card p {
+    font-size: 1.4rem;
+    color: #444;
+    margin-bottom: 40px;
+    max-width: 650px;
+    line-height: 1.4;
+}
+
+.agency-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+}
+
+.agency-socials {
+    display: flex;
+    gap: 16px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 100px;
+    background: #f1f3f4;
+    color: #1f1f1f;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.social-link.instagram:hover {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(214, 36, 159, 0.3);
+}
+
+.agency-logo-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.agency-logo {
+    width: 280px;
+    height: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.agency-card:hover .agency-logo {
+    transform: scale(1.15) rotate(10deg);
+}
+
+.agency-btn {
+    padding: 20px 40px;
+    font-size: 1.3rem;
+    background: #0b57d0;
+    box-shadow: 0 15px 30px rgba(11, 87, 208, 0.3);
+}
+
+@media (max-width: 992px) {
+    .agency-card {
+        flex-direction: column;
+        padding: 60px 30px;
+        text-align: center;
+        gap: 50px;
+        border-radius: 40px;
+    }
+    .agency-card h2 {
+        font-size: 2.8rem;
+    }
+    .agency-card p {
+        font-size: 1.2rem;
+    }
+    .agency-action {
+        justify-content: center;
+    }
+    .agency-logo {
+        width: 180px;
+        height: 180px;
+    }
+}
+
+
+/* Agency Watermark */
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.agency-watermark p {
+    font-size: 0.85rem;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.agency-watermark a {
+    font-weight: 700;
+    color: var(--google-blue);
+    text-decoration: none;
+}
+
+.agency-watermark a:hover {
+    text-decoration: underline;
+}
+
+.heart {
+    color: var(--google-red);
+    display: inline-block;
+    animation: heartbeat 1.5s ease infinite;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.3); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.3); }
+    70% { transform: scale(1); }
+}
+
+@media (max-width: 600px) {
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
 }
