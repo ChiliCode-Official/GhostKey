@@ -204,12 +204,26 @@ const products = [
         category: "streaming",
         type: "selectable",
         icon: "fas fa-owl",
-        image: "https://i.imgur.com/LE4UIfT.png",
+        image: "https://i.imgur.com/bctv2i5.png",
         badge: "Sin Anuncios 🧸",
         description: "Aprende idiomas sin interrupciones con Duolingo Super. Corazones ilimitados y más.",
         variants: [
             { name: "1 Año 🧸", price: 65.00 },
             { name: "3 Meses 🧸", price: 68.00 }
+        ]
+    },
+    {
+        id: 311,
+        name: "Chat GPT",
+        category: "streaming",
+        type: "selectable",
+        icon: "fas fa-robot",
+        image: "https://i.imgur.com/y6wliYM.png",
+        badge: "AI Premium",
+        description: "Acceso a las funciones más avanzadas de ChatGPT. Cuenta nueva renovable o activación en tu propia cuenta.",
+        variants: [
+            { name: "Cuenta nueva (renovable pagando 2 dias antes de que venza)", price: 75.00 },
+            { name: "Cuenta principal por invitacion a correo", price: 83.00 }
         ]
     },
     {
