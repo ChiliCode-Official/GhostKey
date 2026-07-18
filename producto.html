@@ -112,6 +112,7 @@
         let product = null;
         let userData = null;
         let stockStatus = 'disponible'; // Default
+        let defaultCredentials = '';
 
         document.addEventListener("DOMContentLoaded", async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -127,6 +128,8 @@
                 const prodDoc = await getDoc(doc(db, "products", String(id)));
                 if(prodDoc.exists()) {
                     product = prodDoc.data();
+                    // We must attach id to the product object manually if it's not inside data()
+                    product.id = prodDoc.id;
                 } else if (typeof products !== 'undefined') {
                     // Fallback to local products.js if DB is completely empty (before admin seeded)
                     product = products.find(p => String(p.id) === String(id));
@@ -155,7 +158,7 @@
                 const stockDoc = await getDoc(doc(db, "products_stock", String(product.id)));
                 if(stockDoc.exists()) {
                     stockStatus = stockDoc.data().status || 'disponible';
-                    defaultCredentials = stockDoc.data().textToDeliver || '';
+                    defaultCredentials = stockDoc.data().credentialsPool || '';
                 }
             } catch(e) {
                 console.error("Error fetching stock configuration:", e);

@@ -70,50 +70,15 @@
     place-items: center;
     z-index: 1;
 }
-
-.gooey-nav-container .effect.text {
-    color: white;
-    transition: color 0.3s ease;
-}
-
-.gooey-nav-container .effect.text.active {
-    color: black;
-}
-
 .gooey-nav-container .effect.filter {
-    filter: blur(7px) contrast(100) blur(0);
-    mix-blend-mode: lighten;
-}
-
-.gooey-nav-container .effect.filter::before {
-    content: '';
-    position: absolute;
-    inset: -75px;
-    z-index: -2;
-    background: black;
-}
-
-.gooey-nav-container .effect.filter::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+    /* Removed SVG filters and blend modes to prevent the black square artifact */
     background: white;
-    transform: scale(0);
-    opacity: 0;
-    z-index: -1;
     border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.55, 0, 1, 0.45);
+    z-index: 2;
 }
 
-.gooey-nav-container .effect.active::after {
-    animation: pill 0.3s ease both;
-}
-
-@keyframes pill {
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+/* Removed ::before and ::after pseudo-elements that caused the black square */
 
 /* Particles for GooeyNav */
 .particle, .point {

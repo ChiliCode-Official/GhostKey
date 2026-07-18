@@ -63,14 +63,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const mayoreoContainer = document.getElementById('mayoreoProducts');
 
     const renderProducts = async () => {
-        if (typeof products === 'undefined') return;
+        let allProducts = [];
+        let stockMap = {};
+
+        // Fetch products from Firestore
+        try {
+            const prodSnap = await getDocs(collection(db, "products"));
+            if (!prodSnap.empty) {
+                prodSnap.forEach(docSnap => {
+                    allProducts.push({ id: docSnap.id, ...docSnap.data() });
+                });
+            } else if (typeof products !== 'undefined') {
+                allProducts = products;
+            }
+        } catch (e) {
+            console.error("Firebase connection issue:", e);
+            if (typeof products !== 'undefined') allProducts = products;
+        }
+
+        if (allProducts.length === 0) return;
 
         // Fetch stock status from Firestore
-        let stockMap = {};
         try {
             const stockSnap = await getDocs(collection(db, "products_stock"));
             stockSnap.forEach(docSnap => {
-                stockMap[docSnap.data().productId] = docSnap.data();
+                stockMap[docSnap.id] = docSnap.data();
             });
         } catch(e) {
             console.error("Firestore offline or configuration issue:", e);
@@ -119,12 +136,12 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         if (featuredContainer) {
-            const featured = products.filter(p => p.category === 'vbucks' || p.category === 'crew').slice(0, 4);
+            const featured = allProducts.filter(p => p.category === 'vbucks' || p.category === 'crew').slice(0, 4);
             featuredContainer.innerHTML = featured.map(renderProductCard).join('');
         }
 
         if (mayoreoContainer) {
-            const mayoreo = products.filter(p => p.category === 'mayoreo').slice(0, 4);
+            const mayoreo = allProducts.filter(p => p.category === 'mayoreo').slice(0, 4);
             mayoreoContainer.innerHTML = mayoreo.map(renderProductCard).join('');
         }
 

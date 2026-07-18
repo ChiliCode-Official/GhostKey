@@ -58,23 +58,20 @@ function createGooeyNav() {
     // Effects
     const filterEffect = document.createElement('span');
     filterEffect.className = 'effect filter';
-    const textEffect = document.createElement('span');
-    textEffect.className = 'effect text';
     
     container.appendChild(nav);
     container.appendChild(filterEffect);
-    container.appendChild(textEffect);
 
     // Initial positioning
     setTimeout(() => {
         const activeLi = ul.children[activeIndex];
-        if (activeLi) updateEffectPosition(activeLi, container, filterEffect, textEffect);
+        if (activeLi) updateEffectPosition(activeLi, container, filterEffect);
     }, 100);
 
     return container;
 }
 
-function updateEffectPosition(element, container, filterRef, textRef) {
+function updateEffectPosition(element, container, filterRef) {
     const containerRect = container.getBoundingClientRect();
     const pos = element.getBoundingClientRect();
 
@@ -86,28 +83,20 @@ function updateEffectPosition(element, container, filterRef, textRef) {
     };
     
     Object.assign(filterRef.style, styles);
-    Object.assign(textRef.style, styles);
-    // clone content for text effect
-    textRef.innerHTML = element.innerHTML;
 }
 
 function handleGooeyClick(liEl, ul, container) {
     const filterRef = container.querySelector('.effect.filter');
-    const textRef = container.querySelector('.effect.text');
     
     // Update active class
     Array.from(ul.children).forEach(child => child.classList.remove('active'));
     liEl.classList.add('active');
 
-    updateEffectPosition(liEl, container, filterRef, textRef);
+    updateEffectPosition(liEl, container, filterRef);
 
     // Particles
     const particles = filterRef.querySelectorAll('.particle');
     particles.forEach(p => p.remove());
-
-    textRef.classList.remove('active');
-    void textRef.offsetWidth; // trigger reflow
-    textRef.classList.add('active');
 
     makeParticles(filterRef);
 }

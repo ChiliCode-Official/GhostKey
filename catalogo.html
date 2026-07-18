@@ -115,7 +115,7 @@
             try {
                 const stockSnap = await getDocs(collection(db, "products_stock"));
                 stockSnap.forEach(docSnap => {
-                    stockMap[docSnap.data().productId] = docSnap.data();
+                    stockMap[docSnap.id] = docSnap.data();
                 });
             } catch(e) {
                 console.error("Firebase stock check offline.");
