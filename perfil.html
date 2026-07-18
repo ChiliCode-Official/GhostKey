@@ -283,7 +283,7 @@
                         </div>
 
                         <h3>Mis Pedidos</h3>
-                        <div class="table-container">
+                        <div class="table-container" style="margin-bottom: 30px;">
                             <table id="userOrdersTable">
                                 <thead>
                                     <tr>
@@ -297,6 +297,11 @@
                                     <!-- Populated by JS -->
                                 </tbody>
                             </table>
+                        </div>
+
+                        <h3>Mi Lista de Deseos <i class="fas fa-heart" style="color:var(--accent-red);"></i></h3>
+                        <div class="products-grid" id="userWishlistGrid" style="margin-top: 15px;">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
 
@@ -460,6 +465,8 @@
 
     <script src="sparks.js"></script>
     <script src="products.js"></script>
+    <script src="navigation.js"></script>
+    <script type="module" src="wishlist.js"></script>
     <script type="module" src="perfil.js"></script>
     <script>
         function switchAdminTab(tabId) {

@@ -110,8 +110,10 @@ async function loadUserData() {
     
     const userRef = doc(db, "users", currentUser.uid);
     const userSnap = await getDoc(userRef);
+    let userData = null;
     if (userSnap.exists()) {
-        document.getElementById('userBalance').innerText = `$${userSnap.data().balance.toFixed(2)} MXN`;
+        userData = userSnap.data();
+        document.getElementById('userBalance').innerText = `$${userData.balance.toFixed(2)} MXN`;
     }
 
     const q = query(collection(db, "orders"), where("uid", "==", currentUser.uid));
@@ -121,24 +123,57 @@ async function loadUserData() {
     
     if (querySnapshot.empty) {
         tbody.innerHTML = '<tr><td colspan="4">No tienes pedidos aún.</td></tr>';
-        return;
+    } else {
+        querySnapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            let statusBadge = '';
+            if (data.status === 'pendiente') statusBadge = '<span style="color: #ffb703;">Pendiente</span>';
+            if (data.status === 'confirmado') statusBadge = '<span style="color: #00ff00;">Entregado</span>';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-size: 0.8em; color: rgba(255,255,255,0.5);">${docSnap.id.substring(0,8)}...</td>
+                    <td>${data.productName}</td>
+                    <td>${statusBadge}</td>
+                    <td style="font-family: monospace; color: #5113fa;">${data.textDelivered || 'Procesando...'}</td>
+                </tr>
+            `;
+        });
     }
 
-    querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        let statusBadge = '';
-        if (data.status === 'pendiente') statusBadge = '<span style="color: #ffb703;">Pendiente</span>';
-        if (data.status === 'confirmado') statusBadge = '<span style="color: #00ff00;">Entregado</span>';
-        
-        tbody.innerHTML += `
-            <tr>
-                <td style="font-size: 0.8em; color: rgba(255,255,255,0.5);">${docSnap.id.substring(0,8)}...</td>
-                <td>${data.productName}</td>
-                <td>${statusBadge}</td>
-                <td style="font-family: monospace; color: #5113fa;">${data.textDelivered || 'Procesando...'}</td>
-            </tr>
-        `;
-    });
+    // Render Wishlist
+    const wishlistGrid = document.getElementById('userWishlistGrid');
+    if (wishlistGrid) {
+        wishlistGrid.innerHTML = '';
+        const wishlistIds = userData?.wishlist || [];
+        if (wishlistIds.length === 0) {
+            wishlistGrid.innerHTML = '<p style="color:var(--text-secondary);">No tienes productos en tu lista de deseos.</p>';
+        } else {
+            const productsSnap = await getDocs(collection(db, "products"));
+            let productsMap = {};
+            productsSnap.forEach(d => { productsMap[d.id] = {id: d.id, ...d.data()} });
+            
+            wishlistIds.forEach(pid => {
+                const p = productsMap[pid];
+                if (p) {
+                    wishlistGrid.innerHTML += `
+                        <div class="product-card" onclick="window.location.href='producto.html?id=${p.id}'" style="cursor:pointer; display:flex; flex-direction:column;">
+                            <div class="product-image-container" style="height:120px;">
+                                <img src="${p.image}" alt="${p.name}">
+                            </div>
+                            <div class="product-info" style="padding:12px;">
+                                <h4 class="product-title" style="font-size:0.9rem; margin-bottom:8px;">${p.name}</h4>
+                                <div class="product-footer">
+                                    <span class="price">$${p.price.toFixed(2)}</span>
+                                    <button class="wishlist-btn active" data-productid="${p.id}" onclick="event.stopPropagation(); toggleWishlist('${p.id}'); this.closest('.product-card').remove();" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="fas fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+    }
 }
 
 // Admin Data Loading

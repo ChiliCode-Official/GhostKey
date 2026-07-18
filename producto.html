@@ -59,7 +59,10 @@
                     </div>
                     <div class="modal-details" style="background: var(--card-bg); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; border: 1px solid var(--border-color); border-left: none;">
                         <span id="prodCategory" style="color: var(--accent-yellow); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block;">Categoría</span>
-                        <h2 id="prodName" style="font-size: 2.5rem; margin-bottom: 8px;">Cargando...</h2>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
+                            <h2 id="prodName" style="font-size: 2.5rem; margin-bottom: 0;">Cargando...</h2>
+                            <button class="wishlist-btn" id="prodWishlistBtn" onclick="toggleWishlist(new URLSearchParams(window.location.search).get('id'))" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:2rem; transition:color 0.3s; margin-top:5px;"><i class="far fa-heart"></i></button>
+                        </div>
                         
                         <div id="stockBadgeContainer" style="margin-bottom: 16px;">
                             <!-- Injected stock phase badge -->
@@ -99,6 +102,8 @@
 
     <script src="sparks.js"></script>
     <script src="products.js"></script>
+    <script src="navigation.js"></script>
+    <script type="module" src="wishlist.js"></script>
     <script type="module">
         import { auth, db } from "./firebase-config.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
