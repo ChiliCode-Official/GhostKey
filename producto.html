@@ -181,6 +181,11 @@
             } else if (stockStatus === 'agotado') {
                 badgeClass = 'stock-agotado';
                 label = 'Agotado';
+            } else {
+                const lines = defaultCredentials.split('\n').filter(l => l.trim() !== '');
+                if (lines.length > 0) {
+                    label = `En Stock (${lines.length})`;
+                }
             }
 
             container.innerHTML = `<span class="stock-badge ${badgeClass}">${label}</span>`;

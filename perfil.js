@@ -72,23 +72,36 @@ adminLogoutBtn.onclick = () => signOut(auth);
 
 // --- SEEDING FUNCTION ---
 async function checkAndSeedProducts() {
-    const querySnapshot = await getDocs(collection(db, "products"));
-    if (querySnapshot.empty && typeof products !== 'undefined') {
-        console.log("Seeding products to Firestore...");
-        for (const p of products) {
-            await setDoc(doc(db, "products", String(p.id)), p);
+    try {
+        if (typeof products !== 'undefined') {
+            let seededAny = false;
+            for (const p of products) {
+                const docRef = doc(db, "products", String(p.id));
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    await setDoc(docRef, p);
+                    seededAny = true;
+                }
+            }
+            if(seededAny) console.log("Seeding complete.");
         }
-        console.log("Seeding complete.");
+        
+        // Load products array from Firestore for Admin usage
+        const freshSnap = await getDocs(collection(db, "products"));
+        allProducts = [];
+        freshSnap.forEach(docSnap => {
+            allProducts.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        // Sort by numeric id if possible
+        allProducts.sort((a,b) => parseInt(a.id) - parseInt(b.id));
+    } catch(e) {
+        console.error("Error al cargar/sembrar productos:", e);
+        alert("⚠️ No se pudieron cargar los productos. Asegúrate de haber actualizado las Reglas de Firebase (Rules) como te indiqué. Si no lo haces, Firebase bloquea el acceso.");
+        // Fallback a los locales para que el panel no quede en blanco
+        if (typeof products !== 'undefined') {
+            allProducts = [...products];
+        }
     }
-    
-    // Load products array from Firestore for Admin usage
-    const freshSnap = await getDocs(collection(db, "products"));
-    allProducts = [];
-    freshSnap.forEach(docSnap => {
-        allProducts.push({ id: docSnap.id, ...docSnap.data() });
-    });
-    // Sort by numeric id if possible
-    allProducts.sort((a,b) => parseInt(a.id) - parseInt(b.id));
 }
 
 // User Data Loading

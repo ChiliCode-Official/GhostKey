@@ -159,7 +159,7 @@
             }
 
             const renderProductCard = (product) => {
-                const prodStock = stockMap[product.id] || { status: 'disponible' };
+                const prodStock = stockMap[product.id] || { status: 'disponible', credentialsPool: '' };
                 let badgeClass = 'stock-disponible';
                 let label = 'Disponible';
                 let isDisabled = false;
@@ -171,6 +171,12 @@
                     badgeClass = 'stock-agotado';
                     label = 'Agotado';
                     isDisabled = true;
+                } else {
+                    const pool = prodStock.credentialsPool || "";
+                    const lines = pool.split('\n').filter(l => l.trim() !== '');
+                    if (lines.length > 0) {
+                        label = `En Stock (${lines.length})`;
+                    }
                 }
 
                 const badgeHtml = `<div class="product-badge stock-badge ${badgeClass}">${label}</div>`;
