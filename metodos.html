@@ -58,49 +58,72 @@
             <div class="content-scroll">
                 <section class="gsap-reveal" style="max-width: 800px; margin: 0 auto; padding-top: 40px;">
                     <div style="text-align: center; margin-bottom: 48px;">
-                        <i class="fas fa-wallet" style="font-size: 3rem; color: var(--accent-blue); margin-bottom: 16px;"></i>
-                        <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Métodos de Pago</h2>
-                        <p style="color: var(--text-secondary); font-size: 1.1rem;">Aceptamos múltiples formas de pago seguras para tu comodidad.</p>
+                        <i class="fas fa-wallet" style="font-size: 3rem; color: var(--accent-yellow); margin-bottom: 16px;"></i>
+                        <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Métodos de Pago y Recargas</h2>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">Usa las siguientes cuentas para transferir y agregar saldo o pagar pedidos directamente. Guarda tu comprobante.</p>
                     </div>
 
-                    <div style="display: grid; gap: 24px;">
-                        <div style="background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 24px;">
-                            <img src="https://logospng.org/download/mercado-pago/logo-mercado-pago-icone-1024.png" alt="Mercado Pago" style="width: 64px; height: 64px; object-fit: contain;">
-                            <div>
-                                <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Mercado Pago (Transferencia / OXXO)</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">El método más rápido y seguro en México. Aceptamos transferencias STP y pagos en efectivo en tiendas OXXO.</p>
-                            </div>
-                        </div>
-
-                        <div style="background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 24px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png" alt="PayPal" style="width: 64px; object-fit: contain;">
-                            <div>
-                                <h3 style="font-size: 1.2rem; margin-bottom: 8px;">PayPal (Internacional)</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">Para clientes fuera de México. Los pagos mediante PayPal requieren un proceso de verificación por motivos de seguridad.</p>
-                            </div>
-                        </div>
-
-                        <div style="background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 24px;">
-                            <i class="fas fa-university" style="font-size: 3rem; color: var(--accent-green); width: 64px; text-align: center;"></i>
-                            <div>
-                                <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Transferencia Bancaria Directa</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">Puedes realizar un SPEI directo a nuestra cuenta bancaria. Los datos se proporcionan al momento de confirmar tu pedido.</p>
-                            </div>
-                        </div>
+                    <div style="display: grid; gap: 24px;" id="methodsGrid">
+                        <div style="text-align:center; padding:40px; color:var(--text-secondary);">Cargando métodos de pago...</div>
                     </div>
                 </section>
             </div>
         </main>
     </div>
     <script src="sparks.js"></script>
-    <script>
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.utils.toArray('.gsap-reveal').forEach(elem => {
-            gsap.to(elem, {
-                scrollTrigger: { trigger: elem, scroller: ".content-scroll", start: "top 85%" },
-                opacity: 1, y: 0, duration: 0.8, ease: "power3.out"
-            });
+    <script type="module">
+        import { db } from "./firebase-config.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const grid = document.getElementById('methodsGrid');
+            try {
+                const snap = await getDocs(collection(db, "payment_methods"));
+                const methods = [];
+                snap.forEach(docSnap => methods.push(docSnap.data()));
+
+                const activeMethods = methods.filter(m => m.active);
+
+                if(activeMethods.length === 0) {
+                    grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">No hay métodos de pago activos en este momento.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = activeMethods.map(m => `
+                    <div style="background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 24px; position:relative;">
+                        <i class="fas fa-university" style="font-size: 3rem; color: var(--accent-yellow); width: 64px; text-align: center;"></i>
+                        <div style="flex-grow:1;">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">${m.bank}</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom:4px;"><strong>Beneficiario:</strong> ${m.name}</p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom:4px;"><strong>Cuenta / CLABE:</strong> <span style="font-family:monospace; color:white; font-size:1.1rem;">${m.account}</span></p>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;"><strong>Concepto sugerido:</strong> ${m.concept || 'Pago DF'}</p>
+                        </div>
+                        <button class="action-btn" onclick="window.copyToClipboard('${m.account}')" style="background:#2a2a35;" title="Copiar número de cuenta">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                `).join('');
+
+                gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+                    gsap.to(elem, {
+                        scrollTrigger: { trigger: elem, scroller: ".content-scroll", start: "top 85%" },
+                        opacity: 1, y: 0, duration: 0.8, ease: "power3.out"
+                    });
+                });
+
+            } catch(e) {
+                console.error(e);
+                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">Error al cargar los métodos de pago.</div>`;
+            }
         });
+
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("¡Número de cuenta copiado: " + text + "!");
+            });
+        };
     </script>
 </body>
 </html>

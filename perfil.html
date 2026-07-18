@@ -273,10 +273,13 @@
                             <button id="logoutBtn" class="tab-btn">Cerrar Sesión</button>
                         </div>
                         
-                        <div class="stat-card">
+                        <div class="stat-card" style="position: relative;">
                             <div>Saldo Disponible</div>
                             <div class="stat-value" id="userBalance">$0.00 MXN</div>
-                            <div style="margin-top: 10px; font-size: 0.9em; color: rgba(255,255,255,0.6);">Para agregar saldo, contacta al soporte con tu comprobante de transferencia. UID: <span id="userUidDisplay"></span></div>
+                            <button class="action-btn" onclick="window.location.href='metodos.html'" style="position: absolute; right: 20px; top: 20px; background: var(--accent-yellow); color: black;">
+                                <i class="fas fa-plus-circle"></i> Recargar
+                            </button>
+                            <div style="margin-top: 10px; font-size: 0.9em; color: rgba(255,255,255,0.6);">Para agregar saldo, transfiere usando nuestros métodos de pago y contacta soporte. UID: <span id="userUidDisplay"></span></div>
                         </div>
 
                         <h3>Mis Pedidos</h3>
@@ -309,6 +312,7 @@
                             <button class="tab-btn" onclick="switchAdminTab('users')">Gestión de Usuarios</button>
                             <button class="tab-btn" onclick="switchAdminTab('inventory')">Inventario & Stock</button>
                             <button class="tab-btn" onclick="switchAdminTab('products')">Gestión Catálogo</button>
+                            <button class="tab-btn" onclick="switchAdminTab('paymentMethods')">Métodos de Pago</button>
                         </div>
 
                         <!-- Orders Tab -->
@@ -317,9 +321,11 @@
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th>ID Pedido</th>
                                             <th>Cliente</th>
                                             <th>Producto</th>
                                             <th>Pago</th>
+                                            <th>Estado</th>
                                             <th>Acción</th>
                                         </tr>
                                     </thead>
@@ -406,6 +412,40 @@
                                         </tr>
                                     </thead>
                                     <tbody id="adminCatalogTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payment Methods Tab -->
+                        <div id="tab-paymentMethods" class="admin-panel-content">
+                            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3>Agregar Método de Pago</h3>
+                                <input type="hidden" id="editPayMethodId">
+                                <input type="text" id="newPayMethodBank" class="admin-input" placeholder="Banco/Método (ej. BBVA, OXXO)" style="width:100%; max-width: none;"><br>
+                                <input type="text" id="newPayMethodName" class="admin-input" placeholder="Nombre del Beneficiario" style="width:100%; max-width: none;"><br>
+                                <input type="text" id="newPayMethodAccount" class="admin-input" placeholder="CLABE o Número de Cuenta" style="width:100%; max-width: none;"><br>
+                                <input type="text" id="newPayMethodConcept" class="admin-input" placeholder="Concepto de Transferencia" style="width:100%; max-width: none;"><br>
+                                <div style="display:flex; align-items:center; gap: 10px; margin-top: 10px;">
+                                    <input type="checkbox" id="newPayMethodActive" checked> <label for="newPayMethodActive">Activo (Visible para los clientes)</label>
+                                </div>
+                                <button class="action-btn" onclick="window.savePaymentMethod()" id="savePayMethodBtn" style="width: 100%; margin-top: 15px;">Guardar Método</button>
+                                <button class="action-btn reject" onclick="window.resetPaymentMethodForm()" id="cancelPayMethodBtn" style="display:none; width: 100%; margin-top: 10px;">Cancelar Edición</button>
+                            </div>
+
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Estado</th>
+                                            <th>Banco</th>
+                                            <th>Cuenta</th>
+                                            <th>Beneficiario</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminPaymentMethodsTable">
                                         <!-- Populated by JS -->
                                     </tbody>
                                 </table>

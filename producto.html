@@ -73,8 +73,19 @@
                                     <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">Precio Total</span>
                                     <span class="price" style="font-size: 2rem; color: white;" id="prodPrice">$0.00 <span style="font-size:1rem; color:var(--text-secondary);">MXN</span></span>
                                 </div>
-                                <div id="userBalanceText" style="font-size: 0.9rem; color: var(--text-secondary); text-align: right;">
-                                    <!-- Injected balance -->
+                                <div style="text-align: right;">
+                                    <div id="userBalanceText" style="font-size: 0.9rem; color: var(--text-secondary);">
+                                        <!-- Injected balance -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Partial Credit Selector -->
+                            <div id="balanceSelectorContainer" style="display:none; background: rgba(0,0,0,0.3); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <label style="font-size: 0.85rem; color: var(--text-secondary); display:block; margin-bottom: 8px;">Créditos a usar:</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="number" id="balanceToUseInput" class="admin-input" style="flex-grow:1; text-align:right;" min="0" value="0">
+                                    <span style="color:var(--text-secondary);">MXN</span>
                                 </div>
                             </div>
                             
@@ -193,33 +204,74 @@
 
         const updateBuyButtonState = () => {
             const buyBtn = document.getElementById('buyButton');
+            const balanceInputContainer = document.getElementById('balanceSelectorContainer');
+            const balanceInput = document.getElementById('balanceToUseInput');
             
             if (stockStatus === 'agotado') {
                 buyBtn.textContent = "PRODUCTO AGOTADO";
                 buyBtn.disabled = true;
                 buyBtn.onclick = null;
+                balanceInputContainer.style.display = 'none';
                 return;
             }
 
             buyBtn.disabled = false;
 
             const price = product.price;
-            const balance = userData.balance;
+            const balance = userData ? userData.balance : 0;
 
-            if (balance >= price) {
+            if (balance > 0) {
+                balanceInputContainer.style.display = 'block';
+                
+                // Max balance they can use is either their full balance, or the price of the product
+                const maxUsable = Math.min(balance, price);
+                balanceInput.max = maxUsable;
+                
+                // Default to max usable on first load
+                if(!balanceInput.dataset.initialized) {
+                    balanceInput.value = maxUsable;
+                    balanceInput.dataset.initialized = 'true';
+                }
+                
+                // Add event listener to update dynamic button text
+                balanceInput.addEventListener('input', () => {
+                    let val = parseFloat(balanceInput.value);
+                    if(isNaN(val)) val = 0;
+                    if(val < 0) balanceInput.value = 0;
+                    if(val > maxUsable) balanceInput.value = maxUsable;
+                    updateBuyButtonText();
+                });
+            } else {
+                balanceInputContainer.style.display = 'none';
+            }
+            
+            updateBuyButtonText();
+        };
+
+        const updateBuyButtonText = () => {
+            const buyBtn = document.getElementById('buyButton');
+            const price = product.price;
+            const balanceInput = document.getElementById('balanceToUseInput');
+            
+            let val = parseFloat(balanceInput.value) || 0;
+            
+            if (!userData || userData.balance === 0) {
+                buyBtn.textContent = "PAGAR CON TRANSFERENCIA BANCARIA";
+                buyBtn.onclick = () => procesarCompra('transferencia', 0);
+            } else if (val === price) {
                 buyBtn.textContent = `COMPRAR CON SALDO ($${price.toFixed(2)} MXN)`;
-                buyBtn.onclick = () => procesarCompra('saldo');
-            } else if (balance > 0) {
-                const restante = price - balance;
-                buyBtn.textContent = `COMBINAR: $${balance.toFixed(2)} Saldo + $${restante.toFixed(2)} Transferencia`;
-                buyBtn.onclick = () => procesarCompra('combinado');
+                buyBtn.onclick = () => procesarCompra('saldo', val);
+            } else if (val > 0) {
+                const restante = price - val;
+                buyBtn.textContent = `COMBINAR: $${val.toFixed(2)} Saldo + $${restante.toFixed(2)} Transf.`;
+                buyBtn.onclick = () => procesarCompra('combinado', val);
             } else {
                 buyBtn.textContent = "PAGAR CON TRANSFERENCIA BANCARIA";
-                buyBtn.onclick = () => procesarCompra('transferencia');
+                buyBtn.onclick = () => procesarCompra('transferencia', 0);
             }
         };
 
-        const procesarCompra = async (metodo) => {
+        const procesarCompra = async (metodo, balanceUsed) => {
             const buyBtn = document.getElementById('buyButton');
             buyBtn.disabled = true;
             buyBtn.textContent = "Procesando pedido...";
@@ -230,31 +282,28 @@
 
                 let finalStatus = 'pendiente';
                 let finalDeliveredText = '';
-                let finalBalance = balance;
-
-                if (metodo === 'saldo') {
-                    finalBalance = balance - price;
-                } else if (metodo === 'combinado') {
-                    finalBalance = 0;
-                }
+                
+                // Subtract exactly the amount the user selected
+                const finalBalance = balance - balanceUsed;
 
                 // Create Order document in Firestore
                 const orderData = {
-                    uid: userData.uid, // Fixed to use uid instead of userId for consistency with query
-                    userEmail: userData.email, // Use email instead of username
+                    uid: userData.uid,
+                    userEmail: userData.email,
                     productId: product.id,
                     productName: product.name,
                     price: price,
+                    balanceUsed: balanceUsed,
                     status: finalStatus,
                     textDelivered: finalDeliveredText,
-                    method: metodo, // consistent with admin query
+                    method: metodo,
                     timestamp: Date.now()
                 };
 
                 await addDoc(collection(db, "orders"), orderData);
 
                 // Update User Balance in Firestore
-                if (finalBalance !== balance) {
+                if (balanceUsed > 0) {
                     await updateDoc(doc(db, "users", userData.uid), {
                         balance: finalBalance
                     });
@@ -271,18 +320,20 @@
                     whatsText += `💰 Método de pago: *${metodo.toUpperCase()}*%0A`;
                     
                     if (metodo === 'combinado') {
-                        const restante = price - balance;
-                        whatsText += `💵 Combinado: Utilicé $${balance.toFixed(2)} MXN de mi saldo y transferí el restante de *$${restante.toFixed(2)} MXN*.%0A`;
-                    } else {
+                        const restante = price - balanceUsed;
+                        whatsText += `💵 Combinado: Utilicé $${balanceUsed.toFixed(2)} MXN de mi saldo y transferí el restante de *$${restante.toFixed(2)} MXN*.%0A`;
+                    } else if (metodo === 'transferencia') {
                         whatsText += `💵 Total a transferir: *$${price.toFixed(2)} MXN*.%0A`;
+                    } else {
+                        // Just in case it's 'saldo' but couldn't be auto-delivered
+                        whatsText += `💵 Utilicé *$${balanceUsed.toFixed(2)} MXN* de mi saldo.%0A`;
                     }
                     
                     whatsText += `👤 Email: *${userData.email}*%0A`;
                     whatsText += `Adjunto mi comprobante para la entrega.`;
 
                     alert("Pedido registrado. A continuación te redirigiremos a WhatsApp para enviar el comprobante de transferencia y activar tu servicio.");
-                    window.location.open = `https://wa.me/525574123521?text=${whatsText}`;
-                    window.location.href = 'perfil.html';
+                    window.location.href = `https://wa.me/525574123521?text=${whatsText}`;
                 }
 
             } catch(error) {

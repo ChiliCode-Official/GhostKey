@@ -146,25 +146,40 @@ async function loadAdminData() {
     loadAdminOrders();
     loadAdminInventory();
     loadAdminCatalog();
+    loadAdminPaymentMethods();
 }
 
 async function loadAdminOrders() {
-    const querySnapshot = await getDocs(collection(db, "orders"));
+    // Sort by timestamp descending
+    const q = query(collection(db, "orders")); // In a real app we'd orderBy("timestamp", "desc")
+    const querySnapshot = await getDocs(q);
     const tbody = document.getElementById('adminOrdersTable');
     tbody.innerHTML = '';
     
-    querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        if(data.status !== 'pendiente') return;
+    // Sort in memory to avoid missing index error
+    let ordersList = [];
+    querySnapshot.forEach(docSnap => ordersList.push({ id: docSnap.id, ...docSnap.data() }));
+    ordersList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    ordersList.forEach(data => {
+        let statusBadge = '';
+        let actionBtn = '';
+        if (data.status === 'pendiente') {
+            statusBadge = '<span style="color: #ffb703; font-weight:bold;">Pendiente</span>';
+            actionBtn = `<button class="action-btn" onclick="window.confirmOrder('${data.id}', '${data.productId}')">Entregar</button>`;
+        } else {
+            statusBadge = '<span style="color: #00ff00; font-weight:bold;">Confirmado</span>';
+            actionBtn = `<span style="font-size:0.8rem; color:var(--text-secondary);">Completado</span>`;
+        }
 
         tbody.innerHTML += `
             <tr>
+                <td style="font-size:0.8rem; color:rgba(255,255,255,0.6);">${data.id.substring(0,8)}...</td>
                 <td>${data.userEmail}</td>
                 <td>${data.productName}</td>
-                <td>${data.method === 'balance' ? 'Saldo' : 'Transferencia'}</td>
-                <td>
-                    <button class="action-btn" onclick="window.confirmOrder('${docSnap.id}', '${data.productId}')">Confirmar y Entregar</button>
-                </td>
+                <td style="text-transform: capitalize;">${data.method}</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
             </tr>
         `;
     });
@@ -399,5 +414,105 @@ window.confirmOrder = async (orderId, productId) => {
     } catch(e) {
         console.error(e);
         alert("Error al confirmar.");
+    }
+}
+
+// --- PAYMENT METHODS CRUD ---
+let allPaymentMethods = [];
+
+async function loadAdminPaymentMethods() {
+    const tbody = document.getElementById('adminPaymentMethodsTable');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    allPaymentMethods = [];
+
+    const snap = await getDocs(collection(db, "payment_methods"));
+    snap.forEach(docSnap => {
+        allPaymentMethods.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    allPaymentMethods.forEach(method => {
+        const statusIcon = method.active ? '<i class="fas fa-check-circle" style="color:#00ff00;"></i>' : '<i class="fas fa-times-circle" style="color:#ff3366;"></i>';
+        tbody.innerHTML += `
+            <tr>
+                <td>${statusIcon}</td>
+                <td>${method.bank}</td>
+                <td>${method.account}</td>
+                <td>${method.name}</td>
+                <td>
+                    <button class="action-btn" style="background: #2a2a35;" onclick="window.editPaymentMethod('${method.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn reject" onclick="window.deletePaymentMethod('${method.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+window.savePaymentMethod = async () => {
+    const id = document.getElementById('editPayMethodId').value;
+    const bank = document.getElementById('newPayMethodBank').value;
+    const name = document.getElementById('newPayMethodName').value;
+    const account = document.getElementById('newPayMethodAccount').value;
+    const concept = document.getElementById('newPayMethodConcept').value;
+    const active = document.getElementById('newPayMethodActive').checked;
+
+    if(!bank || !name || !account) {
+        alert("Llena los campos obligatorios (Banco, Nombre, Cuenta)");
+        return;
+    }
+
+    try {
+        if(id) {
+            await updateDoc(doc(db, "payment_methods", id), { bank, name, account, concept, active });
+        } else {
+            const newId = Date.now().toString();
+            await setDoc(doc(db, "payment_methods", newId), { bank, name, account, concept, active, createdAt: Date.now() });
+        }
+        window.resetPaymentMethodForm();
+        loadAdminPaymentMethods();
+    } catch (e) {
+        console.error(e);
+        alert("Error al guardar método de pago");
+    }
+}
+
+window.editPaymentMethod = (id) => {
+    const m = allPaymentMethods.find(x => x.id === id);
+    if(!m) return;
+    document.getElementById('editPayMethodId').value = m.id;
+    document.getElementById('newPayMethodBank').value = m.bank || '';
+    document.getElementById('newPayMethodName').value = m.name || '';
+    document.getElementById('newPayMethodAccount').value = m.account || '';
+    document.getElementById('newPayMethodConcept').value = m.concept || '';
+    document.getElementById('newPayMethodActive').checked = m.active !== false;
+    
+    document.querySelector('#tab-paymentMethods h3').textContent = "Editar Método de Pago";
+    document.getElementById('savePayMethodBtn').textContent = "Actualizar Método";
+    document.getElementById('cancelPayMethodBtn').style.display = "block";
+    document.getElementById('tab-paymentMethods').scrollIntoView({ behavior: "smooth" });
+}
+
+window.resetPaymentMethodForm = () => {
+    document.getElementById('editPayMethodId').value = "";
+    document.getElementById('newPayMethodBank').value = "";
+    document.getElementById('newPayMethodName').value = "";
+    document.getElementById('newPayMethodAccount').value = "";
+    document.getElementById('newPayMethodConcept').value = "";
+    document.getElementById('newPayMethodActive').checked = true;
+    
+    document.querySelector('#tab-paymentMethods h3').textContent = "Agregar Método de Pago";
+    document.getElementById('savePayMethodBtn').textContent = "Guardar Método";
+    document.getElementById('cancelPayMethodBtn').style.display = "none";
+}
+
+window.deletePaymentMethod = async (id) => {
+    if(confirm("¿Seguro que quieres eliminar este método de pago?")) {
+        try {
+            await deleteDoc(doc(db, "payment_methods", id));
+            loadAdminPaymentMethods();
+        } catch(e) {
+            console.error(e);
+            alert("Error al eliminar");
+        }
     }
 }

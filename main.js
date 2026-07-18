@@ -7,6 +7,42 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.registerPlugin(ScrollTrigger);
 
     // Initial reveal for elements (watching .content-scroll)
+    
+    // BlurText utility using GSAP
+    const applyBlurText = (selector) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            const text = el.innerText;
+            const words = text.split(' ');
+            el.innerHTML = '';
+            words.forEach((word, i) => {
+                const span = document.createElement('span');
+                span.innerText = word + (i < words.length - 1 ? '\u00A0' : '');
+                span.style.display = 'inline-block';
+                span.style.filter = 'blur(10px)';
+                span.style.opacity = '0';
+                span.style.transform = 'translateY(-20px)';
+                el.appendChild(span);
+            });
+
+            gsap.to(el.querySelectorAll('span'), {
+                scrollTrigger: {
+                    trigger: el,
+                    scroller: ".content-scroll",
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                filter: 'blur(0px)',
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+        });
+    };
+    applyBlurText('.blur-text');
+
     gsap.utils.toArray('.gsap-reveal').forEach(elem => {
         gsap.to(elem, {
             scrollTrigger: {

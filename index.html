@@ -147,7 +147,7 @@
                 <!-- Products Grid -->
                 <section class="gsap-reveal">
                     <div class="section-header">
-                        <h3 class="section-title">Productos Destacados</h3>
+                        <h3 class="section-title blur-text">Productos Destacados</h3>
                         <a href="catalogo.html" class="section-link">Ver todos <i class="fas fa-arrow-right"></i></a>
                     </div>
                     
@@ -158,7 +158,7 @@
 
                 <section class="gsap-reveal" style="margin-top: 40px;">
                     <div class="section-header">
-                        <h3 class="section-title">Mayoreo y Reventa</h3>
+                        <h3 class="section-title blur-text">Mayoreo y Reventa</h3>
                         <a href="catalogo.html?filter=mayoreo" class="section-link">Ver catálogo <i class="fas fa-arrow-right"></i></a>
                     </div>
                     
@@ -171,8 +171,76 @@
         </main>
     </div>
 
+    <!-- Floating Action Button for WhatsApp Support -->
+    <div class="fab-container" onclick="openStepperModal()">
+        <div class="fab-tooltip">¿Necesitas ayuda?</div>
+        <button class="fab-button">
+            <i class="fab fa-whatsapp"></i>
+        </button>
+    </div>
+
+    <!-- Stepper Modal (WhatsApp) -->
+    <div class="stepper-modal-overlay" id="waStepperModal">
+        <div class="stepper-modal-content">
+            <button class="modal-close" onclick="closeStepperModal()"><i class="fas fa-times"></i></button>
+            <div class="stepper-header">Soporte por WhatsApp</div>
+            
+            <div class="stepper-indicator-row">
+                <div class="step-indicator active" id="ind-1">1</div>
+                <div class="step-connector"></div>
+                <div class="step-indicator" id="ind-2">2</div>
+                <div class="step-connector"></div>
+                <div class="step-indicator" id="ind-3">3</div>
+                <div class="step-connector"></div>
+                <div class="step-indicator" id="ind-4">4</div>
+            </div>
+
+            <div class="stepper-body">
+                <!-- Step 1 -->
+                <div class="stepper-step active" id="step-1">
+                    <h3>¿En qué te podemos ayudar?</h3>
+                    <select id="waTopic" class="admin-input" style="width: 100%; margin-top: 15px;">
+                        <option value="Problema con una compra">Problema con una compra</option>
+                        <option value="Duda sobre un método de pago">Duda sobre un método de pago</option>
+                        <option value="Activación de cuenta">Activación de cuenta (Xbox/Epic)</option>
+                        <option value="Otra consulta">Otra consulta general</option>
+                    </select>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="stepper-step" id="step-2">
+                    <h3>Número de Pedido</h3>
+                    <p style="color:var(--text-secondary); font-size: 0.85rem; margin-bottom: 10px;">Si tu consulta es sobre una compra reciente, escribe el número de pedido. Si no, déjalo en blanco.</p>
+                    <input type="text" id="waOrderNumber" class="admin-input" placeholder="#PEDIDO..." style="width: 100%;">
+                </div>
+
+                <!-- Step 3 -->
+                <div class="stepper-step" id="step-3">
+                    <h3>Detalles de tu consulta</h3>
+                    <p style="color:var(--text-secondary); font-size: 0.85rem; margin-bottom: 10px;">Describe brevemente tu problema o duda para poder ayudarte más rápido.</p>
+                    <textarea id="waDetails" class="admin-input" placeholder="Escribe aquí los detalles..." style="width: 100%; height: 100px; resize: none;"></textarea>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="stepper-step" id="step-4">
+                    <h3>¡Todo listo!</h3>
+                    <p style="color:var(--text-secondary); font-size: 0.9rem; margin-top: 10px;">Haz clic en el botón de abajo para ser redirigido a nuestro chat de WhatsApp con la información pre-llenada.</p>
+                    <button class="btn btn-primary" onclick="submitWhatsAppForm()" style="width: 100%; margin-top: 20px; background: #25D366; color: white; display:flex; justify-content:center; gap: 8px;">
+                        <i class="fab fa-whatsapp"></i> Abrir WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <div class="stepper-footer" id="stepperFooter">
+                <button class="btn-stepper back" id="stepperBack" onclick="prevStep()" disabled>Atrás</button>
+                <button class="btn-stepper next" id="stepperNext" onclick="nextStep()">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
     <script src="sparks.js"></script>
     <script src="products.js"></script>
     <script type="module" src="main.js"></script>
+    <script src="stepper.js"></script>
 </body>
 </html>
