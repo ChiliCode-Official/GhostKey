@@ -6,7 +6,7 @@ let currentUid = null;
 let userData = null;
 
 // Inject DOM (New UI)
-const sidebarHtml = 
+const sidebarHtml = `
     <aside class="sidebar right-sidebar" id="friendsSidebar">
         <div class="right-sidebar-header">
             <div class="tabs">
@@ -45,7 +45,7 @@ const sidebarHtml =
             <button class="btn btn-blue" id="copyReferralBtn" style="width:100%; font-size:0.8rem;">Copiar Mi Link de Referido</button>
         </div>
     </aside>
-;
+`;
 
 const appContainer = document.querySelector('.app-container');
 if (appContainer) {
@@ -113,39 +113,39 @@ async function loadFriends() {
             const avatar = "https://i.pravatar.cc/100?u=" + otherUid;
 
             if (f.status === 'accepted') {
-                friendsHtml += \
+                friendsHtml += `
                     <div class="friend-item">
-                        <img src="\" alt="Avatar" class="friend-avatar">
+                        <img src="${avatar}" alt="Avatar" class="friend-avatar">
                         <div class="friend-info">
-                            <span class="friend-name">\</span>
+                            <span class="friend-name">${displayName}</span>
                             <span class="friend-playing" style="color: #4ade80;">Online</span>
                         </div>
                         <img src="https://cdn2.unrealengine.com/v-bucks-1920x1080-1920x1080-d2b384666578.jpg" alt="Game" class="friend-game-icon" style="border-radius:50%;">
                     </div>
-                \;
+                `;
             } else if (f.status === 'pending') {
                 if (f.uid2 === currentUid) {
                     pendingCount++;
-                    requestsHtml += \
+                    requestsHtml += `
                         <div class="friend-item">
-                            <img src="\" alt="Avatar" class="friend-avatar">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar">
                             <div class="friend-info">
-                                <span class="friend-name">\</span>
+                                <span class="friend-name">${displayName}</span>
                                 <span class="friend-playing">Quiere ser tu amigo</span>
                             </div>
-                            <i class="fas fa-check" onclick="acceptFriend('\')" style="color:#4ade80; cursor:pointer; font-size:1.2rem;"></i>
+                            <i class="fas fa-check" onclick="acceptFriend('${f.id}')" style="color:#4ade80; cursor:pointer; font-size:1.2rem;"></i>
                         </div>
-                    \;
+                    `;
                 } else {
-                    requestsHtml += \
+                    requestsHtml += `
                         <div class="friend-item" style="opacity:0.5">
-                            <img src="\" alt="Avatar" class="friend-avatar">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar">
                             <div class="friend-info">
-                                <span class="friend-name">\</span>
+                                <span class="friend-name">${displayName}</span>
                                 <span class="friend-playing">Solicitud enviada</span>
                             </div>
                         </div>
-                    \;
+                    `;
                 }
             }
         }
@@ -239,7 +239,7 @@ window.acceptFriend = async (friendshipId) => {
 // Copy Referral
 document.getElementById('copyReferralBtn').addEventListener('click', () => {
     if(!currentUid) return;
-    const url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + index.html?ref=;
+    const url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + `index.html?ref=${currentUid}`;
     navigator.clipboard.writeText(url).then(() => {
         alert("¡Enlace de referido copiado! Compártelo con tus amigos.");
     });

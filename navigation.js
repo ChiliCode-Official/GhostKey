@@ -28,22 +28,22 @@ function injectNavigation() {
     let navLinksHtml = '';
     NAV_ITEMS.forEach((item, i) => {
         const isActive = i === activeIndex ? 'active' : '';
-        navLinksHtml += 
-            <a href="" class="nav-item ">
-                <i class=""></i>
-                <span></span>
+        navLinksHtml += `
+            <a href="${item.href}" class="nav-item ${isActive}">
+                <i class="${item.icon}"></i>
+                <span>${item.label}</span>
             </a>
-        ;
+        `;
     });
 
-    const leftSidebarHtml = 
+    const leftSidebarHtml = `
         <aside class="sidebar left-sidebar">
             <div class="brand">
                 <div class="brand-logo">DF</div>
                 <span>GHOSTKEY</span>
             </div>
             <nav class="nav-menu">
-                
+                ${navLinksHtml}
             </nav>
             <div class="sidebar-section-title">TOP VENTAS</div>
             <div class="fast-launch">
@@ -76,7 +76,7 @@ function injectNavigation() {
                 </div>
             </div>
         </aside>
-    ;
+    `;
 
     // 2. Create Mobile Dock
     let dockLinksHtml = '';
@@ -90,18 +90,18 @@ function injectNavigation() {
 
     dockItems.forEach((item, i) => {
         const isActive = NAV_ITEMS.findIndex(n => n.href === item.href) === activeIndex ? 'active' : '';
-        dockLinksHtml += 
-            <a href="" class="dock-item ">
-                <div class="dock-icon"><i class=""></i></div>
+        dockLinksHtml += `
+            <a href="${item.href}" class="dock-item ${isActive}">
+                <div class="dock-icon"><i class="${item.icon}"></i></div>
             </a>
-        ;
+        `;
     });
 
-    const dockHtml = 
+    const dockHtml = `
         <div class="mobile-dock">
-            
+            ${dockLinksHtml}
         </div>
-    ;
+    `;
 
     const appContainer = document.querySelector('.app-container');
     const mainContent = document.querySelector('.main-content');
