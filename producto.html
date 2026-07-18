@@ -96,18 +96,32 @@
         let product = null;
         let userData = null;
         let stockStatus = 'disponible'; // Default
-        let defaultCredentials = '';
 
         document.addEventListener("DOMContentLoaded", async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const id = parseInt(urlParams.get('id'));
+            const id = urlParams.get('id');
 
-            if (!id || typeof products === 'undefined') {
+            if (!id) {
                 document.getElementById('prodName').textContent = 'Producto no encontrado';
                 return;
             }
 
-            product = products.find(p => p.id === id);
+            // Fetch Product from Firestore
+            try {
+                const prodDoc = await getDoc(doc(db, "products", String(id)));
+                if(prodDoc.exists()) {
+                    product = prodDoc.data();
+                } else if (typeof products !== 'undefined') {
+                    // Fallback to local products.js if DB is completely empty (before admin seeded)
+                    product = products.find(p => String(p.id) === String(id));
+                }
+            } catch(e) {
+                console.error(e);
+                if (typeof products !== 'undefined') {
+                    product = products.find(p => String(p.id) === String(id));
+                }
+            }
+
             if (!product) {
                 document.getElementById('prodName').textContent = 'Producto no encontrado';
                 return;

@@ -1,6 +1,6 @@
 import { app, auth, db, googleProvider } from "./firebase-config.js";
-import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // DOM Elements
 const authSection = document.getElementById('authSection');
@@ -8,23 +8,25 @@ const userDashboard = document.getElementById('userDashboard');
 const adminDashboard = document.getElementById('adminDashboard');
 
 const googleLoginBtn = document.getElementById('googleLoginBtn');
-const adminLoginBtn = document.getElementById('adminLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
 let currentUser = null;
 let isAdmin = false;
+let allProducts = [];
 
 // Real-time Auth State
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        isAdmin = (user.email === 'admin@digitalfootprint.com');
+        // ADMIN EMAIL SET AS REQUESTED
+        isAdmin = (user.email === 'lrodricg30@gmail.com');
         
         authSection.style.display = 'none';
         
         if (isAdmin) {
             adminDashboard.style.display = 'block';
+            await checkAndSeedProducts();
             loadAdminData();
         } else {
             userDashboard.style.display = 'block';
@@ -56,47 +58,49 @@ googleLoginBtn.onclick = async () => {
         }
     } catch(e) {
         console.error("Google Login Error", e);
-        alert("Error al iniciar sesión con Google.");
+        alert("Error al iniciar sesión con Google. (Recuerda que debes usar Live Server o GitHub Pages).");
     }
 };
 
-adminLoginBtn.onclick = async () => {
-    const u = document.getElementById('adminUser').value;
-    const p = document.getElementById('adminPass').value;
-    
-    if (u === 'Admin' && p === 'Goldito1') {
-        const adminEmail = 'admin@digitalfootprint.com';
-        try {
-            await signInWithEmailAndPassword(auth, adminEmail, p);
-        } catch(e) {
-            try {
-                // Si no existe, lo creamos la primera vez
-                await createUserWithEmailAndPassword(auth, adminEmail, p);
-            } catch(createErr) {
-                console.error("Auth Error", createErr);
-                alert("Error de autenticación.");
-            }
-        }
-    } else {
-        alert("Credenciales incorrectas.");
-    }
-};
+document.getElementById('adminUser').style.display = 'none';
+document.getElementById('adminPass').style.display = 'none';
+document.getElementById('adminLoginBtn').style.display = 'none';
+document.querySelector('.admin-login-box h4').style.display = 'none';
 
 logoutBtn.onclick = () => signOut(auth);
 adminLogoutBtn.onclick = () => signOut(auth);
+
+// --- SEEDING FUNCTION ---
+async function checkAndSeedProducts() {
+    const querySnapshot = await getDocs(collection(db, "products"));
+    if (querySnapshot.empty && typeof products !== 'undefined') {
+        console.log("Seeding products to Firestore...");
+        for (const p of products) {
+            await setDoc(doc(db, "products", String(p.id)), p);
+        }
+        console.log("Seeding complete.");
+    }
+    
+    // Load products array from Firestore for Admin usage
+    const freshSnap = await getDocs(collection(db, "products"));
+    allProducts = [];
+    freshSnap.forEach(docSnap => {
+        allProducts.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    // Sort by numeric id if possible
+    allProducts.sort((a,b) => parseInt(a.id) - parseInt(b.id));
+}
 
 // User Data Loading
 async function loadUserData() {
     document.getElementById('userUidDisplay').innerText = currentUser.uid;
     
-    // Balance
     const userRef = doc(db, "users", currentUser.uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
         document.getElementById('userBalance').innerText = `$${userSnap.data().balance.toFixed(2)} MXN`;
     }
 
-    // Orders
     const q = query(collection(db, "orders"), where("uid", "==", currentUser.uid));
     const querySnapshot = await getDocs(q);
     const tbody = document.querySelector('#userOrdersTable tbody');
@@ -128,6 +132,7 @@ async function loadUserData() {
 async function loadAdminData() {
     loadAdminOrders();
     loadAdminInventory();
+    loadAdminCatalog();
 }
 
 async function loadAdminOrders() {
@@ -137,7 +142,7 @@ async function loadAdminOrders() {
     
     querySnapshot.forEach(docSnap => {
         const data = docSnap.data();
-        if(data.status !== 'pendiente') return; // Only show pending
+        if(data.status !== 'pendiente') return;
 
         tbody.innerHTML += `
             <tr>
@@ -152,12 +157,11 @@ async function loadAdminOrders() {
     });
 }
 
-// Ensure products is available globally from products.js
 async function loadAdminInventory() {
     const tbody = document.getElementById('adminInventoryTable');
     tbody.innerHTML = '';
 
-    for (const prod of products) {
+    for (const prod of allProducts) {
         const stockRef = doc(db, "products_stock", prod.id);
         const stockSnap = await getDoc(stockRef);
         let stockData = stockSnap.exists() ? stockSnap.data() : { status: 'disponible', credentialsPool: '' };
@@ -182,6 +186,110 @@ async function loadAdminInventory() {
         `;
     }
 }
+
+// CATALOG CRUD FUNCTIONS
+async function loadAdminCatalog() {
+    const tbody = document.getElementById('adminCatalogTable');
+    tbody.innerHTML = '';
+
+    for (const prod of allProducts) {
+        tbody.innerHTML += `
+            <tr>
+                <td><img src="${prod.image}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;"></td>
+                <td>${prod.name}</td>
+                <td>$${prod.price.toFixed(2)}</td>
+                <td><span style="font-size:0.8rem; text-transform:uppercase; color: #ffb703;">${prod.category}</span></td>
+                <td>
+                    <button class="action-btn" style="background: #2a2a35;" onclick="window.editProduct('${prod.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn reject" onclick="window.deleteProduct('${prod.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+window.saveProduct = async () => {
+    const id = document.getElementById('editProdId').value;
+    const name = document.getElementById('newProdName').value;
+    const desc = document.getElementById('newProdDesc').value;
+    const price = parseFloat(document.getElementById('newProdPrice').value);
+    const category = document.getElementById('newProdCategory').value;
+    const image = document.getElementById('newProdImage').value;
+
+    if(!name || isNaN(price) || !image) {
+        alert("Llena los campos obligatorios (Nombre, Precio, Imagen)");
+        return;
+    }
+
+    try {
+        if(id) {
+            // Edit
+            await updateDoc(doc(db, "products", id), { name, description: desc, price, category, image });
+            alert("Producto actualizado");
+        } else {
+            // Create
+            const newId = Date.now().toString();
+            await setDoc(doc(db, "products", newId), { id: parseInt(newId), name, description: desc, price, category, image });
+            alert("Producto creado");
+        }
+        window.resetProductForm();
+        await checkAndSeedProducts(); // Reloads allProducts array
+        loadAdminCatalog();
+        loadAdminInventory();
+    } catch (e) {
+        console.error(e);
+        alert("Error al guardar producto");
+    }
+}
+
+window.editProduct = (id) => {
+    const p = allProducts.find(x => x.id === id);
+    if(!p) return;
+    document.getElementById('editProdId').value = p.id;
+    document.getElementById('newProdName').value = p.name;
+    document.getElementById('newProdDesc').value = p.description;
+    document.getElementById('newProdPrice').value = p.price;
+    document.getElementById('newProdCategory').value = p.category;
+    document.getElementById('newProdImage').value = p.image;
+    
+    document.querySelector('#tab-products h3').textContent = "Editar Producto";
+    document.getElementById('saveProdBtn').textContent = "Actualizar Producto";
+    document.getElementById('cancelProdBtn').style.display = "block";
+    
+    // Scroll to top of tab
+    document.getElementById('tab-products').scrollIntoView({ behavior: "smooth" });
+}
+
+window.resetProductForm = () => {
+    document.getElementById('editProdId').value = "";
+    document.getElementById('newProdName').value = "";
+    document.getElementById('newProdDesc').value = "";
+    document.getElementById('newProdPrice').value = "";
+    document.getElementById('newProdCategory').value = "vbucks";
+    document.getElementById('newProdImage').value = "";
+    
+    document.querySelector('#tab-products h3').textContent = "Agregar Nuevo Producto";
+    document.getElementById('saveProdBtn').textContent = "Guardar Producto";
+    document.getElementById('cancelProdBtn').style.display = "none";
+}
+
+window.deleteProduct = async (id) => {
+    if(confirm("¿Seguro que quieres eliminar este producto?")) {
+        try {
+            await deleteDoc(doc(db, "products", id));
+            // Optional: delete stock doc as well
+            await deleteDoc(doc(db, "products_stock", id));
+            alert("Producto eliminado");
+            await checkAndSeedProducts();
+            loadAdminCatalog();
+            loadAdminInventory();
+        } catch(e) {
+            console.error(e);
+            alert("Error al eliminar");
+        }
+    }
+}
+
 
 window.saveInventory = async (productId) => {
     const status = document.getElementById(`status_${productId}`).value;
@@ -260,7 +368,6 @@ window.confirmOrder = async (orderId, productId) => {
                 textToDeliver = lines[0]; // Take first credential
                 lines.shift(); // Remove it
                 
-                // Update stock pool
                 await updateDoc(stockRef, {
                     credentialsPool: lines.join('\\n'),
                     status: lines.length === 0 ? 'agotado' : stockSnap.data().status
@@ -268,7 +375,6 @@ window.confirmOrder = async (orderId, productId) => {
             }
         }
         
-        // Update Order
         await updateDoc(doc(db, "orders", orderId), {
             status: 'confirmado',
             textDelivered: textToDeliver

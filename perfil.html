@@ -237,8 +237,9 @@
 
                         <div class="tabs">
                             <button class="tab-btn active" onclick="switchAdminTab('orders')">Pedidos Pendientes</button>
-                            <button class="tab-btn" onclick="switchAdminTab('users')">Gestión de Usuarios (Saldo)</button>
+                            <button class="tab-btn" onclick="switchAdminTab('users')">Gestión de Usuarios</button>
                             <button class="tab-btn" onclick="switchAdminTab('inventory')">Inventario & Stock</button>
+                            <button class="tab-btn" onclick="switchAdminTab('products')">Gestión Catálogo</button>
                         </div>
 
                         <!-- Orders Tab -->
@@ -296,6 +297,46 @@
                                         </tr>
                                     </thead>
                                     <tbody id="adminInventoryTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Products Catalog Management Tab -->
+                        <div id="tab-products" class="admin-panel-content">
+                            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3>Agregar Nuevo Producto</h3>
+                                <input type="hidden" id="editProdId">
+                                <input type="text" id="newProdName" class="admin-input" placeholder="Nombre (ej. 1000 Pavos)" style="width:100%; max-width: none;"><br>
+                                <textarea id="newProdDesc" class="admin-input" placeholder="Descripción" style="width:100%; max-width: none; height: 60px;"></textarea><br>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="newProdPrice" class="admin-input" placeholder="Precio MXN" style="flex: 1;">
+                                    <select id="newProdCategory" class="admin-input" style="flex: 1;">
+                                        <option value="vbucks">V-Bucks</option>
+                                        <option value="crew">Fortnite Crew</option>
+                                        <option value="discord">Discord</option>
+                                        <option value="realms">Realms</option>
+                                        <option value="mayoreo">Mayoreo</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="newProdImage" class="admin-input" placeholder="Link de Imgur (ej. https://i.imgur.com/abc.png)" style="width:100%; max-width: none;"><br>
+                                <button class="action-btn" onclick="window.saveProduct()" id="saveProdBtn" style="width: 100%; margin-top: 10px;">Guardar Producto</button>
+                                <button class="action-btn reject" onclick="window.resetProductForm()" id="cancelProdBtn" style="display:none; width: 100%; margin-top: 10px;">Cancelar Edición</button>
+                            </div>
+
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <th>Categoría</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminCatalogTable">
                                         <!-- Populated by JS -->
                                     </tbody>
                                 </table>
