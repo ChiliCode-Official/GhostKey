@@ -1,4 +1,4 @@
-﻿import { auth, db } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -8,27 +8,29 @@ let userData = null;
 // Inject DOM (New UI)
 const sidebarHtml = `
     <aside class="sidebar right-sidebar" id="friendsSidebar">
-        <div class="right-sidebar-header">
-            <div class="tabs">
-                <span class="tab active" id="tabFriends">Friends <span class="friends-req-badge" id="badgeFriends" style="display:none;">0</span></span>
-                <span class="tab" id="tabRequests">Requests <span class="badge-red friends-req-badge" id="badgeRequests" style="display:none;">0</span></span>
+        <div class="right-sidebar-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <div class="tabs" style="display:flex; gap:15px; font-weight:600; font-size:0.9rem;">
+                <span class="tab active" id="tabFriends" style="cursor:pointer; color:var(--text-primary);">Friends <span class="friends-req-badge" id="badgeFriends" style="display:none;">0</span></span>
+                <span class="tab" id="tabRequests" style="cursor:pointer; color:var(--text-secondary);">Requests <span class="badge-red friends-req-badge" id="badgeRequests" style="background:rgba(244,63,94,0.2); color:#f43f5e; padding:2px 6px; border-radius:10px; font-size:0.75rem; display:none;">0</span></span>
             </div>
-            <i class="fas fa-info-circle icon-mute"></i>
+            <i class="fas fa-info-circle icon-mute" style="color:var(--text-secondary); cursor:pointer;"></i>
         </div>
         
-        <div class="search-friend-bar">
-            <i class="fas fa-search"></i>
-            <div class="animated-input-container">
-                <div class="form-control" style="margin:0; width:100%;">
-                    <input type="text" id="friendSearchInput" required="">
-                    <label>
-                        <span style="transition-delay:0ms">B</span><span style="transition-delay:50ms">u</span><span style="transition-delay:100ms">s</span><span style="transition-delay:150ms">c</span><span style="transition-delay:200ms">a</span><span style="transition-delay:250ms">r</span>
-                    </label>
-                </div>
+        <div class="search-friend-bar" style="display:flex; align-items:center; gap:10px; margin-bottom: 30px;">
+            <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:10px; padding:8px 12px; display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-search" style="color:var(--text-secondary); font-size:0.8rem;"></i>
+                <input type="text" id="friendSearchInput" placeholder="Search for a friend" style="background:transparent; border:none; color:white; font-size:0.85rem; outline:none; width:100%;">
             </div>
-            <i class="fas fa-user-plus add-friend-icon" id="addFriendBtn" style="cursor:pointer;"></i>
+            <div style="width:32px; height:32px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;" id="addFriendBtn">
+                <i class="fas fa-user-plus" style="color:var(--text-secondary); font-size:0.8rem;"></i>
+            </div>
         </div>
 
+        <div class="sidebar-section-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <span>Friends</span>
+            <span style="background:rgba(255,255,255,0.05); width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">2</span>
+        </div>
+        
         <div class="friends-category">
             <div class="friends-list" id="friendsListContainer">
                 <div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">Cargando...</div>
@@ -114,35 +116,35 @@ async function loadFriends() {
 
             if (f.status === 'accepted') {
                 friendsHtml += `
-                    <div class="friend-item">
-                        <img src="${avatar}" alt="Avatar" class="friend-avatar">
-                        <div class="friend-info">
-                            <span class="friend-name">${displayName}</span>
-                            <span class="friend-playing" style="color: #4ade80;">Online</span>
+                    <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px;">
+                        <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                        <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                            <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                            <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Play Fortnite</span>
                         </div>
-                        <img src="https://cdn2.unrealengine.com/v-bucks-1920x1080-1920x1080-d2b384666578.jpg" alt="Game" class="friend-game-icon" style="border-radius:50%;">
+                        <img src="https://i.imgur.com/3XpcBuu.png" alt="Game" class="friend-game-icon" style="width:20px; height:20px; border-radius:4px; object-fit:cover;">
                     </div>
                 `;
             } else if (f.status === 'pending') {
                 if (f.uid2 === currentUid) {
                     pendingCount++;
                     requestsHtml += `
-                        <div class="friend-item">
-                            <img src="${avatar}" alt="Avatar" class="friend-avatar">
-                            <div class="friend-info">
-                                <span class="friend-name">${displayName}</span>
-                                <span class="friend-playing">Quiere ser tu amigo</span>
+                        <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px;">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                            <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                                <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                                <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Quiere ser tu amigo</span>
                             </div>
-                            <i class="fas fa-check" onclick="acceptFriend('${f.id}')" style="color:#4ade80; cursor:pointer; font-size:1.2rem;"></i>
+                            <i class="fas fa-check" onclick="acceptFriend('${f.id}')" style="color:#4ade80; cursor:pointer; font-size:1rem; background:rgba(74,222,128,0.1); padding:6px; border-radius:50%;"></i>
                         </div>
                     `;
                 } else {
                     requestsHtml += `
-                        <div class="friend-item" style="opacity:0.5">
-                            <img src="${avatar}" alt="Avatar" class="friend-avatar">
-                            <div class="friend-info">
-                                <span class="friend-name">${displayName}</span>
-                                <span class="friend-playing">Solicitud enviada</span>
+                        <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px; opacity:0.5;">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                            <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                                <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                                <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Solicitud enviada</span>
                             </div>
                         </div>
                     `;

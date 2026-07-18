@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --bg-color: #0b0812; /* Very deep dark purple */
-    --sidebar-bg: #120e1a; /* Sidebar background */
-    --card-bg: #1c1627; /* Card background */
+    --bg-color: #0f111a; /* Matching reference dark background */
+    --sidebar-bg: #141620; /* Matching reference sidebar background */
+    --card-bg: #1f2233; /* Matching reference card background */
     --text-primary: #ffffff;
-    --text-secondary: #8c879d;
-    --accent-blue: #3b82f6; /* Ankama style primary action */
+    --text-secondary: #8b92a5;
+    --accent-blue: #3b82f6; 
     --accent-green: #10b981;
     --accent-red: #f43f5e;
-    --accent-yellow: #8b5cf6; /* Replaced yellow with vibrant purple accent */
-    --border-color: rgba(255, 255, 255, 0.06);
-    --glass-bg: rgba(18, 14, 26, 0.85);
+    --accent-yellow: #8b5cf6;
+    --border-color: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(20, 22, 32, 0.85);
     --glass-border: rgba(255, 255, 255, 0.05);
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -34,28 +34,9 @@ body {
     min-height: 100vh;
 }
 
-/* Background effects (purple gradient) */
+/* Background effects removed to match clean reference */
 body::before, body::after {
-    content: '';
-    position: fixed;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    filter: blur(150px);
-    z-index: -1;
-    opacity: 0.2;
-}
-
-body::before {
-    top: -200px;
-    left: -200px;
-    background: var(--accent-blue);
-}
-
-body::after {
-    bottom: -200px;
-    right: -200px;
-    background: var(--accent-yellow);
+    display: none;
 }
 
 /* --- Layout --- */
@@ -64,8 +45,8 @@ body::after {
     grid-template-columns: 240px 1fr 280px;
     width: 100%;
     height: 100vh;
-    padding: 20px;
-    gap: 20px;
+    padding: 0;
+    gap: 0;
     overflow: hidden;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -77,16 +58,22 @@ body::after {
 /* --- Sidebar --- */
 .sidebar {
     background: var(--sidebar-bg);
-    border-radius: var(--radius-lg);
+    border-radius: 0;
     display: flex;
     flex-direction: column;
     padding: 24px 20px;
-    border: 1px solid var(--border-color);
+    border: none;
     z-index: 10;
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
     padding-bottom: 60px; /* Space for toggle button */
+}
+.sidebar.left-sidebar {
+    border-right: 1px solid var(--border-color);
+}
+.sidebar.right-sidebar {
+    border-left: 1px solid var(--border-color);
 }
 .sidebar::-webkit-scrollbar { width: 0; }
 

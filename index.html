@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -43,70 +43,70 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Topbar -->
-            <header class="topbar">
-                <div class="topbar-nav">
-                    <a href="#" class="topbar-link active">General</a>
-                    <a href="#" class="topbar-link">News</a>
-                    <a href="#" class="topbar-link">Discover</a>
+            <header class="topbar" style="display:flex; justify-content:space-between; align-items:center; padding: 20px 40px; margin-bottom: 20px;">
+                <div class="topbar-nav" style="display:flex; gap:20px; font-weight:600; font-size:0.9rem;">
+                    <a href="#" class="topbar-link active" style="color:var(--text-primary); text-decoration:none;">General</a>
+                    <a href="#" class="topbar-link" style="color:var(--text-secondary); text-decoration:none;">News</a>
+                    <a href="#" class="topbar-link" style="color:var(--text-secondary); text-decoration:none;">Discover</a>
                 </div>
                 
-                <div class="topbar-actions">
-                    <div class="icon-btn" title="Notificaciones">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://i.imgur.com/S00u4EI.png" alt="User" class="user-avatar" style="background:var(--accent-blue);">
-                        <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--text-secondary);"></i>
+                <div class="topbar-actions" style="display:flex; align-items:center; gap:20px;">
+                    <div class="icon-btn" title="Notificaciones" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); cursor:pointer;">
+                        <i class="fas fa-bell" style="font-size:0.8rem;"></i>
                     </div>
                 </div>
             </header>
 
-            <!-- Scrollable Content -->
-            <div class="content-scroll">
+            <div class="content-scroll" style="padding: 0 40px;">
                 
-                <!-- Hero Section matching reference -->
-                <section class="hero-banner">
-                    <div class="hero-banner-inner">
-                        <img src="https://i.imgur.com/3XpcBuu.png" alt="Hero Background" class="hero-bg-img">
-                        <div class="hero-content">
-                            <h1 class="split-title">FORTNITE CREW</h1>
-                            <span class="hero-badge">90% recommended</span>
-                            <p>&Uacute;nete al Club de Fortnite y obt&eacute;n recompensas exclusivas mensuales y mucho m&aacute;s.</p>
-                            <div class="hero-actions">
-                                <button class="btn btn-blue" onclick="openSpringModal()">Buy now</button>
-                                <button class="btn btn-white" onclick="openGiftModal()"><i class="fas fa-gift"></i> Gift</button>
-                                <span class="hero-price">Starting price: 11,99&euro;</span>
-                            </div>
+                <section class="hero-banner" style="position:relative; border-radius:20px; overflow:hidden; min-height: 380px; display:flex; align-items:flex-end; padding:40px; margin-bottom:40px;">
+                    <img src="https://i.imgur.com/3XpcBuu.png" alt="Hero Background" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-1;">
+                    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(to right, rgba(15,17,26,0.9) 0%, rgba(15,17,26,0) 70%); z-index:-1;"></div>
+                    <div class="hero-content" style="max-width: 50%; z-index:1;">
+                        <img src="https://i.imgur.com/S00u4EI.png" style="width:30px; height:30px; margin-bottom:20px;" alt="Logo">
+                        <h1 class="split-title" style="font-size: 2.5rem; font-weight:800; text-transform:uppercase; margin-bottom:10px; line-height:1;">FORTNITE CREW</h1>
+                        <span class="hero-badge" style="display:inline-block; background:rgba(59,130,246,0.2); color:#60a5fa; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:600; margin-bottom:15px;">90% recommended</span>
+                        <p style="color:rgba(255,255,255,0.8); font-size:0.95rem; line-height:1.5; margin-bottom:25px;">Únete al Club de Fortnite y obtén recompensas exclusivas mensuales y mucho más.</p>
+                        <div class="hero-actions" style="display:flex; align-items:center; gap:20px;">
+                            <button class="btn btn-blue" onclick="openSpringModal()" style="background:var(--accent-blue); color:white; border:none; padding:12px 30px; border-radius:10px; font-weight:600; cursor:pointer;">Buy now</button>
+                            <span class="hero-price" style="color:rgba(255,255,255,0.7); font-size:0.9rem;">Starting price: 11,99€</span>
                         </div>
                     </div>
                 </section>
 
-                <!-- Products Grid -->
                 <section class="gsap-reveal resume-games-section">
-                    <div class="section-header">
-                        <h3 class="section-title">Productos Destacados <span class="count">3</span></h3>
-                        <a href="catalogo.html" class="section-link">Explore all <i class="fas fa-chevron-right"></i></a>
+                    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h3 class="section-title" style="font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:10px;">Resume my games <span class="count" style="background:rgba(255,255,255,0.1); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:500;">3</span></h3>
+                        <a href="catalogo.html" class="section-link" style="color:var(--accent-blue); text-decoration:none; font-size:0.9rem; font-weight:500;">Explore all <i class="fas fa-chevron-right" style="font-size:0.7rem; margin-left:5px;"></i></a>
                     </div>
                     
-                    <div class="products-grid custom-horizontal-grid" id="featuredProducts">
-                        <!-- Example Static Cards (Will be dynamically injected by products.js usually) -->
-                        <div class="product-card horizontal-card">
-                            <div class="product-image-container">
-                                <img src="https://i.imgur.com/bAD3nB1.png" alt="V-Bucks">
-                                <span class="product-badge">OFERTA</span>
-                            </div>
-                            <div class="product-info-horizontal">
-                                <span class="product-title">V-Bucks</span>
-                                <span class="product-status">Ready for launch</span>
+                    <div class="products-grid custom-horizontal-grid" id="featuredProducts" style="display:flex; gap:20px; overflow-x:auto; padding-bottom:10px;">
+                        <div class="product-card" style="min-width: 260px; height:150px; border-radius:16px; background:#1f2233; position:relative; overflow:hidden; padding:20px; display:flex; flex-direction:column; justify-content:flex-end;">
+                            <img src="https://i.imgur.com/bAD3nB1.png" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.3; z-index:0;" alt="V-Bucks">
+                            <div style="position:absolute; top:15px; left:15px; width:24px; height:24px; background:rgba(0,0,0,0.5); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:white; z-index:1;">V</div>
+                            <div style="position:relative; z-index:1; display:flex; justify-content:space-between; align-items:flex-end;">
+                                <div>
+                                    <div style="font-weight:600; font-size:1rem; margin-bottom:4px;">V-Bucks</div>
+                                    <div style="font-size:0.8rem; color:var(--text-secondary);">Ready for launch</div>
+                                </div>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <i class="fas fa-play" style="font-size:0.8rem; cursor:pointer; color:white;"></i>
+                                    <i class="fas fa-ellipsis-h" style="font-size:1rem; cursor:pointer; color:var(--text-secondary);"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="product-card horizontal-card">
-                            <div class="product-image-container">
-                                <img src="https://i.imgur.com/TT7IPi9.png" alt="Discord">
-                            </div>
-                            <div class="product-info-horizontal">
-                                <span class="product-title">Discord Nitro</span>
-                                <span class="product-status">Ready for launch</span>
+                        <div class="product-card" style="min-width: 260px; height:150px; border-radius:16px; background:#1f2233; position:relative; overflow:hidden; padding:20px; display:flex; flex-direction:column; justify-content:flex-end;">
+                            <img src="https://i.imgur.com/TT7IPi9.png" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.3; z-index:0;" alt="Discord">
+                            <div style="position:absolute; top:15px; left:15px; width:24px; height:24px; background:rgba(0,0,0,0.5); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; color:white; z-index:1;"><i class="fab fa-discord"></i></div>
+                            <div style="position:relative; z-index:1; display:flex; justify-content:space-between; align-items:flex-end;">
+                                <div>
+                                    <div style="font-weight:600; font-size:1rem; margin-bottom:4px;">Discord Nitro</div>
+                                    <div style="font-size:0.8rem; color:var(--text-secondary);">Ready for launch</div>
+                                </div>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <i class="fas fa-play" style="font-size:0.8rem; cursor:pointer; color:white;"></i>
+                                    <i class="fas fa-ellipsis-h" style="font-size:1rem; cursor:pointer; color:var(--text-secondary);"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
