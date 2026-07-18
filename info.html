@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información y Ayuda | Digital Footprint</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .info-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .info-section h2 {
+            color: var(--accent-yellow);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .info-section p, .info-section li {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .info-section ul {
+            padding-left: 20px;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .faq-q {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="catalogo.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="metodos.html" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Métodos</span>
+                </a>
+                <a href="info.html" class="nav-item active">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Info & Ayuda</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar" style="visibility:hidden;"></div>
+                <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.location.href='perfil.html'" style="cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-scroll" style="padding: 40px; max-width: 900px; margin: 0 auto;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 40px; text-align: center;">Centro de Información</h1>
+
+                <section class="info-section">
+                    <h2><i class="fas fa-bullhorn"></i> Sistema de Referidos (Gana 3%)</h2>
+                    <p>En Digital Footprint, premiamos tu lealtad. Puedes generar saldo invitando a tus amigos a comprar en nuestra tienda.</p>
+                    <ul>
+                        <li><strong>Genera tu enlace:</strong> Ve a tu pestaña de Amigos en tu Perfil y haz clic en "Copiar Mi Link de Referido".</li>
+                        <li><strong>Invita:</strong> Envía ese enlace a tus amigos. Si ellos inician sesión por primera vez usando tu enlace, quedarán vinculados a ti para siempre.</li>
+                        <li><strong>Gana Comisión:</strong> Cada vez que uno de tus referidos complete una compra, ganarás automáticamente el <strong>3%</strong> del valor del producto en créditos para tu cuenta.</li>
+                        <li><strong>Uso de créditos:</strong> Estos créditos se pueden utilizar para comprar cualquier producto en la tienda, parcial o totalmente.</li>
+                    </ul>
+                </section>
+
+                <section class="info-section">
+                    <h2><i class="fas fa-gift"></i> Regalar a un Amigo</h2>
+                    <p>Ahora puedes comprar productos y enviarlos directamente al inventario de tus amigos.</p>
+                    <ul>
+                        <li>Añade a la persona a tu lista de Amigos usando su UID o Email.</li>
+                        <li>Ve a cualquier producto en el catálogo y haz clic en el botón de Regalo (🎁).</li>
+                        <li>Selecciona a tu amigo, escribe un mensaje opcional y confirma la compra.</li>
+                        <li>Una vez que el administrador complete el pedido, las credenciales del juego o tarjeta le aparecerán en el perfil de tu amigo, junto con tu mensaje.</li>
+                    </ul>
+                </section>
+
+                <section class="info-section">
+                    <h2><i class="fas fa-wallet"></i> Pagos y Entregas</h2>
+                    <p>Nuestro sistema funciona tanto con Transferencias Bancarias manuales como con Saldo de cuenta.</p>
+                    <ul>
+                        <li><strong>Pagos Completos con Saldo:</strong> Si tienes suficiente saldo de referidos o recargas, tu compra es instantánea y no requiere enviar comprobante. Recibirás tu producto en cuanto el administrador valide el stock.</li>
+                        <li><strong>Transferencia:</strong> Si pagas con transferencia, el sistema te redirigirá a nuestro WhatsApp donde deberás enviar tu comprobante.</li>
+                        <li><strong>Pagos Combinados:</strong> Puedes pagar una parte con tu saldo y transferir el resto.</li>
+                    </ul>
+                </section>
+
+                <section class="info-section">
+                    <h2><i class="fas fa-question-circle"></i> Preguntas Frecuentes (FAQ)</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-q">¿Cuánto tardan en entregar un pedido?</div>
+                        <div class="faq-a">Las entregas suelen demorar entre 15 y 30 minutos si estás dentro del horario de atención. En productos "Bajo pedido", el tiempo puede variar de 1 a 24 horas.</div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-q">Mi referido compró pero no recibí saldo, ¿por qué?</div>
+                        <div class="faq-a">El saldo de referido (3%) se otorga <strong>únicamente después de que el pedido ha sido entregado y confirmado</strong> por el administrador, no al momento de crearlo. Esto es para evitar abusos o pedidos cancelados.</div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-q">¿Dónde encuentro mi UID para que me agreguen mis amigos?</div>
+                        <div class="faq-a">Tu UID aparece en la pestaña de inicio de tu Perfil, justo debajo de tu nombre.</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="sparks.js"></script>
+    <script src="navigation.js"></script>
+    <script type="module" src="friends.js"></script>
+</body>
+</html>

@@ -116,7 +116,7 @@
 
             } catch(e) {
                 console.error(e);
-                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">Error al cargar los métodos de pago.</div>`;
+                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">Error al cargar los métodos de pago: ${e.message}</div>`;
             }
         });
 

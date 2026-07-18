@@ -12,6 +12,7 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     z-index: 10;
+    flex-shrink: 0; /* Prevents navbar from shrinking in catalog/grids */
 }
 
 .gooey-nav-container nav {
@@ -53,8 +54,16 @@
 }
 
 .gooey-nav-container nav ul li.active {
-    color: black;
+    color: #1a082e !important;
     font-weight: 700;
+}
+
+.gooey-nav-container nav ul li.active a,
+.gooey-nav-container nav ul li.active a i,
+.gooey-nav-container nav ul li.active a span {
+    color: #1a082e !important; /* Ensure active link text is readable on the white gooey background */
+    z-index: 10;
+    position: relative;
 }
 
 /* Gooey Effect Container */

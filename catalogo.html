@@ -111,28 +111,32 @@
         let allProducts = [];
 
         const initCatalog = async () => {
-            // Fetch Stock Map first
+            // Fetch products and stock from Firestore concurrently
             try {
-                const stockSnap = await getDocs(collection(db, "products_stock"));
-                stockSnap.forEach(docSnap => {
-                    stockMap[docSnap.id] = docSnap.data();
-                });
-            } catch(e) {
-                console.error("Firebase stock check offline.");
-            }
+                const [prodSnap, stockSnap] = await Promise.all([
+                    getDocs(collection(db, "products")).catch(e => {
+                        console.error("Firebase connection issue for products:", e);
+                        return { empty: true, forEach: () => {} };
+                    }),
+                    getDocs(collection(db, "products_stock")).catch(e => {
+                        console.error("Firebase stock check offline:", e);
+                        return { forEach: () => {} };
+                    })
+                ]);
 
-            // Fetch products from Firestore
-            try {
-                const prodSnap = await getDocs(collection(db, "products"));
-                if(!prodSnap.empty) {
+                if (prodSnap.empty === false || prodSnap.docs) {
                     prodSnap.forEach(docSnap => {
                         allProducts.push({ id: docSnap.id, ...docSnap.data() });
                     });
                 } else if (typeof products !== 'undefined') {
                     allProducts = products;
                 }
+
+                stockSnap.forEach(docSnap => {
+                    stockMap[docSnap.id] = docSnap.data();
+                });
             } catch(e) {
-                console.error("Firebase connection issue:", e);
+                console.error("General Fetch Error:", e);
                 if (typeof products !== 'undefined') allProducts = products;
             }
 
@@ -141,23 +145,23 @@
 
             const renderProductCard = (product) => {
                 const prodStock = stockMap[product.id] || { status: 'disponible', credentialsPool: '' };
+                
                 let badgeClass = 'stock-disponible';
                 let label = 'Disponible';
                 let isDisabled = false;
 
-                if (prodStock.status === 'bajo_pedido') {
+                const pool = prodStock.credentialsPool || "";
+                const lines = pool.split('\n').filter(l => l.trim() !== '');
+
+                if (lines.length > 0) {
+                    label = `En Stock (${lines.length})`;
+                } else if (prodStock.status === 'bajo_pedido') {
                     badgeClass = 'stock-bajo-pedido';
                     label = 'Bajo pedido';
                 } else if (prodStock.status === 'agotado') {
                     badgeClass = 'stock-agotado';
                     label = 'Agotado';
                     isDisabled = true;
-                } else {
-                    const pool = prodStock.credentialsPool || "";
-                    const lines = pool.split('\n').filter(l => l.trim() !== '');
-                    if (lines.length > 0) {
-                        label = `En Stock (${lines.length})`;
-                    }
                 }
 
                 const badgeHtml = `<div class="product-badge stock-badge ${badgeClass}">${label}</div>`;
@@ -227,7 +231,11 @@
             // Check URL parameters for initial filters
             const urlParams = new URLSearchParams(window.location.search);
             const filter = urlParams.get('filter');
-            if(filter) {
+            const search = urlParams.get('search');
+            if (search) {
+                document.getElementById('searchInput').value = search;
+                renderCatalog(filter || 'all', search);
+            } else if(filter) {
                 window.filterCatalog(filter);
             } else {
                 renderCatalog('all');

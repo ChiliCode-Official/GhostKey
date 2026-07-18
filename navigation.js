@@ -1,5 +1,13 @@
 // navigation.js - Dual Navigation System (GooeyNav PC + Dock Mobile)
 
+// Capture referral UID globally
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    if (ref) {
+        localStorage.setItem('referralUid', ref);
+    }
+})();
 const NAV_ITEMS = [
     { label: "Inicio", icon: "fas fa-home", href: "index.html" },
     { label: "Catálogo", icon: "fas fa-th-large", href: "catalogo.html" },

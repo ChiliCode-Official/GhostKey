@@ -66,41 +66,52 @@ document.addEventListener("DOMContentLoaded", () => {
         let allProducts = [];
         let stockMap = {};
 
-        // Fetch products from Firestore
+        // Fetch products and stock from Firestore concurrently
         try {
-            const prodSnap = await getDocs(collection(db, "products"));
-            if (!prodSnap.empty) {
+            const [prodSnap, stockSnap] = await Promise.all([
+                getDocs(collection(db, "products")).catch(e => {
+                    console.error("Firebase connection issue for products:", e);
+                    return { empty: true, forEach: () => {} };
+                }),
+                getDocs(collection(db, "products_stock")).catch(e => {
+                    console.error("Firestore offline or configuration issue for stock:", e);
+                    return { forEach: () => {} };
+                })
+            ]);
+            
+            if (prodSnap.empty === false || prodSnap.docs) {
                 prodSnap.forEach(docSnap => {
                     allProducts.push({ id: docSnap.id, ...docSnap.data() });
                 });
             } else if (typeof products !== 'undefined') {
                 allProducts = products;
             }
+
+            stockSnap.forEach(docSnap => {
+                stockMap[docSnap.id] = docSnap.data();
+            });
         } catch (e) {
-            console.error("Firebase connection issue:", e);
+            console.error("General Fetch Error:", e);
             if (typeof products !== 'undefined') allProducts = products;
         }
 
         if (allProducts.length === 0) return;
 
-        // Fetch stock status from Firestore
-        try {
-            const stockSnap = await getDocs(collection(db, "products_stock"));
-            stockSnap.forEach(docSnap => {
-                stockMap[docSnap.id] = docSnap.data();
-            });
-        } catch(e) {
-            console.error("Firestore offline or configuration issue:", e);
-        }
-
         const renderProductCard = (product) => {
-            const prodStock = stockMap[product.id] || { status: 'disponible' };
+            const prodStock = stockMap[product.id] || { status: 'disponible', credentialsPool: '' };
             
             let badgeClass = 'stock-disponible';
             let label = 'Disponible';
             let isDisabled = false;
 
-            if (prodStock.status === 'bajo_pedido') {
+            const pool = prodStock.credentialsPool || "";
+            const lines = pool.split('\n').filter(l => l.trim() !== '');
+            const count = lines.length;
+
+            if (count > 0) {
+                label = `En Stock (${count})`;
+                badgeClass = 'stock-disponible';
+            } else if (prodStock.status === 'bajo_pedido') {
                 badgeClass = 'stock-bajo-pedido';
                 label = 'Bajo pedido';
             } else if (prodStock.status === 'agotado') {
@@ -198,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                if (userNameElem) userNameElem.textContent = data.username;
+                if (userNameElem) userNameElem.textContent = data.username || user.displayName || user.email.split('@')[0];
                 if (userLinkElem) {
                     userLinkElem.textContent = `$${data.balance.toFixed(2)} MXN`;
                     userLinkElem.href = 'perfil.html';
@@ -212,4 +223,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
+    // 5. Functional Search Bar on Landing Page
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `catalogo.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
 });

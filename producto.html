@@ -92,7 +92,12 @@
                                 </div>
                             </div>
                             
-                            <button id="buyButton" class="btn btn-white" style="padding: 16px 32px; font-size: 1.05rem; width: 100%;" disabled>Iniciando...</button>
+                            <div style="display:flex; gap:12px;">
+                                <button id="buyButton" class="btn btn-white" style="flex-grow:1; padding: 16px; font-size: 1.05rem;" disabled>Iniciando...</button>
+                                <button id="giftButton" class="btn btn-primary" style="padding: 16px; font-size: 1.05rem; background:rgba(88,32,168,0.3); border:1px solid rgba(122,61,214,0.5); border-radius: var(--radius-sm); color:var(--accent-yellow);" disabled title="Regalar a un Amigo">
+                                    <i class="fas fa-gift"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -100,9 +105,30 @@
         </main>
     </div>
 
+    <!-- Gift Modal -->
+    <div class="modal" id="giftModal">
+        <div class="modal-content" style="max-width: 400px; padding: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h3 style="margin:0;"><i class="fas fa-gift" style="color:var(--accent-yellow); margin-right:8px;"></i>Regalar Amigo</h3>
+                <i class="fas fa-times" onclick="closeGiftModal()" style="cursor:pointer; color:rgba(255,255,255,0.5);"></i>
+            </div>
+            
+            <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; display:block;">Selecciona un amigo:</label>
+            <select id="giftFriendSelect" class="admin-input" style="width: 100%; margin-bottom: 16px;">
+                <option value="">Cargando amigos...</option>
+            </select>
+
+            <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; display:block;">Mensaje (Opcional, dura 7 días):</label>
+            <textarea id="giftMessageInput" class="admin-input" rows="3" placeholder="Ej. ¡Feliz Cumpleaños! Disfruta este juego..." style="width: 100%; resize:none; margin-bottom: 24px;"></textarea>
+            
+            <button class="btn btn-primary" id="confirmGiftBtn" style="width: 100%; padding: 12px; font-weight: 600;">Confirmar Regalo</button>
+        </div>
+    </div>
+
     <script src="sparks.js"></script>
     <script src="products.js"></script>
     <script src="navigation.js"></script>
+    <script type="module" src="friends.js"></script>
     <script type="module" src="wishlist.js"></script>
     <script type="module">
         import { auth, db } from "./firebase-config.js";
@@ -194,17 +220,18 @@
             let badgeClass = 'stock-disponible';
             let label = 'Disponible';
 
-            if (stockStatus === 'bajo_pedido') {
+            const lines = defaultCredentials.split('\n').filter(l => l.trim() !== '');
+            const count = lines.length;
+
+            if (count > 0) {
+                label = `En Stock (${count})`;
+                badgeClass = 'stock-disponible';
+            } else if (stockStatus === 'bajo_pedido') {
                 badgeClass = 'stock-bajo-pedido';
                 label = 'Bajo pedido';
             } else if (stockStatus === 'agotado') {
                 badgeClass = 'stock-agotado';
                 label = 'Agotado';
-            } else {
-                const lines = defaultCredentials.split('\n').filter(l => l.trim() !== '');
-                if (lines.length > 0) {
-                    label = `En Stock (${lines.length})`;
-                }
             }
 
             container.innerHTML = `<span class="stock-badge ${badgeClass}">${label}</span>`;
@@ -279,7 +306,7 @@
             }
         };
 
-        const procesarCompra = async (metodo, balanceUsed) => {
+        const procesarCompra = async (metodo, balanceUsed, giftFriendUid = null, giftMessage = '') => {
             const buyBtn = document.getElementById('buyButton');
             buyBtn.disabled = true;
             buyBtn.textContent = "Procesando pedido...";
@@ -296,8 +323,10 @@
 
                 // Create Order document in Firestore
                 const orderData = {
-                    uid: userData.uid,
-                    userEmail: userData.email,
+                    uid: giftFriendUid ? giftFriendUid : userData.uid, // Assigner
+                    giftedBy: giftFriendUid ? userData.uid : null, // Sender
+                    giftMessage: giftMessage,
+                    userEmail: userData.email, // Kept for contact reference
                     productId: product.id,
                     productName: product.name,
                     price: price,
@@ -317,12 +346,33 @@
                     });
                 }
 
-                // Notify User and Redirect
-                if (finalStatus === 'confirmado') {
-                    alert("¡Compra exitosa! Tu saldo ha sido descontado y las credenciales han sido entregadas al instante en tu perfil.");
-                    window.location.href = 'perfil.html';
+                // Notify User and Redirect based on payment method
+                if (metodo === 'saldo') {
+                    // Fully paid with balance - no transfer needed
+                    buyBtn.style.background = "var(--accent-green)";
+                    buyBtn.textContent = "¡Pedido Registrado con Éxito!";
+                    
+                    // Show a sleek toast or prompt
+                    const toast = document.createElement('div');
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.background = 'rgba(0, 210, 106, 0.9)';
+                    toast.style.color = '#white';
+                    toast.style.padding = '16px 24px';
+                    toast.style.borderRadius = '12px';
+                    toast.style.zIndex = '9999';
+                    toast.style.backdropFilter = 'blur(10px)';
+                    toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                    toast.style.fontWeight = '600';
+                    toast.innerHTML = '<i class="fas fa-check-circle"></i> Compra realizada. Redirigiendo a tu perfil para ver tu entrega...';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'perfil.html';
+                    }, 2500);
                 } else {
-                    // Generate WhatsApp text for bank transfer confirmation
+                    // Bank transfer or combined - needs WhatsApp confirmation
                     let whatsText = `Hola, he realizado un pedido en Digital Footprint:%0A`;
                     whatsText += `🛒 *${product.name}*%0A`;
                     whatsText += `💰 Método de pago: *${metodo.toUpperCase()}*%0A`;
@@ -332,23 +382,86 @@
                         whatsText += `💵 Combinado: Utilicé $${balanceUsed.toFixed(2)} MXN de mi saldo y transferí el restante de *$${restante.toFixed(2)} MXN*.%0A`;
                     } else if (metodo === 'transferencia') {
                         whatsText += `💵 Total a transferir: *$${price.toFixed(2)} MXN*.%0A`;
-                    } else {
-                        // Just in case it's 'saldo' but couldn't be auto-delivered
-                        whatsText += `💵 Utilicé *$${balanceUsed.toFixed(2)} MXN* de mi saldo.%0A`;
                     }
                     
                     whatsText += `👤 Email: *${userData.email}*%0A`;
                     whatsText += `Adjunto mi comprobante para la entrega.`;
 
-                    alert("Pedido registrado. A continuación te redirigiremos a WhatsApp para enviar el comprobante de transferencia y activar tu servicio.");
-                    window.location.href = `https://wa.me/525574123521?text=${whatsText}`;
+                    buyBtn.style.background = "var(--accent-yellow)";
+                    buyBtn.style.color = "black";
+                    buyBtn.textContent = "Redirigiendo a WhatsApp...";
+                    
+                    setTimeout(() => {
+                        window.location.href = `https://wa.me/525574123521?text=${whatsText}`;
+                    }, 1500);
                 }
 
             } catch(error) {
                 alert("Error al procesar la compra: " + error.message);
-                updateBuyButtonState();
             }
         };
+
+        // --- Gifting Logic ---
+        document.getElementById('giftButton').addEventListener('click', async () => {
+            document.getElementById('giftModal').classList.add('active');
+            const select = document.getElementById('giftFriendSelect');
+            select.innerHTML = '<option value="">Cargando amigos...</option>';
+            
+            try {
+                const q1 = query(collection(db, "friendships"), where("uid1", "==", userData.uid), where("status", "==", "accepted"));
+                const q2 = query(collection(db, "friendships"), where("uid2", "==", userData.uid), where("status", "==", "accepted"));
+                
+                const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+                let friends = [];
+                s1.forEach(doc => friends.push({ ...doc.data() }));
+                s2.forEach(doc => friends.push({ ...doc.data() }));
+                
+                select.innerHTML = '<option value="">Selecciona un amigo</option>';
+                for (const f of friends) {
+                    const friendUid = (f.uid1 === userData.uid) ? f.uid2 : f.uid1;
+                    const friendDoc = await getDoc(doc(db, "users", friendUid));
+                    if (friendDoc.exists()) {
+                        const fname = friendDoc.data().username || friendDoc.data().email;
+                        select.innerHTML += `<option value="${friendUid}">${fname}</option>`;
+                    }
+                }
+                
+                if (friends.length === 0) {
+                    select.innerHTML = '<option value="">No tienes amigos agregados</option>';
+                }
+            } catch(e) {
+                console.error(e);
+                select.innerHTML = '<option value="">Error al cargar amigos</option>';
+            }
+        });
+
+        window.closeGiftModal = () => {
+            document.getElementById('giftModal').classList.remove('active');
+        };
+
+        document.getElementById('confirmGiftBtn').addEventListener('click', () => {
+            const friendUid = document.getElementById('giftFriendSelect').value;
+            const message = document.getElementById('giftMessageInput').value.trim();
+            
+            if (!friendUid) {
+                alert("Debes seleccionar a un amigo.");
+                return;
+            }
+            
+            const balanceUsed = parseFloat(document.getElementById('balanceToUseInput').value) || 0;
+            // Determine payment method
+            const price = product.price;
+            let metodo = 'transferencia';
+            if (balanceUsed === price) metodo = 'saldo';
+            else if (balanceUsed > 0) metodo = 'combinado';
+            
+            procesarCompra(metodo, balanceUsed, friendUid, message);
+            closeGiftModal();
+        });
+
+        // Add gifting params to procesarCompra
+        // We will modify the previous procesarCompra to handle gifted orders
+
     </script>
 </body>
 </html>

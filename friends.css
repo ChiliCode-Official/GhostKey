@@ -1,0 +1,243 @@
+/* friends.css - Apple/Ankama Inspired Friends Sidebar */
+
+:root {
+    --friends-sidebar-width: 320px;
+    --friends-bg: rgba(26, 8, 46, 0.85); /* Deep dark purple */
+    --friends-border: rgba(255,255,255,0.08);
+}
+
+.friends-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.friends-sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.friends-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: var(--friends-sidebar-width);
+    height: 100vh;
+    background: var(--friends-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid var(--friends-border);
+    z-index: 9999;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    color: white;
+}
+
+.friends-sidebar.open {
+    right: 0;
+}
+
+.friends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.friends-tabs {
+    display: flex;
+    gap: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.friends-tab {
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: color 0.2s;
+    position: relative;
+}
+.friends-tab.active {
+    color: white;
+}
+.friends-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-yellow);
+    border-radius: 2px;
+}
+
+.friends-req-badge {
+    background: var(--accent-red);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+.friends-close-btn {
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    transition: color 0.2s;
+    font-size: 1.2rem;
+}
+.friends-close-btn:hover {
+    color: white;
+}
+
+.friends-search {
+    position: relative;
+    margin-bottom: 24px;
+}
+.friends-search input {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--friends-border);
+    border-radius: 12px;
+    padding: 12px 12px 12px 36px;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+}
+.friends-search input:focus {
+    border-color: var(--accent-yellow);
+}
+.friends-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+}
+
+.friends-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 8px; /* For scrollbar */
+}
+.friends-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+.friends-list-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+.friend-category-title {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    margin: 16px 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+.friend-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.friend-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+.friend-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.friend-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    border: 2px solid var(--friends-bg);
+}
+
+.friend-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+.friend-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.friend-subtext {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.friend-action-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.friend-action-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.referral-box {
+    margin-top: 16px;
+    background: rgba(88, 32, 168, 0.2);
+    border: 1px solid rgba(122, 61, 214, 0.3);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+}
+.referral-box h4 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--accent-yellow);
+}
+.referral-box p {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 12px;
+}
+.referral-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}

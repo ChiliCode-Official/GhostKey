@@ -87,6 +87,9 @@
                 </div>
                 
                 <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer;" title="Amigos">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
                     <div class="icon-btn">
                         <i class="far fa-heart"></i>
                     </div>
@@ -166,6 +169,15 @@
                         <!-- Products will be injected here by JS -->
                     </div>
                 </section>
+                
+                <!-- Footer -->
+                <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: rgba(255,255,255,0.4); font-size: 0.85rem;">
+                    <p>&copy; 2026 Digital Footprint. Todos los derechos reservados.</p>
+                    <div style="margin-top: 10px; display: flex; justify-content: center; gap: 20px;">
+                        <a href="terminos.html" style="color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.3s;">Términos y Condiciones</a>
+                        <a href="privacidad.html" style="color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.3s;">Políticas de Privacidad</a>
+                    </div>
+                </footer>
 
             </div>
         </main>
@@ -242,6 +254,7 @@
     <script src="products.js"></script>
     <script src="navigation.js"></script>
     <script type="module" src="wishlist.js"></script>
+    <script type="module" src="friends.js"></script>
     <script type="module" src="main.js"></script>
     <script src="stepper.js"></script>
 </body>
