@@ -1,430 +1,276 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Producto | Digital Footprint Material</title>
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-
-    <!-- Open Graph / Social Sharing -->
-    <meta property="og:title" content="Digital Footprint | Producto">
-    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
-    
-    <!-- Favicon -->
+    <title>Producto | Digital Footprint</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SVG Gooey Filter (Required for Navbar across all pages) -->
-    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
-        <defs>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-            </filter>
-        </defs>
-    </svg>
-    <style>
-        .product-detail-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: start;
-        }
-        .product-image-card {
-            background: white;
-            border-radius: 40px;
-            padding: 40px;
-            box-shadow: var(--md-sys-elevation-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .product-image-card img {
-            width: 100%;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-        }
-        @media (max-width: 992px) {
-            .product-detail-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .product-image-card {
-                padding: 20px;
-            }
-        }
-
-        .product-info-detail h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--md-sys-color-on-surface);
-        }
-
-        .product-price-large {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--google-blue);
-            margin-bottom: 24px;
-        }
-
-        .product-description {
-            font-size: 1.125rem;
-            color: var(--md-sys-color-on-surface-variant);
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .material-input {
-            background: var(--md-sys-color-surface-variant);
-            border: none;
-            border-bottom: 2px solid var(--md-sys-color-outline);
-            padding: 16px;
-            border-radius: 12px 12px 0 0;
-            width: 100%;
-            font-size: 1.25rem;
-            font-family: inherit;
-            outline: none;
-        }
-
-        .chip-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .chip {
-            padding: 8px 20px;
-            border-radius: 100px;
-            border: 1px solid var(--md-sys-color-outline);
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .chip.active {
-            background: var(--md-sys-color-primary-container);
-            color: var(--md-sys-color-on-primary-container);
-            border-color: transparent;
-        }
-
-        @media (max-width: 968px) {
-            .product-detail-container { grid-template-columns: 1fr; gap: 40px; }
-            .product-image-large { height: 350px; position: static; }
-            .product-info-detail h1 { font-size: 2.5rem; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header class="header">
-        <nav class="nav">
-            <!-- Segment 1: Logo & Cart -->
-            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
-                <span class="material-symbols-rounded">shopping_cart</span>
-                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
             </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="catalogo.html" class="nav-item active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="metodos.html" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Métodos</span>
+                </a>
+                <a href="comprar.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Ayuda</span>
+                </a>
+                <a href="contacto.html" class="nav-item">
+                    <i class="fas fa-headset"></i>
+                    <span>Contacto</span>
+                </a>
+            </nav>
+        </aside>
 
-            <!-- Segment 2: Links -->
-            <div class="nav-segment segment-links">
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-blue">
-                        <span class="material-symbols-rounded">home</span>
-                        <span>Inicio</span>
-                    </a></li>
-                    <li><a href="catalogo.html" class="active nav-green">
-                        <span class="material-symbols-rounded">category</span>
-                        <span>Catálogo</span>
-                    </a></li>
-                    <li><a href="metodos.html" class="nav-yellow">
-                        <span class="material-symbols-rounded">payments</span>
-                        <span>Métodos</span>
-                    </a></li>
-                    <li><a href="comprar.html" class="nav-red">
-                        <span class="material-symbols-rounded">help</span>
-                        <span>Ayuda</span>
-                    </a></li>
-                </ul>
-            </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar" style="visibility: hidden;"></div>
+                <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.history.back()" style="cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                </div>
+            </header>
 
-            <!-- Segment 3: Action -->
-            <div class="nav-segment segment-action" id="installSegment">
-                <button class="btn-install" id="installApp">
-                    <span class="material-symbols-rounded">download_for_offline</span>
-                </button>
-            </div>
-        </nav>
-    </header>
+            <div class="content-scroll" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <div class="modal-content" style="transform: none; display: flex; width: 100%; max-width: 900px; background: transparent; border: none;">
+                    <div class="modal-image" style="border-radius: var(--radius-lg); overflow: hidden; height: 400px;" id="prodImgContainer">
+                        <img id="prodImage" src="" alt="">
+                    </div>
+                    <div class="modal-details" style="background: var(--card-bg); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; border: 1px solid var(--border-color); border-left: none;">
+                        <span id="prodCategory" style="color: var(--accent-yellow); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block;">Categoría</span>
+                        <h2 id="prodName" style="font-size: 2.5rem; margin-bottom: 8px;">Cargando...</h2>
+                        
+                        <div id="stockBadgeContainer" style="margin-bottom: 16px;">
+                            <!-- Injected stock phase badge -->
+                        </div>
 
-    <main class="page-content" style="padding-top: 40px;">
-        <div class="container" id="productDetail">
-            <!-- Content loaded via JS -->
-            <div style="text-align: center; padding: 100px 0;">
-                <span class="material-symbols-rounded" style="font-size: 64px; color: var(--google-blue); animation: spin 1s linear infinite;">progress_activity</span>
-                <p style="margin-top: 24px;">Configurando tu experiencia...</p>
-            </div>
-        </div>
-
-        <section class="container section-padding" style="margin-top: 80px; border-top: 1px solid var(--md-sys-color-outline-variant);">
-            <h2 style="margin-bottom: 32px;">También te puede interesar</h2>
-            <div class="products-grid" id="relatedGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
-                <!-- Suggested products loaded via JS -->
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2024 Digital Footprint. Material Design.</p>
-                <div class="agency-watermark">
-                    <p>Desarrollado con <span class="heart">❤</span> por <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank">ChiliCode Agency</a> | 
-                       <a href="https://www.instagram.com/chilicode_agency/" target="_blank"><i class="fab fa-instagram"></i> Agency</a> | 
-                       <a href="https://www.instagram.com/rodricg30/" target="_blank"><i class="fab fa-instagram"></i> CEO</a>
-                    </p>
+                        <p id="prodDesc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 32px; font-size: 0.95rem;">...</p>
+                        
+                        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">Precio Total</span>
+                                    <span class="price" style="font-size: 2rem; color: white;" id="prodPrice">$0.00 <span style="font-size:1rem; color:var(--text-secondary);">MXN</span></span>
+                                </div>
+                                <div id="userBalanceText" style="font-size: 0.9rem; color: var(--text-secondary); text-align: right;">
+                                    <!-- Injected balance -->
+                                </div>
+                            </div>
+                            
+                            <button id="buyButton" class="btn btn-white" style="padding: 16px 32px; font-size: 1.05rem; width: 100%;" disabled>Iniciando...</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </main>
+    </div>
 
+    <script src="sparks.js"></script>
     <script src="products.js"></script>
-    <script src="main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const productId = parseInt(params.get('id'));
-            const fromFilter = params.get('from') || 'all';
-            const product = products.find(p => p.id === productId);
-            const container = document.getElementById('productDetail');
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc, setDoc, addDoc, collection, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            if (product) {
-                const backUrl = `catalogo.html?filter=${fromFilter}`;
+        let product = null;
+        let userData = null;
+        let stockStatus = 'disponible'; // Default
+        let defaultCredentials = '';
 
-                if (product.type === 'calculator') {
-                    const unitName = product.unitName || 'Unidades';
-                    const hasGuarantee = product.priceWithGuarantee !== undefined;
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id'));
 
-                    container.innerHTML = `
-                        <div class="product-detail-container">
-                            <div class="product-image-large">
-                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
-                            </div>
-                            <div class="product-info-detail">
-                                ${product.badge ? `<span style="background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); padding: 4px 16px; border-radius: 100px; font-weight: 600; font-size: 0.8rem; margin-bottom: 16px; display: inline-block;">${product.badge}</span>` : ''}
-                                <h1>${product.name}</h1>
-                                <p class="product-description">${product.description}</p>
-                                
-                                <div style="background: #ffffff; padding: 32px; border-radius: 28px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 32px;">
-                                    ${hasGuarantee ? `
-                                        <div style="margin-bottom: 24px;">
-                                            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Modalidad de servicio</label>
-                                            <div class="chip-group">
-                                                <div class="chip active" data-price="${product.price}">Sin Garantía</div>
-                                                <div class="chip" data-price="${product.priceWithGuarantee}">Con Garantía (+Seguro)</div>
-                                            </div>
-                                        </div>
-                                    ` : ''}
+            if (!id || typeof products === 'undefined') {
+                document.getElementById('prodName').textContent = 'Producto no encontrado';
+                return;
+            }
 
-                                    <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Cantidad de ${unitName}</label>
-                                    <div class="qty-selector-large" style="display: flex; align-items: center; gap: 12px; background: var(--md-sys-color-surface-variant); padding: 8px; border-radius: 20px; margin-bottom: 24px;">
-                                        <button id="calcMinus" class="btn-icon" style="width: 48px; height: 48px; border-radius: 16px; border: none; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                            <span class="material-symbols-rounded">remove</span>
-                                        </button>
-                                        <input type="number" id="calcAmount" value="${product.minAmount || 1}" min="${product.minAmount || 1}" step="${product.step || 1}" class="material-input" style="flex: 1; text-align: center; border: none; background: transparent; font-size: 1.5rem; font-weight: 700; padding: 0;">
-                                        <button id="calcPlus" class="btn-icon" style="width: 48px; height: 48px; border-radius: 16px; border: none; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                            <span class="material-symbols-rounded">add</span>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="product-price-large" id="calculatedPrice" style="margin-top: 32px;">
-                                        $${product.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
-                                    </div>
-                                    <p id="unitCostDesc" style="font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);"></p>
-                                </div>
+            product = products.find(p => p.id === id);
+            if (!product) {
+                document.getElementById('prodName').textContent = 'Producto no encontrado';
+                return;
+            }
 
-                                <div style="display: flex; gap: 16px;">
-                                    <button id="addCalculatedBtn" class="btn btn-primary" style="flex: 2; padding: 18px;">
-                                        <span class="material-symbols-rounded">shopping_cart</span>
-                                        Añadir al carrito
-                                    </button>
-                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+            // Fill UI basic details
+            document.getElementById('prodName').textContent = product.name;
+            document.getElementById('prodDesc').textContent = product.description;
+            document.getElementById('prodPrice').innerHTML = `$${product.price.toFixed(2)} <span style="font-size:1rem; color:var(--text-secondary);">MXN</span>`;
+            document.getElementById('prodImage').src = product.image;
+            document.getElementById('prodCategory').textContent = product.category;
 
-                    // Calculator Logic
-                    const amountInput = document.getElementById('calcAmount');
-                    const priceDisplay = document.getElementById('calculatedPrice');
-                    const addBtn = document.getElementById('addCalculatedBtn');
-                    const unitCostDesc = document.getElementById('unitCostDesc');
-                    const minusBtn = document.getElementById('calcMinus');
-                    const plusBtn = document.getElementById('calcPlus');
-                    
-                    let currentPrice = product.price;
-                    let currentMode = hasGuarantee ? "Sin Garantía" : "";
+            // Fetch Real-time Stock Config from Firestore
+            try {
+                const stockDoc = await getDoc(doc(db, "products_stock", String(product.id)));
+                if(stockDoc.exists()) {
+                    stockStatus = stockDoc.data().status || 'disponible';
+                    defaultCredentials = stockDoc.data().textToDeliver || '';
+                }
+            } catch(e) {
+                console.error("Error fetching stock configuration:", e);
+            }
 
-                    // Identify if it's "per 1000" (like followers) or "per unit" (like wholesale)
-                    const isPerThousand = product.id === 90; 
+            renderStockBadge();
 
-                    const updatePrice = () => {
-                        let amount = parseInt(amountInput.value) || 0;
-                        const min = parseInt(amountInput.min) || 1;
+            // Listen to auth
+            onAuthStateChanged(auth, async (user) => {
+                const buyBtn = document.getElementById('buyButton');
+                const balanceText = document.getElementById('userBalanceText');
+                
+                if (user) {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        userData.uid = user.uid;
+                        balanceText.innerHTML = `Tu Saldo: <strong>$${userData.balance.toFixed(2)} MXN</strong>`;
                         
-                        // Force minimum quantity
-                        if (amount < min) {
-                            amount = min;
-                            amountInput.value = min;
-                        }
-
-                        const total = isPerThousand ? (amount * (currentPrice / 1000)) : (amount * currentPrice);
-                        priceDisplay.innerHTML = `$${total.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>`;
-                        
-                        if (isPerThousand) {
-                            unitCostDesc.textContent = `Precio por mil: $${currentPrice.toFixed(2)}`;
-                        } else {
-                            unitCostDesc.textContent = `Precio por unidad: $${currentPrice.toFixed(2)}`;
-                        }
-                        
-                        return { amount, total };
-                    };
-
-                    const chips = document.querySelectorAll('.chip');
-                    chips.forEach(chip => {
-                        chip.addEventListener('click', () => {
-                            chips.forEach(c => c.classList.remove('active'));
-                            chip.classList.add('active');
-                            currentPrice = parseFloat(chip.dataset.price);
-                            currentMode = chip.textContent;
-                            updatePrice();
-                        });
-                    });
-
-                    minusBtn.addEventListener('click', () => {
-                        const step = parseInt(amountInput.step) || 1;
-                        amountInput.value = Math.max(parseInt(amountInput.min), (parseInt(amountInput.value) || 0) - step);
-                        updatePrice();
-                    });
-
-                    plusBtn.addEventListener('click', () => {
-                        const step = parseInt(amountInput.step) || 1;
-                        amountInput.value = (parseInt(amountInput.value) || 0) + step;
-                        updatePrice();
-                    });
-
-                    amountInput.addEventListener('input', updatePrice);
-                    
-                    // Initial calculation
-                    updatePrice();
-
-                    addBtn.addEventListener('click', () => {
-                        const { amount, total } = updatePrice();
-                        addToCartCalculated(product.id, amount, total, unitName, currentMode);
-                    });
-
-                } else if (product.type === 'selectable') {
-                    container.innerHTML = `
-                        <div class="product-detail-container">
-                            <div class="product-image-large">
-                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
-                            </div>
-                            <div class="product-info-detail">
-                                <h1>${product.name}</h1>
-                                <p class="product-description">${product.description}</p>
-                                
-                                <div style="background: #ffffff; padding: 32px; border-radius: 28px; border: 1px solid var(--md-sys-color-outline-variant); margin-bottom: 32px;">
-                                    <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block;">Elige una opción</label>
-                                    <div class="chip-group" id="variantOptions">
-                                        ${product.variants.map((v, i) => `
-                                            <div class="chip ${i === 0 ? 'active' : ''}" data-price="${v.price}" data-name="${v.name}">${v.name}</div>
-                                        `).join('')}
-                                    </div>
-                                    <div class="product-price-large" id="selectedPrice" style="margin-top: 32px;">
-                                        $${product.variants[0].price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
-                                    </div>
-                                </div>
-
-                                <div style="display: flex; gap: 16px;">
-                                    <button id="addVariantBtn" class="btn btn-primary" style="flex: 2; padding: 18px;">
-                                        <span class="material-symbols-rounded">shopping_cart</span>
-                                        Añadir al carrito
-                                    </button>
-                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    const variantChips = document.querySelectorAll('.chip');
-                    const priceDisplay = document.getElementById('selectedPrice');
-                    let currentVariant = product.variants[0];
-
-                    variantChips.forEach(chip => {
-                        chip.addEventListener('click', () => {
-                            variantChips.forEach(c => c.classList.remove('active'));
-                            chip.classList.add('active');
-                            currentVariant = { name: chip.dataset.name, price: parseFloat(chip.dataset.price) };
-                            priceDisplay.innerHTML = `$${currentVariant.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>`;
-                        });
-                    });
-
-                    document.getElementById('addVariantBtn').addEventListener('click', () => {
-                        addToCartCalculated(product.id, currentVariant.name, currentVariant.price, '', '');
-                    });
+                        updateBuyButtonState();
+                    }
                 } else {
-                    container.innerHTML = `
-                        <div class="product-detail-container">
-                            <div class="product-image-large">
-                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span class="material-symbols-rounded" style="font-size: 160px; color: var(--google-blue); opacity: 0.2;">inventory_2</span>`}
-                            </div>
-                            <div class="product-info-detail">
-                                <h1>${product.name}</h1>
-                                <div class="product-price-large">
-                                    $${product.price.toFixed(2)} <small style="font-size: 1rem; color: var(--md-sys-color-on-surface-variant);">MXN</small>
-                                </div>
-                                <p class="product-description">${product.description}</p>
-                                <div style="display: flex; gap: 16px;">
-                                    <button onclick="addToCart(${product.id})" class="btn btn-primary" style="flex: 2; padding: 18px;">
-                                        <span class="material-symbols-rounded">shopping_cart</span>
-                                        Añadir al carrito
-                                    </button>
-                                    <a href="${backUrl}" class="btn btn-outline" style="flex: 1; padding: 18px;">Volver</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    balanceText.textContent = "Inicia sesión para comprar";
+                    buyBtn.textContent = "Iniciar sesión para comprar";
+                    buyBtn.disabled = false;
+                    buyBtn.onclick = () => window.location.href = 'perfil.html';
+                }
+            });
+        });
+
+        const renderStockBadge = () => {
+            const container = document.getElementById('stockBadgeContainer');
+            let badgeClass = 'stock-disponible';
+            let label = 'Disponible';
+
+            if (stockStatus === 'bajo_pedido') {
+                badgeClass = 'stock-bajo-pedido';
+                label = 'Bajo pedido';
+            } else if (stockStatus === 'agotado') {
+                badgeClass = 'stock-agotado';
+                label = 'Agotado';
+            }
+
+            container.innerHTML = `<span class="stock-badge ${badgeClass}">${label}</span>`;
+        };
+
+        const updateBuyButtonState = () => {
+            const buyBtn = document.getElementById('buyButton');
+            
+            if (stockStatus === 'agotado') {
+                buyBtn.textContent = "PRODUCTO AGOTADO";
+                buyBtn.disabled = true;
+                buyBtn.onclick = null;
+                return;
+            }
+
+            buyBtn.disabled = false;
+
+            const price = product.price;
+            const balance = userData.balance;
+
+            if (balance >= price) {
+                buyBtn.textContent = `COMPRAR CON SALDO ($${price.toFixed(2)} MXN)`;
+                buyBtn.onclick = () => procesarCompra('saldo');
+            } else if (balance > 0) {
+                const restante = price - balance;
+                buyBtn.textContent = `COMBINAR: $${balance.toFixed(2)} Saldo + $${restante.toFixed(2)} Transferencia`;
+                buyBtn.onclick = () => procesarCompra('combinado');
+            } else {
+                buyBtn.textContent = "PAGAR CON TRANSFERENCIA BANCARIA";
+                buyBtn.onclick = () => procesarCompra('transferencia');
+            }
+        };
+
+        const procesarCompra = async (metodo) => {
+            const buyBtn = document.getElementById('buyButton');
+            buyBtn.disabled = true;
+            buyBtn.textContent = "Procesando pedido...";
+
+            try {
+                const balance = userData.balance;
+                const price = product.price;
+
+                let finalStatus = 'pendiente';
+                let finalDeliveredText = '';
+                let finalBalance = balance;
+
+                if (metodo === 'saldo') {
+                    finalBalance = balance - price;
+                } else if (metodo === 'combinado') {
+                    finalBalance = 0;
                 }
 
-                // Render Suggestions
-                const relatedGrid = document.getElementById('relatedGrid');
-                const suggestions = products
-                    .filter(p => p.id !== product.id && (p.category === product.category))
-                    .slice(0, 4);
+                // Create Order document in Firestore
+                const orderData = {
+                    uid: userData.uid, // Fixed to use uid instead of userId for consistency with query
+                    userEmail: userData.email, // Use email instead of username
+                    productId: product.id,
+                    productName: product.name,
+                    price: price,
+                    status: finalStatus,
+                    textDelivered: finalDeliveredText,
+                    method: metodo, // consistent with admin query
+                    timestamp: Date.now()
+                };
 
-                relatedGrid.innerHTML = suggestions.map(p => `
-                    <div class="card animate-reveal active" onclick="window.location.href='producto.html?id=${p.id}'" style="cursor: pointer;">
-                        <div style="height: 160px; background: #f1f3f4; border-radius: 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center;">
-                             ${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">` : `<span class="material-symbols-rounded">inventory_2</span>`}
-                        </div>
-                        <h3 style="font-size: 1rem; margin-bottom: 4px;">${p.name}</h3>
-                        <p style="font-weight:700; color:var(--google-blue);">$${p.price.toFixed(2)}</p>
-                    </div>
-                `).join('');
+                await addDoc(collection(db, "orders"), orderData);
+
+                // Update User Balance in Firestore
+                if (finalBalance !== balance) {
+                    await updateDoc(doc(db, "users", userData.uid), {
+                        balance: finalBalance
+                    });
+                }
+
+                // Notify User and Redirect
+                if (finalStatus === 'confirmado') {
+                    alert("¡Compra exitosa! Tu saldo ha sido descontado y las credenciales han sido entregadas al instante en tu perfil.");
+                    window.location.href = 'perfil.html';
+                } else {
+                    // Generate WhatsApp text for bank transfer confirmation
+                    let whatsText = `Hola, he realizado un pedido en Digital Footprint:%0A`;
+                    whatsText += `🛒 *${product.name}*%0A`;
+                    whatsText += `💰 Método de pago: *${metodo.toUpperCase()}*%0A`;
+                    
+                    if (metodo === 'combinado') {
+                        const restante = price - balance;
+                        whatsText += `💵 Combinado: Utilicé $${balance.toFixed(2)} MXN de mi saldo y transferí el restante de *$${restante.toFixed(2)} MXN*.%0A`;
+                    } else {
+                        whatsText += `💵 Total a transferir: *$${price.toFixed(2)} MXN*.%0A`;
+                    }
+                    
+                    whatsText += `👤 Email: *${userData.email}*%0A`;
+                    whatsText += `Adjunto mi comprobante para la entrega.`;
+
+                    alert("Pedido registrado. A continuación te redirigiremos a WhatsApp para enviar el comprobante de transferencia y activar tu servicio.");
+                    window.location.open = `https://wa.me/525574123521?text=${whatsText}`;
+                    window.location.href = 'perfil.html';
+                }
+
+            } catch(error) {
+                alert("Error al procesar la compra: " + error.message);
+                updateBuyButtonState();
             }
-        });
+        };
     </script>
 </body>
-
 </html>

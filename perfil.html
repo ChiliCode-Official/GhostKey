@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil y Admin | Digital Footprint</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background: rgba(20, 20, 25, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-section, .dashboard-section, .admin-section {
+            display: none; /* hidden by default, toggled by JS */
+        }
+
+        .auth-box {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .google-btn {
+            background: #fff;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .google-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .admin-login-box {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .stat-card {
+            background: rgba(81, 19, 250, 0.1);
+            border: 1px solid rgba(81, 19, 250, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: #5113fa;
+            font-weight: bold;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        th {
+            color: rgba(255,255,255,0.5);
+            font-weight: normal;
+        }
+
+        .action-btn {
+            background: #5113fa;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .action-btn.reject {
+            background: #fa134d;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #5113fa;
+            border-color: #5113fa;
+        }
+
+        .admin-panel-content {
+            display: none;
+        }
+
+        .admin-panel-content.active {
+            display: block;
+        }
+
+        textarea.admin-input {
+            max-width: 100%;
+            height: 100px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="catalogo.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-actions" style="margin-left: auto;">
+                    <div class="icon-btn" onclick="window.location.href='index.html'" style="cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                <div class="profile-container">
+                    
+                    <!-- Auth Section -->
+                    <div id="authSection" class="auth-section">
+                        <div class="auth-box">
+                            <h2>Iniciar Sesión</h2>
+                            <p style="color: rgba(255,255,255,0.6); margin-bottom: 30px;">Ingresa para ver tus pedidos y saldo.</p>
+                            <button id="googleLoginBtn" class="google-btn">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google">
+                                Continuar con Google
+                            </button>
+
+                            <div class="admin-login-box">
+                                <h4>Acceso Administrativo</h4>
+                                <input type="text" id="adminUser" class="admin-input" placeholder="Usuario"><br>
+                                <input type="password" id="adminPass" class="admin-input" placeholder="Contraseña"><br>
+                                <button id="adminLoginBtn" class="action-btn">Entrar como Admin</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Dashboard Section -->
+                    <div id="userDashboard" class="dashboard-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                            <h2>Mi Perfil</h2>
+                            <button id="logoutBtn" class="tab-btn">Cerrar Sesión</button>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div>Saldo Disponible</div>
+                            <div class="stat-value" id="userBalance">$0.00 MXN</div>
+                            <div style="margin-top: 10px; font-size: 0.9em; color: rgba(255,255,255,0.6);">Para agregar saldo, contacta al soporte con tu comprobante de transferencia. UID: <span id="userUidDisplay"></span></div>
+                        </div>
+
+                        <h3>Mis Pedidos</h3>
+                        <div class="table-container">
+                            <table id="userOrdersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Producto</th>
+                                        <th>Estado</th>
+                                        <th>Entrega / Credenciales</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admin Dashboard Section -->
+                    <div id="adminDashboard" class="admin-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                            <h2><i class="fas fa-crown" style="color: #ffb703;"></i> Panel de Administración</h2>
+                            <button id="adminLogoutBtn" class="tab-btn">Cerrar Sesión</button>
+                        </div>
+
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="switchAdminTab('orders')">Pedidos Pendientes</button>
+                            <button class="tab-btn" onclick="switchAdminTab('users')">Gestión de Usuarios (Saldo)</button>
+                            <button class="tab-btn" onclick="switchAdminTab('inventory')">Inventario & Stock</button>
+                        </div>
+
+                        <!-- Orders Tab -->
+                        <div id="tab-orders" class="admin-panel-content active">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>Producto</th>
+                                            <th>Pago</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminOrdersTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Users Tab -->
+                        <div id="tab-users" class="admin-panel-content">
+                            <div style="margin-bottom: 20px;">
+                                <input type="text" id="searchUserEmail" class="admin-input" placeholder="Buscar email...">
+                                <button class="action-btn" onclick="searchUser()">Buscar</button>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Email</th>
+                                            <th>UID</th>
+                                            <th>Saldo Actual</th>
+                                            <th>Añadir Saldo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminUsersTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Tab -->
+                        <div id="tab-inventory" class="admin-panel-content">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Estado</th>
+                                            <th>Credenciales en Stock (Una por línea)</th>
+                                            <th>Guardar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminInventoryTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="sparks.js"></script>
+    <script src="products.js"></script>
+    <script type="module" src="perfil.js"></script>
+    <script>
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.admin-panel-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,363 +1,178 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Footprint | Material Design Edition</title>
-    <meta name="description"
-        content="Descubre las mejores ofertas en V-Bucks, Cuentas OG y suscripciones de Streaming.">
+    <title>Digital Footprint | Game Store</title>
+    <meta name="description" content="Descubre las mejores ofertas en V-Bucks, Crew y más.">
 
-    <!-- Open Graph / Social Sharing -->
-    <meta property="og:title" content="Digital Footprint | Tu Tienda Gaming Premium">
-    <meta property="og:description"
-        content="Descubre las mejores ofertas en V-Bucks, Cuentas OG y Streaming. Calidad Premium.">
-    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
-    <meta property="og:url" content="index.html">
-    <meta property="og:type" content="website">
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
 
-    <!-- Material You Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="style.css">
 
-    <!-- Gooey Filter for Navbar -->
-    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
-        <defs>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                    result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-        </defs>
-    </svg>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-
 <body>
-    <header class="header">
-        <nav class="nav">
-            <!-- Segment 1: Logo & Cart -->
-            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
-                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="logo-img">
-                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
             </div>
 
-            <!-- Segment 2: Links -->
-            <div class="nav-segment segment-links">
-                <ul class="nav-list">
-                    <li><a href="index.html" class="active nav-blue">
-                            <span class="material-symbols-rounded">home</span>
-                            <span>Inicio</span>
-                        </a></li>
-                    <li><a href="catalogo.html" class="nav-green">
-                            <span class="material-symbols-rounded">category</span>
-                            <span>Catálogo</span>
-                        </a></li>
-                    <li><a href="metodos.html" class="nav-yellow">
-                            <span class="material-symbols-rounded">payments</span>
-                            <span>Métodos</span>
-                        </a></li>
-                    <li><a href="comprar.html" class="nav-red">
-                            <span class="material-symbols-rounded">help</span>
-                            <span>Ayuda</span>
-                        </a></li>
-                </ul>
-            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="catalogo.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="metodos.html" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Métodos</span>
+                </a>
+                <a href="comprar.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Ayuda</span>
+                </a>
+                <a href="contacto.html" class="nav-item">
+                    <i class="fas fa-headset"></i>
+                    <span>Contacto</span>
+                </a>
+            </nav>
 
-            <!-- Segment 3: Action -->
-            <div class="nav-segment segment-action" id="installSegment">
-                <button class="btn-install" id="installApp">
-                    <span class="material-symbols-rounded">download_for_offline</span>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <!-- Full Immersive 3D Hero -->
-        <section class="hero-3d">
-            <div class="spline-full-container">
-                <div class="spline-wrapper">
-                    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.90/build/spline-viewer.js"></script>
-                    <spline-viewer url="https://prod.spline.design/h75YifN31oZtzhS0/scene.splinecode"></spline-viewer>
+            <div class="sidebar-section-title">TOP VENTAS</div>
+            <div class="fast-launch">
+                <div class="game-item" onclick="window.location.href='catalogo.html?filter=vbucks'">
+                    <img src="https://i.imgur.com/bAD3nB1.png" class="game-icon" alt="VBucks">
+                    <span class="game-name">V-Bucks Ofertas</span>
+                </div>
+                <div class="game-item" onclick="window.location.href='catalogo.html?filter=crew'">
+                    <img src="https://i.imgur.com/3XpcBuu.png" class="game-icon" alt="Crew">
+                    <span class="game-name">Fortnite Crew</span>
+                </div>
+                <div class="game-item" onclick="window.location.href='catalogo.html?filter=discord'">
+                    <img src="https://i.imgur.com/TT7IPi9.png" class="game-icon" alt="Discord">
+                    <span class="game-name">Discord Nitro</span>
                 </div>
             </div>
-            <div class="container hero-3d-content">
-                <div class="hero-text-box">
-                    <h1 class="hero-title">Tu universo digital, <span style="color: var(--google-blue);">optimizado.</span></h1>
-                    <p class="hero-subtitle">Experimenta la mejor selección de servicios gaming y suscripciones con la garantía y el diseño que te mereces.</p>
-                    <div class="hero-btns">
-                        <a href="catalogo.html" class="btn btn-primary">
-                            <span class="material-symbols-rounded">shopping_bag</span>
-                            Explorar Catálogo
-                        </a>
-                        <a href="metodos.html" class="btn btn-outline">
-                            <span class="material-symbols-rounded">payments</span>
-                            Métodos de Pago
-                        </a>
+
+            <div class="active-download">
+                <div class="active-download-top">
+                    <i class="fab fa-discord dl-icon" style="background:#5865F2; display:flex; align-items:center; justify-content:center; font-size:14px; color:white;"></i>
+                    <div class="dl-info">
+                        <span class="dl-title">Comunidad Activa</span>
+                        <span class="dl-status">Soporte 24/7</span>
                     </div>
                 </div>
+                <a href="https://discord.gg/Aq3TjM4tJT" target="_blank" class="btn btn-primary" style="width:100%; font-size:0.75rem; padding:8px; background:var(--accent-blue); color:white; border-radius:4px; text-align:center; text-decoration:none; display:block; margin-top:8px;">Unirse</a>
             </div>
-        </section>
+        </aside>
 
-        <!-- Categories Section -->
-        <section class="section-padding">
-            <div class="container">
-                <div style="margin-bottom: 48px;">
-                    <h2 style="margin-bottom: 12px;">Categorías</h2>
-                    <p style="color: var(--md-sys-color-on-surface-variant);">Todo lo que necesitas para tu setup
-                        digital.</p>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar productos, V-Bucks, Nitro...">
+                    <i class="fas fa-sliders-h" style="cursor:pointer;"></i>
                 </div>
-                <div class="featured-grid">
-                    <div class="card card-fortnite" onclick="window.location.href='catalogo.html?filter=fortnite'"
-                        style="cursor: pointer;">
-                        <div class="card-icon">
-                            <span class="material-symbols-rounded">videogame_asset</span>
-                        </div>
-                        <h3>Fortnite & Gaming</h3>
-                        <p>Cuentas exclusivas, V-Bucks y pavos legales para tu cuenta principal.</p>
-                        <a href="catalogo.html?filter=fortnite" class="btn btn-secondary">Ver más</a>
+                
+                <div class="topbar-actions">
+                    <div class="icon-btn">
+                        <i class="far fa-heart"></i>
                     </div>
-
-                    <div class="card card-consoles" onclick="window.location.href='catalogo.html?filter=mayoreo'"
-                        style="cursor: pointer;">
-                        <div class="card-icon">
-                            <span class="material-symbols-rounded">groups</span>
-                        </div>
-                        <h3>Ventas al Mayoreo</h3>
-                        <p>Mejores precios para revendedores en cuentas y activaciones de Fortnite.</p>
-                        <a href="catalogo.html?filter=mayoreo" class="btn btn-secondary">Explorar</a>
+                    <div class="icon-btn" onclick="window.location.href='catalogo.html'" style="cursor:pointer;">
+                        <i class="fas fa-shopping-bag"></i>
+                        <div class="badge" id="cartBadge">0</div>
                     </div>
-
-                    <div class="card card-streaming" onclick="window.location.href='catalogo.html?filter=streaming'"
-                        style="cursor: pointer;">
-                        <div class="card-icon">
-                            <span class="material-symbols-rounded">movie</span>
+                    <div class="user-profile">
+                        <img src="https://i.imgur.com/S00u4EI.png" alt="User" class="user-avatar" style="background:var(--accent-blue);">
+                        <div class="user-info">
+                            <span class="user-name">Invitado</span>
+                            <a href="perfil.html" class="user-link">Ver perfil</a>
                         </div>
-                        <h3>Streaming & Diseño</h3>
-                        <p>Netflix, Disney+, Canva Pro, Adobe y más. Perfiles y cuentas completas.</p>
-                        <a href="catalogo.html?filter=streaming" class="btn btn-secondary">Ver ofertas</a>
                     </div>
                 </div>
-            </div>
-        <!-- Testimonials Section -->
-        <section class="section-padding" style="background: rgba(255,255,255,0.4); backdrop-filter: blur(5px);">
-            <div class="container">
-                <div style="margin-bottom: 48px; text-align: center;">
-                    <h2 style="margin-bottom: 12px;">Lo que dicen nuestros clientes</h2>
-                    <p style="color: var(--md-sys-color-on-surface-variant);">La confianza de nuestra comunidad es nuestra mayor garantía.</p>
-                </div>
-                <div class="featured-grid">
-                    <div class="card">
-                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-scroll">
+                
+                <!-- Hero Carousel -->
+                <section class="hero-carousel gsap-reveal">
+                    <div class="carousel-cards">
+                        <div class="carousel-card" data-pos="left">
+                            <img src="https://i.imgur.com/3XpcBuu.png" alt="Fortnite Crew" style="object-fit:cover; filter:brightness(0.5);">
+                            <div class="carousel-card-overlay">
+                                <h2>Fortnite Crew</h2>
+                                <p>Únete al Club de Fortnite y obtén recompensas exclusivas mensuales.</p>
+                                <div class="carousel-actions">
+                                    <button class="btn btn-white" onclick="window.location.href='catalogo.html?filter=crew'">VER MÁS</button>
+                                </div>
+                            </div>
                         </div>
-                        <p>"Excelente servicio, compré 5000 pavos y me llegaron en menos de 10 minutos. 100% confiable."</p>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--md-sys-color-primary-container); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--md-sys-color-on-primary-container);">JD</div>
-                            <div>
-                                <h4 style="font-size: 0.9rem;">Juan Diego</h4>
-                                <p style="font-size: 0.8rem; margin: 0;">Cliente Verificado</p>
+                        <div class="carousel-card" data-pos="center">
+                            <img src="https://i.imgur.com/bAD3nB1.png" alt="V-Bucks" style="object-fit:cover; background:#2a2d3e;">
+                            <div class="carousel-card-overlay">
+                                <h2 style="color:var(--accent-blue);">V-BUCKS</h2>
+                                <p>Adquiere Paquetes de V-Bucks a precios reducidos con total seguridad y envíos rápidos a tu cuenta.</p>
+                                <div class="carousel-actions">
+                                    <button class="btn btn-white" onclick="window.location.href='catalogo.html?filter=vbucks'">EXPLORAR</button>
+                                    <button class="btn-icon"><i class="fas fa-play"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-card" data-pos="right">
+                            <img src="https://i.imgur.com/TT7IPi9.png" alt="Discord Nitro" style="object-fit:cover; filter:brightness(0.5);">
+                            <div class="carousel-card-overlay">
+                                <h2>Discord Nitro</h2>
+                                <p>Mejora tu experiencia en Discord con Nitro y Boosts al mejor precio.</p>
+                                <div class="carousel-actions">
+                                    <button class="btn btn-white" onclick="window.location.href='catalogo.html?filter=discord'">VER MÁS</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                        </div>
-                        <p>"La cuenta OG que compré está increíble. Todo tal cual la descripción y el soporte por Discord fue muy rápido."</p>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #e6f4ea; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--google-green);">AR</div>
-                            <div>
-                                <h4 style="font-size: 0.9rem;">Alex Rodriguez</h4>
-                                <p style="font-size: 0.8rem; margin: 0;">Cliente VIP</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div style="display: flex; gap: 4px; color: var(--google-yellow); margin-bottom: 16px;">
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                            <span class="material-symbols-rounded">star</span>
-                        </div>
-                        <p>"Llevo meses comprando mis suscripciones de Netflix aquí y nunca he tenido una sola caída. El mejor precio."</p>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #fce8e6; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--google-red);">MS</div>
-                            <div>
-                                <h4 style="font-size: 0.9rem;">Maria Sanchez</h4>
-                                <p style="font-size: 0.8rem; margin: 0;">Cliente Verificado</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Fortnite V-Bucks Star Section -->
-        <section class="container star-product">
-            <div class="cta-card">
-                <div class="cta-card-visual">
-                </div>
-                <div class="cta-card-content">
-                    <span class="top-product-badge">PRODUCTO TOP</span>
-                    <h2>V-Bucks <br><span style="color: var(--google-yellow);">Regalos Directos</span></h2>
-                    <p>Obtén los cosméticos más nuevos sin esperas. 100% legales y seguros para tu cuenta principal.</p>
-                    <ul class="cta-features">
-                        <li><span class="material-symbols-rounded">check_circle</span> Recibe regalos en minutos</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> Sin riesgo de baneo</li>
-                    </ul>
-                    <div class="cta-price-action">
-                        <span class="cta-price">Desde $78 <small>MXN</small></span>
-                        <a href="catalogo.html?filter=fortnite" class="btn btn-primary cta-btn">Ver Catálogo</a>
+                <!-- Products Grid -->
+                <section class="gsap-reveal">
+                    <div class="section-header">
+                        <h3 class="section-title">Productos Destacados</h3>
+                        <a href="catalogo.html" class="section-link">Ver todos <i class="fas fa-arrow-right"></i></a>
                     </div>
-                </div>
-            </div>
-        </section>
+                    
+                    <div class="products-grid" id="featuredProducts">
+                        <!-- Products will be injected here by JS -->
+                    </div>
+                </section>
 
-        <!-- Benefits -->
-        <section class="section-padding">
-            <div class="container">
-                <div class="benefits-grid">
-                    <div class="benefit-item">
-                        <span class="material-symbols-rounded benefit-icon"
-                            style="color: var(--google-blue);">verified_user</span>
-                        <h3>Garantía Total</h3>
-                        <p>Todos nuestros servicios cuentan con soporte y garantía durante el tiempo contratado.</p>
+                <section class="gsap-reveal" style="margin-top: 40px;">
+                    <div class="section-header">
+                        <h3 class="section-title">Mayoreo y Reventa</h3>
+                        <a href="catalogo.html?filter=mayoreo" class="section-link">Ver catálogo <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="benefit-item">
-                        <span class="material-symbols-rounded benefit-icon"
-                            style="color: var(--google-red);">bolt</span>
-                        <h3>Entrega Instantánea</h3>
-                        <p>Recibe tus accesos en minutos después de confirmar tu pago vía Discord o WhatsApp.</p>
+                    
+                    <div class="products-grid" id="mayoreoProducts">
+                        <!-- Products will be injected here by JS -->
                     </div>
-                    <div class="benefit-item">
-                        <span class="material-symbols-rounded benefit-icon"
-                            style="color: var(--google-green);">support_agent</span>
-                        <h3>Soporte 24/7</h3>
-                        <p>Estamos disponibles en todo momento vía Discord o <a href="https://wa.me/525574123521" target="_blank" style="color: #25d366; font-weight: 700;">WhatsApp</a> para ayudarte.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Agency Promotion Section -->
-        <section class="section-padding agency-promo-section">
-            <div class="container">
-                <div class="agency-card">
-                    <div class="agency-content">
-                        <span class="agency-badge">DISEÑO PROFESIONAL</span>
-                        <h2>¿Te gustaría tener un sitio web <span style="color: var(--google-blue);">como este?</span></h2>
-                        <p>Convierte tus ideas en una experiencia digital premium. En <strong>ChiliCode</strong> creamos plataformas de alto impacto visual y rendimiento optimizado.</p>
-                        <div class="agency-action">
-                            <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank" class="btn btn-primary agency-btn">
-                                <span class="material-symbols-rounded">rocket_launch</span>
-                                Contactar a ChiliCode
-                            </a>
-                            <div class="agency-socials">
-                                <a href="https://www.instagram.com/chilicode_agency/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>Agency</span>
-                                </a>
-                                <a href="https://www.instagram.com/rodricg30/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>CEO</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="agency-logo-wrapper">
-                        <img src="https://i.imgur.com/kwFQJGZ.png" alt="ChiliCode Logo" class="agency-logo">
-                    </div>
-                </div>
             </div>
-        </section>
-    </main>
+        </main>
+    </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div class="logo" style="margin-bottom: 24px;">
-                        <span class="material-symbols-rounded" style="color: var(--google-blue);">fingerprint</span>
-                        DIGITAL<span>FOOTPRINT</span>
-                    </div>
-                    <p style="color: var(--md-sys-color-on-surface-variant);">Tu puerta al universo digital. Calidad
-                        Google, servicio premium.</p>
-                </div>
-                <div>
-                    <h4 style="margin-bottom: 16px;">Tienda</h4>
-                    <ul style="list-style: none; display: grid; gap: 8px;">
-                        <li><a href="catalogo.html?filter=fortnite">Fortnite</a></li>
-                        <li><a href="catalogo.html?filter=mayoreo">Mayoreo</a></li>
-                        <li><a href="catalogo.html?filter=streaming">Streaming</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="margin-bottom: 16px;">Ayuda</h4>
-                    <ul style="list-style: none; display: grid; gap: 8px;">
-                        <li><a href="metodos.html">Métodos de Pago</a></li>
-                        <li><a href="comprar.html">Cómo Comprar</a></li>
-                        <li><a href="contacto.html">Contacto</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="margin-bottom: 16px;">Comunidad</h4>
-                    <a href="https://discord.gg/Aq3TjM4tJT" class="btn btn-secondary" style="width: 100%;">Unirse al
-                        Discord</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Digital Footprint. Designed with Material You principles.</p>
-                <div class="agency-watermark">
-                    <p>Desarrollado con <span class="heart">❤</span> por <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank">ChiliCode Agency</a> | 
-                       <a href="https://www.instagram.com/chilicode_agency/" target="_blank"><i class="fab fa-instagram"></i> Agency</a> | 
-                       <a href="https://www.instagram.com/rodricg30/" target="_blank"><i class="fab fa-instagram"></i> CEO</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
-        <i class="fab fa-discord"></i>
-    </a>
-
-    <script>
-        // Simple header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-    </script>
+    <script src="sparks.js"></script>
     <script src="products.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
-
 </html>

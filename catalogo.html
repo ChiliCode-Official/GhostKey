@@ -1,173 +1,209 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo | Digital Footprint Material</title>
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-    
-    <!-- Open Graph / Social Sharing -->
-    <meta property="og:title" content="Digital Footprint | Catálogo Premium">
-    <meta property="og:description" content="Explora nuestras ofertas en gaming y streaming.">
-    <meta property="og:image" content="https://i.imgur.com/S00u4EI.png">
-    
-    <!-- Favicon -->
+    <title>Catálogo | Digital Footprint</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://imgur.com/S00u4EI">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SVG Gooey Filter (Required for Navbar across all pages) -->
-    <svg style="visibility: hidden; position: absolute;" width="0" height="0">
-        <defs>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-            </filter>
-        </defs>
-    </svg>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-
 <body>
-    <header class="header">
-        <nav class="nav">
-            <!-- Segment 1: Logo & Cart -->
-            <div class="nav-segment segment-logo" onclick="openCart()" style="cursor: pointer;">
-                <span class="material-symbols-rounded">shopping_cart</span>
-                <div class="nav-cart-badge" id="navCartCount" style="display: none;">0</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
             </div>
-
-            <!-- Segment 2: Links -->
-            <div class="nav-segment segment-links">
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-blue">
-                        <span class="material-symbols-rounded">home</span>
-                        <span>Inicio</span>
-                    </a></li>
-                    <li><a href="catalogo.html" class="active nav-green">
-                        <span class="material-symbols-rounded">category</span>
-                        <span>Catálogo</span>
-                    </a></li>
-                    <li><a href="metodos.html" class="nav-yellow">
-                        <span class="material-symbols-rounded">payments</span>
-                        <span>Métodos</span>
-                    </a></li>
-                    <li><a href="comprar.html" class="nav-red">
-                        <span class="material-symbols-rounded">help</span>
-                        <span>Ayuda</span>
-                    </a></li>
-                </ul>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="catalogo.html" class="nav-item active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="metodos.html" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Métodos</span>
+                </a>
+                <a href="comprar.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Ayuda</span>
+                </a>
+                <a href="contacto.html" class="nav-item">
+                    <i class="fas fa-headset"></i>
+                    <span>Contacto</span>
+                </a>
+            </nav>
+            <div class="sidebar-section-title">TOP VENTAS</div>
+            <div class="fast-launch">
+                <div class="game-item" onclick="window.filterCatalog('vbucks')">
+                    <img src="https://i.imgur.com/bAD3nB1.png" class="game-icon" alt="VBucks">
+                    <span class="game-name">V-Bucks Ofertas</span>
+                </div>
+                <div class="game-item" onclick="window.filterCatalog('crew')">
+                    <img src="https://i.imgur.com/3XpcBuu.png" class="game-icon" alt="Crew">
+                    <span class="game-name">Fortnite Crew</span>
+                </div>
+                <div class="game-item" onclick="window.filterCatalog('discord')">
+                    <img src="https://i.imgur.com/TT7IPi9.png" class="game-icon" alt="Discord">
+                    <span class="game-name">Discord Nitro</span>
+                </div>
             </div>
+        </aside>
 
-            <!-- Segment 3: Action -->
-            <div class="nav-segment segment-action" id="installSegment">
-                <button class="btn-install" id="installApp">
-                    <span class="material-symbols-rounded">download_for_offline</span>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <main class="page-content">
-        <!-- Catalog Header -->
-        <section class="section-padding" style="background: var(--md-sys-color-primary-container); border-radius: 0 0 40px 40px; padding: 60px 0;">
-            <div class="container">
-                <h1 style="color: var(--md-sys-color-on-primary-container); margin-bottom: 24px;">Nuestro Catálogo</h1>
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar productos..." onkeyup="window.searchProducts()">
+                </div>
                 
-                <!-- Material Search Bar -->
-                <div class="search-container" style="background: white; border-radius: 100px; padding: 8px 24px; display: flex; align-items: center; gap: 16px; box-shadow: var(--md-sys-elevation-1); max-width: 600px;">
-                    <span class="material-symbols-rounded" style="color: var(--md-sys-color-on-surface-variant);">search</span>
-                    <input type="text" id="searchInput" placeholder="Busca pavos, streaming, mayoreo..." 
-                           style="border: none; outline: none; flex: 1; font-size: 1rem; font-family: inherit;">
+                <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.location.href='index.html'" style="cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="user-profile" onclick="window.location.href='perfil.html'" style="cursor:pointer;">
+                        <img src="https://i.imgur.com/S00u4EI.png" alt="User" class="user-avatar" style="background:var(--accent-blue);">
+                    </div>
                 </div>
-            </div>
-        </section>
+            </header>
 
-        <section class="container section-padding">
-            <!-- Material Chips for Filters -->
-            <div class="filter-system" style="margin-bottom: 40px;">
-                <div class="main-filters" id="mainFilters" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" data-main="all">Todo</button>
-                    <button class="btn btn-outline" data-main="fortnite">Fortnite</button>
-                    <button class="btn btn-outline" data-main="streaming">Streaming</button>
-                    <button class="btn btn-outline" data-main="mayoreo">Mayoreo</button>
-                    <button class="btn btn-outline" data-main="extras">Otros</button>
-                </div>
-            </div>
+            <div class="content-scroll">
+                <section class="gsap-reveal" style="margin-top: 20px;">
+                    <div class="section-header">
+                        <h2 class="section-title" style="font-size: 2rem;">Explorar Catálogo</h2>
+                    </div>
 
-            <div class="products-grid" id="fullCatalog" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
-                <!-- Products dynamically rendered here -->
-                <div style="text-align: center; grid-column: 1/-1; padding: 5rem;">
-                    <span class="material-symbols-rounded" style="font-size: 48px; color: var(--google-blue); animation: spin 1s linear infinite;">progress_activity</span>
-                    <p style="margin-top: 16px;">Cargando catálogo premium...</p>
-                </div>
+                    <div class="category-filters">
+                        <button class="filter-btn active" onclick="window.filterCatalog('all')">Todos</button>
+                        <button class="filter-btn" onclick="window.filterCatalog('crew')">Fortnite Crew</button>
+                        <button class="filter-btn" onclick="window.filterCatalog('vbucks')">V-Bucks</button>
+                        <button class="filter-btn" onclick="window.filterCatalog('realms')">Realms</button>
+                        <button class="filter-btn" onclick="window.filterCatalog('discord')">Discord</button>
+                        <button class="filter-btn" onclick="window.filterCatalog('mayoreo')">Mayoreo</button>
+                    </div>
+                    
+                    <div class="products-grid" id="catalogGrid">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
             </div>
-        </section>
+        </main>
+    </div>
 
-        <!-- Agency Promotion Section -->
-        <section class="section-padding agency-promo-section">
-            <div class="container">
-                <div class="agency-card">
-                    <div class="agency-content">
-                        <span class="agency-badge">DISEÑO PROFESIONAL</span>
-                        <h2>¿Te gustaría tener un sitio web <span style="color: var(--google-blue);">como este?</span></h2>
-                        <p>Convierte tus ideas en una experiencia digital premium. En <strong>ChiliCode</strong> creamos plataformas de alto impacto visual y rendimiento optimizado.</p>
-                        <div class="agency-action">
-                            <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank" class="btn btn-primary agency-btn">
-                                <span class="material-symbols-rounded">rocket_launch</span>
-                                Contactar a ChiliCode
-                            </a>
-                            <div class="agency-socials">
-                                <a href="https://www.instagram.com/chilicode_agency/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>Agency</span>
-                                </a>
-                                <a href="https://www.instagram.com/rodricg30/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>CEO</span>
-                                </a>
+    <script src="sparks.js"></script>
+    <script src="products.js"></script>
+    <script type="module">
+        import { db } from "./firebase-config.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        let stockMap = {};
+
+        const initCatalog = async () => {
+            // Fetch stock states
+            try {
+                const stockSnap = await getDocs(collection(db, "products_stock"));
+                stockSnap.forEach(docSnap => {
+                    stockMap[docSnap.data().productId] = docSnap.data();
+                });
+            } catch(e) {
+                console.error("Firebase connection issue:", e);
+            }
+
+            renderCatalog('all');
+            
+            // Check URL parameters for filters
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            if(filter) {
+                filterCatalog(filter);
+            }
+        };
+
+        window.renderCatalog = (filter, searchQuery = "") => {
+            const grid = document.getElementById('catalogGrid');
+            if(!grid || typeof products === 'undefined') return;
+
+            let filtered = products;
+            
+            if (filter !== 'all') {
+                filtered = filtered.filter(p => p.category === filter);
+            }
+            
+            if (searchQuery) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+            }
+
+            const renderProductCard = (product) => {
+                const prodStock = stockMap[product.id] || { status: 'disponible' };
+                let badgeClass = 'stock-disponible';
+                let label = 'Disponible';
+                let isDisabled = false;
+
+                if (prodStock.status === 'bajo_pedido') {
+                    badgeClass = 'stock-bajo-pedido';
+                    label = 'Bajo pedido';
+                } else if (prodStock.status === 'agotado') {
+                    badgeClass = 'stock-agotado';
+                    label = 'Agotado';
+                    isDisabled = true;
+                }
+
+                const badgeHtml = `<div class="product-badge stock-badge ${badgeClass}">${label}</div>`;
+                
+                return `
+                    <div class="product-card" onclick="window.location.href='producto.html?id=${product.id}'" style="${isDisabled ? 'opacity: 0.7;' : ''}">
+                        <div class="product-image-container">
+                            <img src="${product.image}" alt="${product.name}">
+                            ${badgeHtml}
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-title">${product.name}</h4>
+                            <p class="product-desc">${product.description}</p>
+                            <div class="product-footer">
+                                <div class="price-box">
+                                    <span class="price-tag">MXN</span>
+                                    <span class="price">$${product.price.toFixed(2)}</span>
+                                </div>
+                                <button class="buy-btn" ${isDisabled ? 'disabled' : ''}><i class="fas fa-plus"></i></button>
                             </div>
                         </div>
                     </div>
-                    <div class="agency-logo-wrapper">
-                        <img src="https://i.imgur.com/kwFQJGZ.png" alt="ChiliCode Logo" class="agency-logo">
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+                `;
+            };
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2024 Digital Footprint. Material Design 3 Edition.</p>
-                <div class="agency-watermark">
-                    <p>Desarrollado con <span class="heart">❤</span> por <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank">ChiliCode Agency</a> | 
-                       <a href="https://www.instagram.com/chilicode_agency/" target="_blank"><i class="fab fa-instagram"></i> Agency</a> | 
-                       <a href="https://www.instagram.com/rodricg30/" target="_blank"><i class="fab fa-instagram"></i> CEO</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
+            grid.innerHTML = filtered.map(renderProductCard).join('');
+            ScrollTrigger.refresh();
+        };
 
-    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
-        <i class="fab fa-discord"></i>
-    </a>
+        window.filterCatalog = (category) => {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.filter-btn')).find(btn => btn.getAttribute('onclick').includes(category));
+            if(activeBtn) activeBtn.classList.add('active');
+            
+            renderCatalog(category, document.getElementById('searchInput').value);
+        };
 
-    <script src="products.js"></script>
-    <script src="main.js"></script>
+        window.searchProducts = () => {
+            const activeBtn = document.querySelector('.filter-btn.active');
+            let cat = 'all';
+            if (activeBtn) {
+                const match = activeBtn.getAttribute('onclick').match(/'([^']+)'/);
+                if (match) cat = match[1];
+            }
+            renderCatalog(cat, document.getElementById('searchInput').value);
+        };
+
+        // Run
+        initCatalog();
+    </script>
 </body>
-
 </html>

@@ -1,133 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto | Digital Footprint</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Rajdhani:wght@500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-
-<body class="dark-theme">
-    <header class="header">
-        <nav class="nav container">
-            <div class="logo">
-                <a href="index.html">
-                    <span class="logo-text">DIGITAL<span>FOOTPRINT</span></span>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
+                <span class="brand-name">FOOTPRINT</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
                 </a>
-            </div>
-            <ul class="nav-list">
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="catalogo.html">Catálogo</a></li>
-                <li><a href="metodos.html">Métodos</a></li>
-                <li><a href="comprar.html">Cómo Comprar</a></li>
-                <li><a href="discord.html">Discord</a></li>
-                <li><a href="contacto.html" class="active">Contacto</a></li>
-            </ul>
-            <button class="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
-    </header>
+                <a href="catalogo.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="metodos.html" class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Métodos</span>
+                </a>
+                <a href="comprar.html" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Ayuda</span>
+                </a>
+                <a href="contacto.html" class="nav-item active">
+                    <i class="fas fa-headset"></i>
+                    <span>Contacto</span>
+                </a>
+            </nav>
+        </aside>
 
-    <main class="page-content">
-        <section class="page-header container">
-            <h1 class="text-gradient">¿Necesitas Ayuda?</h1>
-            <p>Estamos disponibles 24/7 para atender tus dudas o pedidos.</p>
-        </section>
-
-        <section class="contact-methods container section-padding">
-            <div class="contact-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                <div class="contact-card"
-                    style="background: var(--dark-card); padding: 3rem; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border);">
-                    <i class="fab fa-whatsapp" style="font-size: 3rem; color: #25d366; margin-bottom: 1.5rem;"></i>
-                    <h3>WhatsApp</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Alternativa para quienes no tienen
-                        Discord. Compra y soporte rápido.</p>
-                    <a href="https://wa.me/525574123521" class="btn btn-primary">Chatear Ahora</a>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar" style="visibility: hidden;"></div>
+                <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.history.back()" style="cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
                 </div>
-                <div class="contact-card"
-                    style="background: var(--dark-card); padding: 3rem; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border);">
-                    <i class="fab fa-discord" style="font-size: 3rem; color: #5865F2; margin-bottom: 1.5rem;"></i>
-                    <h3>Discord</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Soporte por Tickets y Comunidad.</p>
-                    <a href="discord.html" class="btn btn-secondary">Abrir Ticket</a>
-                </div>
-            </div>
+            </header>
 
-            <div class="contact-form-container"
-                style="max-width: 600px; margin: 4rem auto 0; background: var(--glass-bg); padding: 3rem; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center;">
-                <h3 class="white-glow" style="margin-bottom: 2rem;">¿Necesitas ayuda inmediata?</h3>
-                <p style="margin-bottom: 2rem;">No utilizamos formularios lentos. Haz clic en el botón de abajo para
-                    unirte a nuestro servidor de Discord y abrir un ticket de soporte. ¡Estamos listos para atenderte!
-                </p>
-                <a href="https://discord.gg/Aq3TjM4tJT" class="btn btn-primary btn-glow btn-lg"
-                    style="padding: 1rem 3rem;"><i class="fab fa-discord"></i> Soporte vía Discord</a>
-            </div>
-        </section>
+            <div class="content-scroll">
+                <section class="gsap-reveal" style="max-width: 600px; margin: 0 auto; padding-top: 40px; text-align: center;">
+                    <i class="fas fa-envelope-open-text" style="font-size: 3rem; color: var(--accent-blue); margin-bottom: 16px;"></i>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Contáctanos</h2>
+                    <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 48px;">Estamos aquí para ayudarte. Si tienes dudas, problemas con una compra o quieres hacer un pedido de mayoreo, escríbenos por cualquiera de nuestros canales oficiales.</p>
 
-        <!-- Agency Promotion Section -->
-        <section class="section-padding agency-promo-section">
-            <div class="container">
-                <div class="agency-card">
-                    <div class="agency-content">
-                        <span class="agency-badge">DISEÑO PROFESIONAL</span>
-                        <h2>¿Te gustaría tener un sitio web <span style="color: var(--google-blue);">como este?</span></h2>
-                        <p>Convierte tus ideas en una experiencia digital premium. En <strong>ChiliCode</strong> creamos plataformas de alto impacto visual y rendimiento optimizado.</p>
-                        <div class="agency-action">
-                            <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank" class="btn btn-primary agency-btn">
-                                <span class="material-symbols-rounded">rocket_launch</span>
-                                Contactar a ChiliCode
-                            </a>
-                            <div class="agency-socials">
-                                <a href="https://www.instagram.com/chilicode_agency/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>Agency</span>
-                                </a>
-                                <a href="https://www.instagram.com/rodricg30/" target="_blank" class="social-link instagram">
-                                    <i class="fab fa-instagram"></i>
-                                    <span>CEO</span>
-                                </a>
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <a href="https://wa.me/525574123521" target="_blank" style="text-decoration: none;">
+                            <div style="background: var(--card-bg); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s;">
+                                <i class="fab fa-whatsapp" style="font-size: 2.5rem; color: #25D366;"></i>
+                                <div style="text-align: left; color: white;">
+                                    <h3 style="font-size: 1.2rem; margin-bottom: 4px;">Atención por WhatsApp</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Respuesta Rápida (Recomendado)</p>
+                                </div>
+                                <i class="fas fa-external-link-alt" style="margin-left: auto; color: var(--text-secondary);"></i>
                             </div>
-                        </div>
-                    </div>
-                    <div class="agency-logo-wrapper">
-                        <img src="https://i.imgur.com/kwFQJGZ.png" alt="ChiliCode Logo" class="agency-logo">
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+                        </a>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2024 Digital Footprint. Todos los derechos reservados.</p>
-                <div class="agency-watermark">
-                    <p>Desarrollado con <span class="heart">❤</span> por <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank">ChiliCode Agency</a> | 
-                       <a href="https://www.instagram.com/chilicode_agency/" target="_blank"><i class="fab fa-instagram"></i> Agency</a> | 
-                       <a href="https://www.instagram.com/rodricg30/" target="_blank"><i class="fab fa-instagram"></i> CEO</a>
-                    </p>
-                </div>
+                        <a href="https://discord.gg/Aq3TjM4tJT" target="_blank" style="text-decoration: none;">
+                            <div style="background: var(--card-bg); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 20px; transition: all 0.3s;">
+                                <i class="fab fa-discord" style="font-size: 2.5rem; color: #5865F2;"></i>
+                                <div style="text-align: left; color: white;">
+                                    <h3 style="font-size: 1.2rem; margin-bottom: 4px;">Comunidad en Discord</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Abre un ticket de soporte o únete a la comunidad</p>
+                                </div>
+                                <i class="fas fa-external-link-alt" style="margin-left: auto; color: var(--text-secondary);"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="https://chilicode-official.github.io/ChiliCode/" target="_blank" style="text-decoration: none;">
+                            <div style="background: rgba(11, 87, 208, 0.1); padding: 24px; border-radius: var(--radius-lg); border: 1px solid rgba(11, 87, 208, 0.3); display: flex; align-items: center; gap: 20px; transition: all 0.3s;">
+                                <img src="https://i.imgur.com/kwFQJGZ.png" alt="ChiliCode Logo" style="width: 48px; height: 48px; object-fit: contain;">
+                                <div style="text-align: left; color: white;">
+                                    <h3 style="font-size: 1.2rem; margin-bottom: 4px;">Desarrollado por ChiliCode</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">¿Quieres una web como esta? Contáctanos.</p>
+                                </div>
+                                <i class="fas fa-external-link-alt" style="margin-left: auto; color: var(--text-secondary);"></i>
+                            </div>
+                        </a>
+                    </div>
+                </section>
             </div>
-        </div>
-    </footer>
-    <!-- Discord Floating Button -->
-    <a href="https://discord.gg/Aq3TjM4tJT" class="discord-float" target="_blank">
-        <i class="fab fa-discord"></i>
-    </a>
-
-    <script src="products.js"></script>
-    <script src="main.js"></script>
+        </main>
+    </div>
+    <script src="sparks.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+            gsap.to(elem, {
+                scrollTrigger: { trigger: elem, scroller: ".content-scroll", start: "top 85%" },
+                opacity: 1, y: 0, duration: 0.8, ease: "power3.out"
+            });
+        });
+    </script>
 </body>
-
 </html>
