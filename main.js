@@ -95,20 +95,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const badgeHtml = `<div class="product-badge stock-badge ${badgeClass}">${label}</div>`;
             
             return `
-                <div class="product-card" onclick="window.location.href='producto.html?id=${product.id}'" style="${isDisabled ? 'opacity: 0.7;' : ''}">
-                    <div class="product-image-container">
+                <div class="product-card" style="${isDisabled ? 'opacity: 0.7;' : ''}">
+                    <div class="product-image-container" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">
                         <img src="${product.image}" alt="${product.name}">
                         ${badgeHtml}
                     </div>
                     <div class="product-info">
-                        <h4 class="product-title">${product.name}</h4>
-                        <p class="product-desc">${product.description}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h4 class="product-title" style="margin-bottom:0;" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">${product.name}</h4>
+                            <button class="wishlist-btn" data-productid="${product.id}" onclick="event.stopPropagation(); toggleWishlist('${product.id}')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="far fa-heart"></i></button>
+                        </div>
+                        <p class="product-desc" style="margin-top:8px;" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">${product.description}</p>
                         <div class="product-footer">
                             <div class="price-box">
                                 <span class="price-tag">MXN</span>
                                 <span class="price">$${product.price.toFixed(2)}</span>
                             </div>
-                            <button class="buy-btn" ${isDisabled ? 'disabled' : ''}><i class="fas fa-plus"></i></button>
+                            <button class="buy-btn" ${isDisabled ? 'disabled' : ''} onclick="window.location.href='producto.html?id=${product.id}'"><i class="fas fa-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -164,10 +167,18 @@ document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, async (user) => {
         const userNameElem = document.querySelector('.user-name');
         const userLinkElem = document.querySelector('.user-link');
-        const cartBadge = document.getElementById('cartBadge');
+        const userAvatars = document.querySelectorAll('.user-avatar');
 
         if (user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
+            
+            // Update profile picture globally
+            if (user.photoURL) {
+                userAvatars.forEach(avatar => {
+                    avatar.src = user.photoURL;
+                });
+            }
+
             if (userDoc.exists()) {
                 const data = userDoc.data();
                 if (userNameElem) userNameElem.textContent = data.username;
