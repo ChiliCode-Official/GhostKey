@@ -60,26 +60,36 @@ body::after {
 
 /* --- Layout --- */
 .app-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
     width: 100%;
     height: 100vh;
     padding: 20px;
     gap: 20px;
     overflow: hidden;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-container.sidebar-collapsed {
+    grid-template-columns: 80px 1fr 280px;
 }
 
 /* --- Sidebar --- */
 .sidebar {
-    width: 250px;
     background: var(--sidebar-bg);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
     padding: 24px 20px;
     border: 1px solid var(--border-color);
-    flex-shrink: 0;
     z-index: 10;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    padding-bottom: 60px; /* Space for toggle button */
 }
+.sidebar::-webkit-scrollbar { width: 0; }
+
 
 .brand {
     display: flex;
@@ -114,6 +124,7 @@ body::after {
     font-weight: 500;
     text-decoration: none;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .nav-item:hover {
@@ -143,6 +154,78 @@ body::after {
     font-size: 1.1rem;
     width: 20px;
     text-align: center;
+    flex-shrink: 0;
+}
+
+.nav-item span {
+    transition: opacity 0.2s, width 0.2s;
+    opacity: 1;
+}
+
+/* Collapsed state styles for sidebar items */
+.sidebar-collapsed .brand-name {
+    display: none;
+}
+.sidebar-collapsed .brand {
+    justify-content: center;
+}
+.sidebar-collapsed .nav-item span {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
+.sidebar-collapsed .nav-item {
+    justify-content: center;
+    padding: 12px;
+}
+.sidebar-collapsed .sidebar-section-title,
+.sidebar-collapsed .game-name,
+.sidebar-collapsed .active-download {
+    display: none;
+}
+.sidebar-collapsed .fast-launch .game-item {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle-btn {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+.sidebar-toggle-btn i {
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+.sidebar-collapsed .sidebar-toggle-btn span {
+    display: none;
+}
+.sidebar-collapsed .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+.sidebar-collapsed .sidebar-toggle-btn {
+    justify-content: center;
 }
 
 .sidebar-section-title {
@@ -218,27 +301,24 @@ body::after {
     z-index: 20;
 }
 
-.search-bar {
+.topbar-nav {
     display: flex;
-    align-items: center;
-    background: var(--card-bg);
-    padding: 12px 20px;
-    border-radius: var(--radius-full);
-    width: 400px;
-    gap: 12px;
-    border: 1px solid var(--border-color);
+    gap: 24px;
 }
 
-.search-bar i { color: var(--text-secondary); }
-.search-bar input {
-    background: transparent;
-    border: none;
-    color: white;
-    outline: none;
-    flex: 1;
-    font-size: 0.9rem;
+.topbar-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s;
 }
-.search-bar input::placeholder { color: var(--text-secondary); }
+
+.topbar-link:hover, .topbar-link.active {
+    color: var(--text-primary);
+}
+
+/* Removed old search bar */
 
 .topbar-actions {
     display: flex;
@@ -307,106 +387,228 @@ body::after {
     border-radius: 4px;
 }
 
-/* --- Hero Carousel --- */
-.hero-carousel {
+/* --- Hero Section --- */
+.hero-banner {
     position: relative;
-    height: 350px;
-    margin-bottom: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.carousel-cards {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.carousel-card {
-    position: absolute;
-    width: 600px;
-    height: 300px;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+    margin-bottom: 40px;
+    height: 380px;
 }
 
-.carousel-card img {
+.hero-banner-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #110e20;
+}
+
+.hero-bg-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.8;
 }
 
-.carousel-card-overlay {
+.hero-content {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
+    padding: 40px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 32px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%);
 }
 
-.carousel-card h2 {
-    font-size: 2rem;
+.hero-content h1 {
+    font-size: 3rem;
     font-weight: 800;
     margin-bottom: 8px;
     text-transform: uppercase;
+    font-family: 'Oswald', sans-serif; /* A bolder font for the title */
 }
-.carousel-card p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-    max-width: 400px;
+
+.hero-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: fit-content;
+    margin-bottom: 12px;
 }
-.carousel-actions {
+
+.hero-content p {
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    max-width: 450px;
+    line-height: 1.5;
+}
+
+.hero-actions {
     display: flex;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
 }
-.btn {
-    padding: 10px 24px;
+
+.btn-blue {
+    background: #2563eb;
+    color: white;
+    padding: 12px 28px;
     border-radius: var(--radius-full);
     font-weight: 600;
-    font-size: 0.85rem;
+    border: none;
     cursor: pointer;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
+    transition: background 0.2s;
 }
-.btn-white {
-    background: var(--accent-blue);
-    color: white;
-}
-.btn-white:hover { background: #400ec4; transform: scale(1.05); }
 
-.btn-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(5px);
+.btn-blue:hover {
+    background: #1d4ed8;
+}
+
+.hero-price {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Right Sidebar specific styles */
+.right-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.tabs {
+    display: flex;
+    gap: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.tabs .tab {
+    cursor: pointer;
+}
+.tabs .tab.active {
+    color: var(--text-primary);
+}
+.badge-red {
+    background: #ef4444;
     color: white;
-    border: none;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+.icon-mute {
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.search-friend-bar {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+.search-friend-bar i {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+.search-friend-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    flex: 1;
+    font-size: 0.85rem;
+}
+.add-friend-icon {
     cursor: pointer;
 }
-.btn-icon:hover { background: rgba(255,255,255,0.3); }
+.friends-category {
+    margin-bottom: 24px;
+}
+.category-header {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.friend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.friend-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+.friend-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #333;
+}
+.friend-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.friend-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.friend-playing {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.friend-game-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
 
-/* Carousel Positioning */
-.carousel-card[data-pos="center"] { z-index: 3; transform: scale(1) translateX(0); opacity: 1; }
-.carousel-card[data-pos="left"] { z-index: 2; transform: scale(0.85) translateX(-250px); opacity: 0.6; filter: brightness(0.6); }
-.carousel-card[data-pos="right"] { z-index: 2; transform: scale(0.85) translateX(250px); opacity: 0.6; filter: brightness(0.6); }
+/* Horizontal Cards for Resume Games */
+.custom-horizontal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.horizontal-card {
+    flex-direction: row;
+    height: 100px;
+    align-items: center;
+}
+.horizontal-card .product-image-container {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+.product-info-horizontal {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.product-info-horizontal .product-title {
+    margin-bottom: 4px;
+}
+.product-info-horizontal .product-status {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
 
 /* --- Sections & Grids --- */
 .section-header {
@@ -946,23 +1148,41 @@ body::after {
     /* GSAP will animate from opacity 0 to 1 dynamically */
 }
 
-@media (max-width: 1024px) {
-    .sidebar { width: 80px; padding: 24px 12px; }
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .app-container {
+        grid-template-columns: 80px 1fr 250px;
+    }
     .brand-name, .nav-item span, .sidebar-section-title, .game-name, .active-download { display: none; }
     .nav-item { justify-content: center; padding: 12px; }
     .brand { justify-content: center; margin-bottom: 40px; }
-    .carousel-card { width: 500px; height: 250px; }
+}
+
+@media (max-width: 1024px) {
+    .app-container {
+        grid-template-columns: 80px 1fr; /* Hide right sidebar on mobile/tablet */
+    }
+    .right-sidebar { display: none; }
 }
 
 @media (max-width: 768px) {
-    .app-container { flex-direction: column; padding: 0; gap: 0; }
-    .sidebar { width: 100%; height: 70px; flex-direction: row; align-items: center; justify-content: space-around; border-radius: 0; border: none; border-top: 1px solid var(--border-color); order: 2; padding: 0; z-index: 100; }
-    .brand, .fast-launch { display: none; }
-    .nav-menu { flex-direction: row; margin: 0; width: 100%; justify-content: space-around; }
-    .main-content { border-radius: 0; border: none; order: 1; padding-bottom: 70px; }
-    .carousel-card { width: 90%; height: 200px; }
+    .app-container { 
+        display: block; 
+        padding: 0; 
+        height: auto;
+        min-height: 100vh;
+    }
+    .left-sidebar { display: none; } /* Hide left sidebar on mobile */
+    .right-sidebar { display: none; } /* Hide right sidebar on mobile */
+    .mobile-only { display: block; }
+    
+    .main-content { border-radius: 0; border: none; padding-bottom: 100px; min-height: 100vh; background: transparent; }
     .topbar { padding: 16px; }
-    .search-bar { width: auto; flex: 1; margin-right: 12px; }
-    .user-name, .user-link { display: none; }
-    .content-scroll { padding: 0 16px 20px; }
+    
+    .hero-banner { border-radius: 0; height: 300px; margin-bottom: 24px; }
+    .content-scroll { padding: 0 16px 20px; overflow-y: visible; }
+    .custom-horizontal-grid { grid-template-columns: 1fr; }
 }
