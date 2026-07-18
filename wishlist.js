@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase-config.js";
+﻿import { auth, db } from "./firebase-config.js";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Global wishlist state for quick UI updates
@@ -23,7 +23,7 @@ export const initWishlist = () => {
 export const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
     if (!user) {
-        alert("Debes iniciar sesión para añadir a favoritos.");
+        alert("Debes iniciar sesiÃ³n para aÃ±adir a favoritos.");
         window.location.href = "perfil.html";
         return;
     }
@@ -69,3 +69,4 @@ const updateAllWishlistIcons = () => {
 window.toggleWishlist = toggleWishlist;
 
 document.addEventListener("DOMContentLoaded", initWishlist);
+

@@ -1,4 +1,4 @@
-let currentStepperStep = 1;
+﻿let currentStepperStep = 1;
 const totalSteps = 4;
 
 function openStepperModal() {
@@ -101,3 +101,4 @@ window.submitWhatsAppForm = function() {
     window.open(`https://wa.me/525574123521?text=${encodedMessage}`, '_blank');
     closeStepperModal();
 };
+

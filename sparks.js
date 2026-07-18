@@ -1,4 +1,4 @@
-// Vanilla JS implementation of ClickSpark and CursorGrid (adapted from React Bits)
+﻿// Vanilla JS implementation of ClickSpark and CursorGrid (adapted from React Bits)
 // Theme colors: Purple #5113fa
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -257,3 +257,4 @@ document.addEventListener("DOMContentLoaded", () => {
     rebuildGrid();
     wakeGrid();
 });
+

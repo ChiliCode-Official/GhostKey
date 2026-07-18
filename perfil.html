@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil y Admin | Digital Footprint</title>
+    <title>Perfil y Admin | GhostKey</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
 
     <!-- Fonts & Icons -->
@@ -433,7 +433,7 @@
         <aside class="sidebar">
             <div class="brand">
                 <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
-                <span class="brand-name">FOOTPRINT</span>
+                <span class="brand-name">GHOSTKEY</span>
             </div>
             <nav class="nav-menu">
                 <a href="index.html" class="nav-item">
@@ -442,7 +442,7 @@
                 </a>
                 <a href="catalogo.html" class="nav-item">
                     <i class="fas fa-th-large"></i>
-                    <span>Catálogo</span>
+                    <span>CatÃ¡logo</span>
                 </a>
             </nav>
         </aside>
@@ -469,14 +469,14 @@
                             <p style="color: rgba(255,255,255,0.6); margin-bottom: 30px;">Ingresa para ver tus pedidos entregados, lista de deseos y saldo disponible.</p>
                             <button id="googleLoginBtn" class="google-btn">
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google">
-                                Iniciar Sesión con Google
+                                Iniciar SesiÃ³n con Google
                             </button>
 
                             <!-- Hidden Administrative Login to keep original functionality intact -->
                             <div class="admin-login-box" style="display:none;">
                                 <h4>Acceso Administrativo</h4>
                                 <input type="text" id="adminUser" class="admin-input" placeholder="Usuario"><br>
-                                <input type="password" id="adminPass" class="admin-input" placeholder="Contraseña"><br>
+                                <input type="password" id="adminPass" class="admin-input" placeholder="ContraseÃ±a"><br>
                                 <button id="adminLoginBtn" class="action-btn">Entrar como Admin</button>
                             </div>
                         </div>
@@ -486,7 +486,7 @@
                     <div id="userDashboard" class="dashboard-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap:16px;">
                             <h2 style="font-size: 2rem; font-weight: 800;"><i class="fas fa-user-circle" style="color:var(--accent-blue);"></i> Mi Cuenta</h2>
-                            <button id="logoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                            <button id="logoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar SesiÃ³n</button>
                         </div>
                         
                         <div class="dashboard-grid">
@@ -498,7 +498,7 @@
                                 </div>
                                 <div>
                                     <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.4; margin-bottom: 12px;">
-                                        Recarga saldo transfiriendo mediante nuestros métodos de pago y enviando tu comprobante a Soporte.
+                                        Recarga saldo transfiriendo mediante nuestros mÃ©todos de pago y enviando tu comprobante a Soporte.
                                     </p>
                                     <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 16px; word-break: break-all;">
                                         UID: <span id="userUidDisplay" style="font-family: monospace;"></span>
@@ -511,16 +511,16 @@
 
                             <!-- Right: Short Description / Action info -->
                             <div class="apple-card" style="background: rgba(255,255,255,0.02); display:flex; flex-direction:column; justify-content:center;">
-                                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Información de Entrega</h3>
+                                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">InformaciÃ³n de Entrega</h3>
                                 <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
-                                    ¡Gracias por comprar en Digital Footprint! Todos tus códigos de juegos, pavos, suscripciones de Discord o Minecraft Realms se entregarán directamente en esta sección.
-                                    Una vez que el administrador confirme tu pago, tu código aparecerá al instante en la lista de abajo para que puedas copiarlo y activarlo.
+                                    Â¡Gracias por comprar en GhostKey! Todos tus cÃ³digos de juegos, pavos, suscripciones de Discord o Minecraft Realms se entregarÃ¡n directamente en esta secciÃ³n.
+                                    Una vez que el administrador confirme tu pago, tu cÃ³digo aparecerÃ¡ al instante en la lista de abajo para que puedas copiarlo y activarlo.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Orders Grid -->
-                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;"><i class="fas fa-box" style="color: var(--accent-yellow);"></i> Historial de Pedidos y Códigos</h3>
+                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;"><i class="fas fa-box" style="color: var(--accent-yellow);"></i> Historial de Pedidos y CÃ³digos</h3>
                         <div class="apple-table-card" style="margin-bottom: 40px;">
                             <div style="overflow-x: auto;">
                                 <table class="apple-table" id="userOrdersTable">
@@ -529,7 +529,7 @@
                                             <th>ID Pedido</th>
                                             <th>Producto</th>
                                             <th>Estado</th>
-                                            <th>Código / Credenciales de Entrega</th>
+                                            <th>CÃ³digo / Credenciales de Entrega</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -557,7 +557,7 @@
                     <div id="adminDashboard" class="admin-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap:16px;">
                             <h2 style="font-size: 2rem; font-weight: 800;"><i class="fas fa-crown" style="color: #ffb703;"></i> Control Administrativo</h2>
-                            <button id="adminLogoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                            <button id="adminLogoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar SesiÃ³n</button>
                         </div>
 
                         <!-- Stat Cards Overview -->
@@ -573,7 +573,7 @@
                                 <span style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">Requieren Entrega</span>
                             </div>
                             <div class="apple-card">
-                                <span class="card-title-sub">Catálogo</span>
+                                <span class="card-title-sub">CatÃ¡logo</span>
                                 <div class="card-value" id="statProductsCount">0</div>
                                 <span style="font-size: 0.8rem; color: var(--accent-green);">Productos Activos</span>
                             </div>
@@ -584,8 +584,8 @@
                             <button class="apple-tab-btn active" onclick="switchAdminTab('orders')"><i class="fas fa-shopping-cart"></i> Pedidos Pendientes</button>
                             <button class="apple-tab-btn" onclick="switchAdminTab('users')"><i class="fas fa-users"></i> Control de Saldos</button>
                             <button class="apple-tab-btn" onclick="switchAdminTab('inventory')"><i class="fas fa-warehouse"></i> Inventario de Claves</button>
-                            <button class="apple-tab-btn" onclick="switchAdminTab('products')"><i class="fas fa-tags"></i> Editar Catálogo</button>
-                            <button class="apple-tab-btn" onclick="switchAdminTab('paymentMethods')"><i class="fas fa-university"></i> Métodos de Pago</button>
+                            <button class="apple-tab-btn" onclick="switchAdminTab('products')"><i class="fas fa-tags"></i> Editar CatÃ¡logo</button>
+                            <button class="apple-tab-btn" onclick="switchAdminTab('paymentMethods')"><i class="fas fa-university"></i> MÃ©todos de Pago</button>
                         </div>
 
                         <!-- Orders Tab -->
@@ -600,7 +600,7 @@
                                                 <th>Producto</th>
                                                 <th>Pago</th>
                                                 <th>Estado</th>
-                                                <th>Acción</th>
+                                                <th>AcciÃ³n</th>
                                             </tr>
                                         </thead>
                                         <tbody id="adminOrdersTable">
@@ -628,7 +628,7 @@
                                                 <th>Email</th>
                                                 <th>UID del Cliente</th>
                                                 <th>Saldo Actual</th>
-                                                <th>Añadir Saldo (MXN)</th>
+                                                <th>AÃ±adir Saldo (MXN)</th>
                                             </tr>
                                         </thead>
                                         <tbody id="adminUsersTable">
@@ -648,7 +648,7 @@
                                             <tr>
                                                 <th>Producto</th>
                                                 <th>Estado del Stock</th>
-                                                <th>Códigos / Claves Disponibles (Una por línea)</th>
+                                                <th>CÃ³digos / Claves Disponibles (Una por lÃ­nea)</th>
                                                 <th>Guardar</th>
                                             </tr>
                                         </thead>
@@ -676,7 +676,7 @@
                                         <input type="number" id="newProdPrice" class="admin-input-styled" placeholder="0.00">
                                     </div>
                                     <div>
-                                        <label class="admin-label">Categoría</label>
+                                        <label class="admin-label">CategorÃ­a</label>
                                         <select id="newProdCategory" class="admin-input-styled">
                                             <option value="vbucks">V-Bucks</option>
                                             <option value="crew">Fortnite Crew</option>
@@ -689,7 +689,7 @@
 
                                 <div class="admin-input-group">
                                     <div>
-                                        <label class="admin-label">Descripción Detallada</label>
+                                        <label class="admin-label">DescripciÃ³n Detallada</label>
                                         <textarea id="newProdDesc" class="admin-input-styled" placeholder="Escribe detalles del producto, tiempos de entrega..." style="height: 70px; resize: vertical;"></textarea>
                                     </div>
                                 </div>
@@ -715,7 +715,7 @@
                                                 <th>Miniatura</th>
                                                 <th>Nombre</th>
                                                 <th>Precio</th>
-                                                <th>Categoría</th>
+                                                <th>CategorÃ­a</th>
                                                 <th>Acciones</th>
                                             </tr>
                                         </thead>
@@ -730,7 +730,7 @@
                         <!-- Payment Methods Tab -->
                         <div id="tab-paymentMethods" class="admin-panel-content">
                             <div class="admin-form-box">
-                                <div class="admin-form-title" id="formPayTitle"><i class="fas fa-plus"></i> Crear Método de Pago</div>
+                                <div class="admin-form-title" id="formPayTitle"><i class="fas fa-plus"></i> Crear MÃ©todo de Pago</div>
                                 <input type="hidden" id="editPayMethodId">
 
                                 <div class="admin-input-group double">
@@ -747,7 +747,7 @@
                                 <div class="admin-input-group double">
                                     <div>
                                         <label class="admin-label">Clabe Interbancaria / Cuenta / Celular</label>
-                                        <input type="text" id="newPayMethodAccount" class="admin-input-styled" placeholder="CLABE o número de tarjeta">
+                                        <input type="text" id="newPayMethodAccount" class="admin-input-styled" placeholder="CLABE o nÃºmero de tarjeta">
                                     </div>
                                     <div>
                                         <label class="admin-label">Concepto de pago solicitado</label>
@@ -761,7 +761,7 @@
                                 </div>
 
                                 <div style="display: flex; gap: 12px; margin-top: 10px;">
-                                    <button class="admin-btn-action" onclick="window.savePaymentMethod()" id="savePayMethodBtn" style="flex: 1;"><i class="fas fa-check"></i> Guardar Método</button>
+                                    <button class="admin-btn-action" onclick="window.savePaymentMethod()" id="savePayMethodBtn" style="flex: 1;"><i class="fas fa-check"></i> Guardar MÃ©todo</button>
                                     <button class="admin-btn-action danger" onclick="window.resetPaymentMethodForm()" id="cancelPayMethodBtn" style="display:none;"><i class="fas fa-times"></i> Cancelar</button>
                                 </div>
                             </div>
@@ -801,11 +801,11 @@
                 <input type="hidden" id="modalProductId">
                 
                 <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.5; margin-bottom:15px;">
-                    Escribe el código o las credenciales del servicio que se le entregarán al usuario. El cliente podrá verlo y copiarlo desde su perfil al instante.
+                    Escribe el cÃ³digo o las credenciales del servicio que se le entregarÃ¡n al usuario. El cliente podrÃ¡ verlo y copiarlo desde su perfil al instante.
                 </p>
                 
-                <label class="admin-label">Código / Credencial a entregar</label>
-                <textarea id="modalDeliveryText" class="admin-input-styled" placeholder="Código de activación o credenciales..." style="height: 100px; font-family: monospace;"></textarea>
+                <label class="admin-label">CÃ³digo / Credencial a entregar</label>
+                <textarea id="modalDeliveryText" class="admin-input-styled" placeholder="CÃ³digo de activaciÃ³n o credenciales..." style="height: 100px; font-family: monospace;"></textarea>
             </div>
             <div class="admin-modal-footer">
                 <button class="admin-btn-action secondary" onclick="closeDeliveryModal()"><i class="fas fa-times"></i> Cancelar</button>
@@ -835,7 +835,7 @@
         function copyToClipboard(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalText = btn.innerHTML;
-                btn.innerHTML = "<i class='fas fa-check'></i> ¡Copiado!";
+                btn.innerHTML = "<i class='fas fa-check'></i> Â¡Copiado!";
                 btn.style.background = "var(--accent-green)";
                 btn.style.color = "#fff";
                 setTimeout(() => {
@@ -848,3 +848,4 @@
     </script>
 </body>
 </html>
+

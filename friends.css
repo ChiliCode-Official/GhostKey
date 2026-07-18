@@ -45,6 +45,25 @@
     right: 0;
 }
 
+@media (min-width: 1200px) {
+    .friends-sidebar-overlay {
+        display: none !important;
+    }
+    .friends-sidebar {
+        position: relative;
+        right: 0;
+        height: 100%;
+        border-radius: var(--radius-lg);
+        border-left: none;
+        border: 1px solid var(--border-color);
+        box-shadow: none;
+        display: flex !important;
+    }
+    .friends-close-btn {
+        display: none;
+    }
+}
+
 .friends-header {
     display: flex;
     justify-content: space-between;

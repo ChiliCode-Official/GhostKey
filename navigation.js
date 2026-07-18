@@ -1,4 +1,4 @@
-// navigation.js - Dual Navigation System (GooeyNav PC + Dock Mobile)
+﻿// navigation.js - Dual Navigation System (GooeyNav PC + Dock Mobile)
 
 // Capture referral UID globally
 (function() {
@@ -10,8 +10,8 @@
 })();
 const NAV_ITEMS = [
     { label: "Inicio", icon: "fas fa-home", href: "index.html" },
-    { label: "Catálogo", icon: "fas fa-th-large", href: "catalogo.html" },
-    { label: "Métodos", icon: "fas fa-wallet", href: "metodos.html" },
+    { label: "CatÃ¡logo", icon: "fas fa-th-large", href: "catalogo.html" },
+    { label: "MÃ©todos", icon: "fas fa-wallet", href: "metodos.html" },
     { label: "Mi Perfil", icon: "fas fa-user", href: "perfil.html" },
     { label: "Ayuda", icon: "fas fa-question-circle", href: "comprar.html" },
     { label: "Contacto", icon: "fas fa-headset", href: "contacto.html" }
@@ -35,7 +35,7 @@ function createGooeyNav() {
     brand.style.marginBottom = '2em';
     brand.innerHTML = `
         <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
-        <span class="brand-name" style="font-weight: 800; font-size: 1.2rem;">FOOTPRINT</span>
+        <span class="brand-name" style="font-weight: 800; font-size: 1.2rem;">GHOSTKEY</span>
     `;
     container.appendChild(brand);
 
@@ -274,3 +274,4 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(dock);
     }
 });
+

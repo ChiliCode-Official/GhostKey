@@ -1,4 +1,4 @@
-const products = [
+﻿const products = [
     // --- Crew FN ---
     {
         id: 1,
@@ -30,7 +30,7 @@ const products = [
         icon: "fas fa-coins",
         image: "https://i.imgur.com/bAD3nB1.png",
         badge: "",
-        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones específicas (como Argentina). Ideal para enviar regalos."
+        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones especÃ­ficas (como Argentina). Ideal para enviar regalos."
     },
     {
         id: 4,
@@ -40,7 +40,7 @@ const products = [
         icon: "fas fa-coins",
         image: "https://i.imgur.com/WSRmepB.png",
         badge: "OFERTA",
-        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones específicas (como Argentina). Ideal para enviar regalos."
+        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones especÃ­ficas (como Argentina). Ideal para enviar regalos."
     },
     {
         id: 5,
@@ -50,7 +50,7 @@ const products = [
         icon: "fas fa-coins",
         image: "https://i.imgur.com/KQZ4gx3.png",
         badge: "OFERTA",
-        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones específicas (como Argentina). Ideal para enviar regalos."
+        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones especÃ­ficas (como Argentina). Ideal para enviar regalos."
     },
     {
         id: 6,
@@ -60,7 +60,7 @@ const products = [
         icon: "fas fa-coins",
         image: "https://i.imgur.com/bAD3nB1.png",
         badge: "",
-        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones específicas (como Argentina). Ideal para enviar regalos."
+        description: "Cuentas nuevas y privadas. V-Bucks comprados en regiones especÃ­ficas (como Argentina). Ideal para enviar regalos."
     },
 
     // --- Realms ---
@@ -88,13 +88,13 @@ const products = [
     },
     {
         id: 9,
-        name: "Nitro Boost Trial (30 días)",
+        name: "Nitro Boost Trial (30 dÃ­as)",
         price: 59.00,
         category: "discord",
         icon: "fab fa-discord",
         image: "https://i.imgur.com/TT7IPi9.png",
         badge: "",
-        description: "Un enlace de prueba gratuita de 1 mes (30 días) para Discord Nitro."
+        description: "Un enlace de prueba gratuita de 1 mes (30 dÃ­as) para Discord Nitro."
     },
     {
         id: 10,
@@ -104,7 +104,7 @@ const products = [
         icon: "fas fa-rocket",
         image: "https://i.imgur.com/TT7IPi9.png",
         badge: "",
-        description: "Paquete de 14 potenciadores (boosts) para un servidor de Discord personal con una duración aproximada de un mes (27-30 días)."
+        description: "Paquete de 14 potenciadores (boosts) para un servidor de Discord personal con una duraciÃ³n aproximada de un mes (27-30 dÃ­as)."
     },
 
     // --- Mayoreos / ReVenta ---
@@ -162,7 +162,7 @@ const products = [
     },
     {
         id: 15,
-        name: "Crew FN (XBOX-PC-PLAY) Créditos",
+        name: "Crew FN (XBOX-PC-PLAY) CrÃ©ditos",
         price: 60.00,
         category: "mayoreo",
         icon: "fab fa-xbox",
@@ -191,3 +191,4 @@ const products = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = products;
 }
+

@@ -1,21 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --bg-color: #2c0658; /* Deep Eneba Purple bg */
-    --sidebar-bg: #3d0773; /* Dark Purple */
-    --card-bg: #5820a8; /* Lighter Card Purple */
+    --bg-color: #0b0812; /* Very deep dark purple */
+    --sidebar-bg: #120e1a; /* Sidebar background */
+    --card-bg: #1c1627; /* Card background */
     --text-primary: #ffffff;
-    --text-secondary: #d3c4e3;
-    --accent-blue: #7a3dd6; /* Bright hover purple */
-    --accent-green: #00d26a;
+    --text-secondary: #8c879d;
+    --accent-blue: #3b82f6; /* Ankama style primary action */
+    --accent-green: #10b981;
     --accent-red: #f43f5e;
-    --accent-yellow: #ffd000; /* Eneba Yellow */
-    --border-color: rgba(255, 208, 0, 0.15); /* Yellow tinted borders */
-    --glass-bg: rgba(61, 7, 115, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-yellow: #8b5cf6; /* Replaced yellow with vibrant purple accent */
+    --border-color: rgba(255, 255, 255, 0.06);
+    --glass-bg: rgba(18, 14, 26, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.05);
     --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
     --radius-full: 9999px;
 }
 
@@ -122,9 +122,21 @@ body::after {
 }
 
 .nav-item.active {
-    background: rgba(81, 19, 250, 0.2);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
-    border: 1px solid rgba(81, 19, 250, 0.3);
+    position: relative;
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--accent-blue);
+    border-radius: 0 4px 4px 0;
 }
 
 .nav-item i {

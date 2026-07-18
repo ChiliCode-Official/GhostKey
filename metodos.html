@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Métodos de Pago | Digital Footprint</title>
+    <title>MÃ©todos de Pago | GhostKey</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
         <aside class="sidebar">
             <div class="brand">
                 <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
-                <span class="brand-name">FOOTPRINT</span>
+                <span class="brand-name">GHOSTKEY</span>
             </div>
             <nav class="nav-menu">
                 <a href="index.html" class="nav-item">
@@ -27,11 +27,11 @@
                 </a>
                 <a href="catalogo.html" class="nav-item">
                     <i class="fas fa-th-large"></i>
-                    <span>Catálogo</span>
+                    <span>CatÃ¡logo</span>
                 </a>
                 <a href="metodos.html" class="nav-item active">
                     <i class="fas fa-wallet"></i>
-                    <span>Métodos</span>
+                    <span>MÃ©todos</span>
                 </a>
                 <a href="comprar.html" class="nav-item">
                     <i class="fas fa-question-circle"></i>
@@ -59,12 +59,12 @@
                 <section class="gsap-reveal" style="max-width: 800px; margin: 0 auto; padding-top: 40px;">
                     <div style="text-align: center; margin-bottom: 48px;">
                         <i class="fas fa-wallet" style="font-size: 3rem; color: var(--accent-yellow); margin-bottom: 16px;"></i>
-                        <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Métodos de Pago y Recargas</h2>
+                        <h2 style="font-size: 2.5rem; margin-bottom: 16px;">MÃ©todos de Pago y Recargas</h2>
                         <p style="color: var(--text-secondary); font-size: 1.1rem;">Usa las siguientes cuentas para transferir y agregar saldo o pagar pedidos directamente. Guarda tu comprobante.</p>
                     </div>
 
                     <div style="display: grid; gap: 24px;" id="methodsGrid">
-                        <div style="text-align:center; padding:40px; color:var(--text-secondary);">Cargando métodos de pago...</div>
+                        <div style="text-align:center; padding:40px; color:var(--text-secondary);">Cargando mÃ©todos de pago...</div>
                     </div>
                 </section>
             </div>
@@ -88,7 +88,7 @@
                 const activeMethods = methods.filter(m => m.active);
 
                 if(activeMethods.length === 0) {
-                    grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">No hay métodos de pago activos en este momento.</div>`;
+                    grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">No hay mÃ©todos de pago activos en este momento.</div>`;
                     return;
                 }
 
@@ -101,7 +101,7 @@
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom:4px;"><strong>Cuenta / CLABE:</strong> <span style="font-family:monospace; color:white; font-size:1.1rem;">${m.account}</span></p>
                             <p style="color: var(--text-secondary); font-size: 0.9rem;"><strong>Concepto sugerido:</strong> ${m.concept || 'Pago DF'}</p>
                         </div>
-                        <button class="action-btn" onclick="window.copyToClipboard('${m.account}')" style="background:#2a2a35;" title="Copiar número de cuenta">
+                        <button class="action-btn" onclick="window.copyToClipboard('${m.account}')" style="background:#2a2a35;" title="Copiar nÃºmero de cuenta">
                             <i class="fas fa-copy"></i> Copiar
                         </button>
                     </div>
@@ -116,13 +116,13 @@
 
             } catch(e) {
                 console.error(e);
-                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">Error al cargar los métodos de pago: ${e.message}</div>`;
+                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-secondary);">Error al cargar los mÃ©todos de pago: ${e.message}</div>`;
             }
         });
 
         window.copyToClipboard = (text) => {
             navigator.clipboard.writeText(text).then(() => {
-                alert("¡Número de cuenta copiado: " + text + "!");
+                alert("Â¡NÃºmero de cuenta copiado: " + text + "!");
             });
         };
     </script>

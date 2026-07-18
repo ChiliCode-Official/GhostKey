@@ -25,7 +25,7 @@ const sidebarHtml = `
         
         <div class="friends-search">
             <i class="fas fa-search"></i>
-            <input type="text" id="friendSearchInput" placeholder="Añadir amigo por UID o Email...">
+            <input type="text" id="friendSearchInput" placeholder="AÃ±adir amigo por UID o Email...">
             <button id="addFriendBtn" class="friend-action-btn" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:var(--accent-blue);"><i class="fas fa-user-plus"></i></button>
         </div>
 
@@ -39,18 +39,23 @@ const sidebarHtml = `
         </div>
 
         <div class="referral-box">
-            <h4><i class="fas fa-gift"></i> Gana 3% de Comisión</h4>
-            <p>Invita a un amigo y gana créditos de sus compras.</p>
+            <h4><i class="fas fa-gift"></i> Gana 3% de ComisiÃ³n</h4>
+            <p>Invita a un amigo y gana crÃ©ditos de sus compras.</p>
             <button class="referral-btn" id="copyReferralBtn">Copiar Mi Link de Referido</button>
         </div>
     </div>
 `;
-document.body.insertAdjacentHTML('beforeend', sidebarHtml);
+const appContainer = document.querySelector('.app-container');
+if (appContainer) {
+    appContainer.insertAdjacentHTML('beforeend', sidebarHtml);
+} else {
+    document.body.insertAdjacentHTML('beforeend', sidebarHtml);
+}
 
 // Global Toggle Function (can be called from any button in the app)
 window.toggleFriendsSidebar = () => {
     if(!currentUid) {
-        alert("Debes iniciar sesión para ver tus amigos.");
+        alert("Debes iniciar sesiÃ³n para ver tus amigos.");
         window.location.href = 'perfil.html';
         return;
     }
@@ -179,7 +184,7 @@ async function loadFriends() {
             }
         }
 
-        friendsContainer.innerHTML = friendsHtml || '<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">Aún no tienes amigos agregados.</div>';
+        friendsContainer.innerHTML = friendsHtml || '<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">AÃºn no tienes amigos agregados.</div>';
         requestsContainer.innerHTML = requestsHtml || '<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">No hay solicitudes pendientes.</div>';
         
         const badgeReq = document.getElementById('badgeRequests');
@@ -261,7 +266,7 @@ window.acceptFriend = async (friendshipId) => {
         await updateDoc(doc(db, "friendships", friendshipId), {
             status: 'accepted'
         });
-        alert("¡Solicitud aceptada!");
+        alert("Â¡Solicitud aceptada!");
         loadFriends();
     } catch(e) {
         console.error(e);
@@ -274,6 +279,7 @@ document.getElementById('copyReferralBtn').addEventListener('click', () => {
     if(!currentUid) return;
     const url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + `index.html?ref=${currentUid}`;
     navigator.clipboard.writeText(url).then(() => {
-        alert("¡Enlace de referido copiado! Compártelo con tus amigos.");
+        alert("Â¡Enlace de referido copiado! CompÃ¡rtelo con tus amigos.");
     });
 });
+
