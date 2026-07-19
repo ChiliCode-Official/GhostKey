@@ -452,8 +452,11 @@ window.saveProduct = async () => {
 };
 
 window.editProduct = (id) => {
-    const p = allProducts.find(x => x.id === id);
-    if(!p) return;
+    const p = allProducts.find(x => String(x.id) === String(id));
+    if(!p) {
+        console.error("Product not found:", id, allProducts);
+        return;
+    }
     document.getElementById('editProdId').value = p.id;
     document.getElementById('newProdName').value = p.name;
     document.getElementById('newProdDesc').value = p.description;

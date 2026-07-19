@@ -63,6 +63,14 @@ body::before, body::after {
     grid-template-columns: 80px 1fr 280px;
 }
 
+.app-container.friends-active .sidebar.right-sidebar {
+    width: auto;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 24px 20px;
+    border-left: 1px solid var(--border-color);
+}
+
 /* --- Sidebar --- */
 .sidebar {
     background: var(--sidebar-bg);
@@ -299,6 +307,15 @@ body::before, body::after {
     justify-content: space-between;
     padding: 24px 32px;
     z-index: 20;
+}
+
+/* Admin Tabs Fix */
+.admin-panel-content {
+    display: none;
+}
+.admin-panel-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease-out;
 }
 
 .topbar-nav {
