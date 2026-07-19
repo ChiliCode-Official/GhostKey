@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -11,41 +11,15 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="brand">
-                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
-                <span class="brand-name">GHOSTKEY</span>
-            </div>
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Inicio</span>
-                </a>
-                <a href="catalogo.html" class="nav-item active">
-                    <i class="fas fa-th-large"></i>
-                    <span>CatÃ¡logo</span>
-                </a>
-                <a href="metodos.html" class="nav-item">
-                    <i class="fas fa-wallet"></i>
-                    <span>MÃ©todos</span>
-                </a>
-                <a href="comprar.html" class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Ayuda</span>
-                </a>
-                <a href="contacto.html" class="nav-item">
-                    <i class="fas fa-headset"></i>
-                    <span>Contacto</span>
-                </a>
-            </nav>
-        </aside>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="topbar">
                 <div class="search-bar" style="visibility: hidden;"></div>
                 <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer;" title="Amigos">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
                     <div class="icon-btn" onclick="window.history.back()" style="cursor:pointer;">
                         <i class="fas fa-arrow-left"></i>
                     </div>
@@ -58,7 +32,7 @@
                         <img id="prodImage" src="" alt="">
                     </div>
                     <div class="modal-details" style="background: var(--card-bg); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; border: 1px solid var(--border-color); border-left: none;">
-                        <span id="prodCategory" style="color: var(--accent-yellow); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block;">CategorÃ­a</span>
+                        <span id="prodCategory" style="color: var(--accent-yellow); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block;">Categoría</span>
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
                             <h2 id="prodName" style="font-size: 2.5rem; margin-bottom: 0;">Cargando...</h2>
                             <button class="wishlist-btn" id="prodWishlistBtn" onclick="toggleWishlist(new URLSearchParams(window.location.search).get('id'))" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:2rem; transition:color 0.3s; margin-top:5px;"><i class="far fa-heart"></i></button>
@@ -85,7 +59,7 @@
 
                             <!-- Partial Credit Selector -->
                             <div id="balanceSelectorContainer" style="display:none; background: rgba(0,0,0,0.3); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                                <label style="font-size: 0.85rem; color: var(--text-secondary); display:block; margin-bottom: 8px;">CrÃ©ditos a usar:</label>
+                                <label style="font-size: 0.85rem; color: var(--text-secondary); display:block; margin-bottom: 8px;">Créditos a usar:</label>
                                 <div style="display: flex; gap: 10px; align-items: center;">
                                     <input type="number" id="balanceToUseInput" class="admin-input" style="flex-grow:1; text-align:right;" min="0" value="0">
                                     <span style="color:var(--text-secondary);">MXN</span>
@@ -106,7 +80,7 @@
     </div>
 
     <!-- Gift Modal -->
-    <div class="modal" id="giftModal">
+    <div class="modal-overlay" id="giftModal">
         <div class="modal-content" style="max-width: 400px; padding: 24px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                 <h3 style="margin:0;"><i class="fas fa-gift" style="color:var(--accent-yellow); margin-right:8px;"></i>Regalar Amigo</h3>
@@ -118,8 +92,8 @@
                 <option value="">Cargando amigos...</option>
             </select>
 
-            <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; display:block;">Mensaje (Opcional, dura 7 dÃ­as):</label>
-            <textarea id="giftMessageInput" class="admin-input" rows="3" placeholder="Ej. Â¡Feliz CumpleaÃ±os! Disfruta este juego..." style="width: 100%; resize:none; margin-bottom: 24px;"></textarea>
+            <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; display:block;">Mensaje (Opcional, dura 7 días):</label>
+            <textarea id="giftMessageInput" class="admin-input" rows="3" placeholder="Ej. ¡Feliz Cumpleaños! Disfruta este juego..." style="width: 100%; resize:none; margin-bottom: 24px;"></textarea>
             
             <button class="btn btn-primary" id="confirmGiftBtn" style="width: 100%; padding: 12px; font-weight: 600;">Confirmar Regalo</button>
         </div>
@@ -207,8 +181,8 @@
                         updateBuyButtonState();
                     }
                 } else {
-                    balanceText.textContent = "Inicia sesiÃ³n para comprar";
-                    buyBtn.textContent = "Iniciar sesiÃ³n para comprar";
+                    balanceText.textContent = "Inicia sesión para comprar";
+                    buyBtn.textContent = "Iniciar sesión para comprar";
                     buyBtn.disabled = false;
                     buyBtn.onclick = () => window.location.href = 'perfil.html';
                 }
@@ -350,7 +324,7 @@
                 if (metodo === 'saldo') {
                     // Fully paid with balance - no transfer needed
                     buyBtn.style.background = "var(--accent-green)";
-                    buyBtn.textContent = "Â¡Pedido Registrado con Ã‰xito!";
+                    buyBtn.textContent = "¡Pedido Registrado con Éxito!";
                     
                     // Show a sleek toast or prompt
                     const toast = document.createElement('div');
@@ -374,17 +348,17 @@
                 } else {
                     // Bank transfer or combined - needs WhatsApp confirmation
                     let whatsText = `Hola, he realizado un pedido en GhostKey:%0A`;
-                    whatsText += `ðŸ›’ *${product.name}*%0A`;
-                    whatsText += `ðŸ’° MÃ©todo de pago: *${metodo.toUpperCase()}*%0A`;
+                    whatsText += `🛒 *${product.name}*%0A`;
+                    whatsText += `💰 Método de pago: *${metodo.toUpperCase()}*%0A`;
                     
                     if (metodo === 'combinado') {
                         const restante = price - balanceUsed;
-                        whatsText += `ðŸ’µ Combinado: UtilicÃ© $${balanceUsed.toFixed(2)} MXN de mi saldo y transferÃ­ el restante de *$${restante.toFixed(2)} MXN*.%0A`;
+                        whatsText += `💵 Combinado: Utilicé $${balanceUsed.toFixed(2)} MXN de mi saldo y transferí el restante de *$${restante.toFixed(2)} MXN*.%0A`;
                     } else if (metodo === 'transferencia') {
-                        whatsText += `ðŸ’µ Total a transferir: *$${price.toFixed(2)} MXN*.%0A`;
+                        whatsText += `💵 Total a transferir: *$${price.toFixed(2)} MXN*.%0A`;
                     }
                     
-                    whatsText += `ðŸ‘¤ Email: *${userData.email}*%0A`;
+                    whatsText += `👤 Email: *${userData.email}*%0A`;
                     whatsText += `Adjunto mi comprobante para la entrega.`;
 
                     buyBtn.style.background = "var(--accent-yellow)";
@@ -465,3 +439,4 @@
     </script>
 </body>
 </html>
+

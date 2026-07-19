@@ -72,6 +72,9 @@ document.getElementById('tabRequests').addEventListener('click', (e) => {
 
 // Auth State
 onAuthStateChanged(auth, async (user) => {
+    const friendsContainer = document.getElementById('friendsListContainer');
+    const requestsContainer = document.getElementById('requestsListContainer');
+
     if (user) {
         currentUid = user.uid;
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -83,6 +86,20 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         currentUid = null;
         userData = null;
+        if (friendsContainer) {
+            friendsContainer.innerHTML = `
+                <div style="text-align:center; margin-top:20px; padding: 20px; color:var(--text-secondary); font-size:0.85rem;">
+                    <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:12px; color:var(--accent-yellow);"></i>
+                    <p style="margin-bottom:15px;">Inicia sesión para ver y agregar amigos.</p>
+                    <button class="btn btn-blue" onclick="window.location.href='perfil.html'" style="font-size:0.8rem; padding:8px 16px; width: 100%;">Iniciar Sesión</button>
+                </div>
+            `;
+        }
+        if (requestsContainer) {
+            requestsContainer.innerHTML = '';
+        }
+        const badgeReq = document.getElementById('badgeRequests');
+        if (badgeReq) badgeReq.style.display = 'none';
     }
 });
 
@@ -173,6 +190,11 @@ document.getElementById('addFriendBtn').addEventListener('click', async () => {
     const input = document.getElementById('friendSearchInput').value.trim();
     if(!input) return;
 
+    if (!currentUid || !userData) {
+        alert("Debes iniciar sesión para agregar amigos.");
+        return;
+    }
+
     if(input === currentUid || input === userData.email) {
         alert("No puedes agregarte a ti mismo.");
         return;
@@ -246,3 +268,11 @@ document.getElementById('copyReferralBtn').addEventListener('click', () => {
         alert("¡Enlace de referido copiado! Compártelo con tus amigos.");
     });
 });
+
+// Expose toggle sidebar globally
+window.toggleFriendsSidebar = () => {
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+        appContainer.classList.toggle('friends-active');
+    }
+};

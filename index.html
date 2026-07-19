@@ -51,6 +51,9 @@
                 </div>
                 
                 <div class="topbar-actions" style="display:flex; align-items:center; gap:20px;">
+                    <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:var(--text-secondary);" title="Amigos">
+                        <i class="fas fa-user-friends" style="font-size:0.8rem;"></i>
+                    </div>
                     <div class="icon-btn" title="Notificaciones" style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); cursor:pointer;">
                         <i class="fas fa-bell" style="font-size:0.8rem;"></i>
                     </div>
@@ -236,7 +239,6 @@
     <script type="module" src="wishlist.js"></script>
     <script type="module" src="friends.js"></script>
     <script type="module" src="main.js"></script>
-    <script src="stepper.js"></script>
     <script src="components.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -288,6 +290,7 @@
     </script>
 </body>
 </html>
+
 
 
 

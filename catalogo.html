@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatÃ¡logo | GhostKey</title>
+    <title>Catálogo | GhostKey</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/S00u4EI.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,50 +14,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="brand">
-                <img src="https://i.imgur.com/S00u4EI.png" alt="Logo" class="brand-icon">
-                <span class="brand-name">GHOSTKEY</span>
-            </div>
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Inicio</span>
-                </a>
-                <a href="catalogo.html" class="nav-item active">
-                    <i class="fas fa-th-large"></i>
-                    <span>CatÃ¡logo</span>
-                </a>
-                <a href="metodos.html" class="nav-item">
-                    <i class="fas fa-wallet"></i>
-                    <span>MÃ©todos</span>
-                </a>
-                <a href="comprar.html" class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Ayuda</span>
-                </a>
-                <a href="contacto.html" class="nav-item">
-                    <i class="fas fa-headset"></i>
-                    <span>Contacto</span>
-                </a>
-            </nav>
-            <div class="sidebar-section-title">TOP VENTAS</div>
-            <div class="fast-launch">
-                <div class="game-item" onclick="window.filterCatalog('vbucks')">
-                    <img src="https://i.imgur.com/bAD3nB1.png" class="game-icon" alt="VBucks">
-                    <span class="game-name">V-Bucks Ofertas</span>
-                </div>
-                <div class="game-item" onclick="window.filterCatalog('crew')">
-                    <img src="https://i.imgur.com/3XpcBuu.png" class="game-icon" alt="Crew">
-                    <span class="game-name">Fortnite Crew</span>
-                </div>
-                <div class="game-item" onclick="window.filterCatalog('discord')">
-                    <img src="https://i.imgur.com/TT7IPi9.png" class="game-icon" alt="Discord">
-                    <span class="game-name">Discord Nitro</span>
-                </div>
-            </div>
-        </aside>
 
         <main class="main-content">
             <header class="topbar">
@@ -67,6 +23,9 @@
                 </div>
                 
                 <div class="topbar-actions">
+                    <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer;" title="Amigos">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
                     <div class="icon-btn" onclick="window.location.href='index.html'" style="cursor:pointer;">
                         <i class="fas fa-arrow-left"></i>
                     </div>
@@ -79,7 +38,7 @@
             <div class="content-scroll">
                 <section class="gsap-reveal" style="margin-top: 20px;">
                     <div class="section-header">
-                        <h2 class="section-title" style="font-size: 2rem;">Explorar CatÃ¡logo</h2>
+                        <h2 class="section-title" style="font-size: 2rem;">Explorar Catálogo</h2>
                     </div>
 
                     <div class="category-filters">
@@ -103,6 +62,7 @@
     <script src="products.js"></script>
     <script src="navigation.js"></script>
     <script type="module" src="wishlist.js"></script>
+    <script type="module" src="friends.js"></script>
     <script type="module">
         import { db } from "./firebase-config.js";
         import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -111,33 +71,39 @@
         let allProducts = [];
 
         const initCatalog = async () => {
+            let fetchedProducts = [];
             // Fetch products and stock from Firestore concurrently
             try {
                 const [prodSnap, stockSnap] = await Promise.all([
                     getDocs(collection(db, "products")).catch(e => {
                         console.error("Firebase connection issue for products:", e);
-                        return { empty: true, forEach: () => {} };
+                        return null;
                     }),
                     getDocs(collection(db, "products_stock")).catch(e => {
                         console.error("Firebase stock check offline:", e);
-                        return { forEach: () => {} };
+                        return null;
                     })
                 ]);
 
-                if (prodSnap.empty === false || prodSnap.docs) {
+                if (prodSnap && typeof prodSnap.forEach === 'function') {
                     prodSnap.forEach(docSnap => {
-                        allProducts.push({ id: docSnap.id, ...docSnap.data() });
+                        fetchedProducts.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                } else if (typeof products !== 'undefined') {
-                    allProducts = products;
                 }
 
-                stockSnap.forEach(docSnap => {
-                    stockMap[docSnap.id] = docSnap.data();
-                });
+                if (stockSnap && typeof stockSnap.forEach === 'function') {
+                    stockSnap.forEach(docSnap => {
+                        stockMap[docSnap.id] = docSnap.data();
+                    });
+                }
             } catch(e) {
                 console.error("General Fetch Error:", e);
-                if (typeof products !== 'undefined') allProducts = products;
+            }
+
+            if (fetchedProducts.length > 0) {
+                allProducts = fetchedProducts;
+            } else if (typeof products !== 'undefined') {
+                allProducts = products;
             }
 
             // GSAP Animations (initialize on load)
@@ -247,3 +213,4 @@
     </script>
 </body>
 </html>
+

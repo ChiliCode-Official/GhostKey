@@ -11,8 +11,8 @@
 const NAV_ITEMS = [
     { label: 'Inicio', icon: 'fas fa-home', href: 'index.html' },
     { label: 'Cat&aacute;logo', icon: 'fas fa-search', href: 'catalogo.html' },
-    { label: 'Tienda', icon: 'fas fa-store', href: 'metodos.html' },
-    { label: 'Biblioteca', icon: 'fas fa-chart-bar', href: 'perfil.html' }
+    { label: 'M&eacute;todos', icon: 'fas fa-wallet', href: 'metodos.html' },
+    { label: 'Biblioteca', icon: 'fas fa-gamepad', href: 'perfil.html' }
 ];
 
 function getCurrentActiveIndex() {
@@ -103,13 +103,26 @@ function injectNavigation() {
     const dockItems = [
         NAV_ITEMS[0],
         NAV_ITEMS[1],
-        { label: 'Wishlist', icon: 'fas fa-heart', href: 'perfil.html' },
+        { label: 'Wishlist', icon: 'fas fa-heart', href: 'perfil.html?tab=wishlist' },
         NAV_ITEMS[2],
         NAV_ITEMS[3]
     ];
 
     dockItems.forEach((item, i) => {
-        const isActive = NAV_ITEMS.findIndex(n => n.href === item.href) === activeIndex ? 'active' : '';
+        const cleanPath = window.location.pathname;
+        const cleanHref = item.href.split('?')[0];
+        let isActive = cleanPath.includes(cleanHref) ? 'active' : '';
+        
+        // Special case handling to avoid double activation on Wishlist and Biblioteca
+        if (cleanHref === 'perfil.html') {
+            const isWishlistTab = window.location.search.includes('tab=wishlist') || window.location.hash === '#wishlist';
+            if (item.label === 'Wishlist') {
+                isActive = isWishlistTab ? 'active' : '';
+            } else if (item.label === 'Biblioteca') {
+                isActive = !isWishlistTab ? 'active' : '';
+            }
+        }
+
         dockLinksHtml += `
             <a href="${item.href}" class="dock-item ${isActive}">
                 <div class="dock-icon"><i class="${item.icon}"></i></div>
@@ -128,7 +141,16 @@ function injectNavigation() {
     
     if (appContainer) {
         // Remove old sidebars if any
-        document.querySelectorAll('.sidebar.left-sidebar, .mobile-dock').forEach(e => e.remove());
+        document.querySelectorAll('.sidebar, .mobile-dock').forEach(e => {
+            if (!e.classList.contains('left-sidebar') && !e.classList.contains('right-sidebar')) {
+                e.remove();
+            } else if (e.classList.contains('mobile-dock')) {
+                e.remove();
+            }
+        });
+        
+        // Remove left sidebar if it already exists to avoid duplicates
+        document.querySelectorAll('.sidebar.left-sidebar').forEach(e => e.remove());
         
         // Insert left sidebar before main content
         if (mainContent) {

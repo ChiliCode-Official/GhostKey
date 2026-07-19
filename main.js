@@ -1,4 +1,4 @@
-﻿import { auth, db } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const renderProducts = async () => {
         let allProducts = [];
+        let fetchedProducts = [];
         let stockMap = {};
 
         // Fetch products and stock from Firestore concurrently
@@ -71,28 +72,33 @@ document.addEventListener("DOMContentLoaded", () => {
             const [prodSnap, stockSnap] = await Promise.all([
                 getDocs(collection(db, "products")).catch(e => {
                     console.error("Firebase connection issue for products:", e);
-                    return { empty: true, forEach: () => {} };
+                    return null;
                 }),
                 getDocs(collection(db, "products_stock")).catch(e => {
                     console.error("Firestore offline or configuration issue for stock:", e);
-                    return { forEach: () => {} };
+                    return null;
                 })
             ]);
             
-            if (prodSnap.empty === false || prodSnap.docs) {
+            if (prodSnap && typeof prodSnap.forEach === 'function') {
                 prodSnap.forEach(docSnap => {
-                    allProducts.push({ id: docSnap.id, ...docSnap.data() });
+                    fetchedProducts.push({ id: docSnap.id, ...docSnap.data() });
                 });
-            } else if (typeof products !== 'undefined') {
-                allProducts = products;
             }
 
-            stockSnap.forEach(docSnap => {
-                stockMap[docSnap.id] = docSnap.data();
-            });
+            if (stockSnap && typeof stockSnap.forEach === 'function') {
+                stockSnap.forEach(docSnap => {
+                    stockMap[docSnap.id] = docSnap.data();
+                });
+            }
         } catch (e) {
             console.error("General Fetch Error:", e);
-            if (typeof products !== 'undefined') allProducts = products;
+        }
+
+        if (fetchedProducts.length > 0) {
+            allProducts = fetchedProducts;
+        } else if (typeof products !== 'undefined') {
+            allProducts = products;
         }
 
         if (allProducts.length === 0) return;

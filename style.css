@@ -42,7 +42,7 @@ body::before, body::after {
 /* --- Layout --- */
 .app-container {
     display: grid;
-    grid-template-columns: 240px 1fr 280px;
+    grid-template-columns: 240px 1fr 0px; /* Friends closed by default */
     width: 100%;
     height: 100vh;
     padding: 0;
@@ -52,6 +52,14 @@ body::before, body::after {
 }
 
 .app-container.sidebar-collapsed {
+    grid-template-columns: 80px 1fr 0px;
+}
+
+.app-container.friends-active {
+    grid-template-columns: 240px 1fr 280px;
+}
+
+.app-container.sidebar-collapsed.friends-active {
     grid-template-columns: 80px 1fr 280px;
 }
 
@@ -73,7 +81,12 @@ body::before, body::after {
     border-right: 1px solid var(--border-color);
 }
 .sidebar.right-sidebar {
-    border-left: 1px solid var(--border-color);
+    border-left: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
 }
 .sidebar::-webkit-scrollbar { width: 0; }
 
@@ -1172,4 +1185,84 @@ body::before, body::after {
     .hero-banner { border-radius: 0; height: 300px; margin-bottom: 24px; }
     .content-scroll { padding: 0 16px 20px; overflow-y: visible; }
     .custom-horizontal-grid { grid-template-columns: 1fr; }
+    
+    .mobile-dock {
+        display: flex;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 40px);
+        max-width: 450px;
+        height: 64px;
+        background: rgba(20, 22, 32, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding: 0 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .mobile-dock .dock-item {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0;
+    }
+    .mobile-dock .dock-item:hover, .mobile-dock .dock-item.active {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+    }
+    .mobile-dock .dock-item.active .dock-icon {
+        color: var(--accent-blue);
+        transform: scale(1.1);
+    }
+    .mobile-dock .dock-icon {
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* --- Generic buttons & visited link override --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-white {
+    background-color: #ffffff !important;
+    color: #110e20 !important;
+}
+
+.btn-white:hover {
+    background-color: #f5f5f7 !important;
+    color: #110e20 !important;
+}
+
+a.btn, a.btn:visited {
+    color: #110e20 !important;
+}
+
+.mobile-dock {
+    display: none;
 }
