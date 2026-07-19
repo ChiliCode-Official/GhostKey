@@ -97,8 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (fetchedProducts.length > 0) {
             allProducts = fetchedProducts;
-        } else if (typeof products !== 'undefined') {
-            allProducts = products;
         }
 
         if (allProducts.length === 0) return;
@@ -136,10 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="product-info">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <h4 class="product-title" style="margin-bottom:0;" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">${product.name}</h4>
-                            <button class="wishlist-btn" data-productid="${product.id}" onclick="event.stopPropagation(); toggleWishlist('${product.id}')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="far fa-heart"></i></button>
+                            <h4 class="product-title" style="margin-bottom:0; cursor:pointer;" onclick="window.location.href='producto.html?id=${product.id}'">${product.name}</h4>
+                            <button class="wishlist-btn" data-productid="${product.id}" onclick="event.stopPropagation(); window.toggleWishlist('${product.id}')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="far fa-heart"></i></button>
                         </div>
-                        <p class="product-desc" style="margin-top:8px;" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">${product.description}</p>
+                        <p class="product-desc" style="margin-top:8px; cursor:pointer;" onclick="window.location.href='producto.html?id=${product.id}'">${product.description}</p>
                         <div class="product-footer">
                             <div class="price-box">
                                 <span class="price-tag">MXN</span>

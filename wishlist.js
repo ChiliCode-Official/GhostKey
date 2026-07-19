@@ -23,7 +23,7 @@ export const initWishlist = () => {
 export const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
     if (!user) {
-        alert("Debes iniciar sesiÃ³n para aÃ±adir a favoritos.");
+        alert("Debes iniciar sesión para añadir a favoritos.");
         window.location.href = "perfil.html";
         return;
     }

@@ -1,4 +1,4 @@
-﻿import { app, auth, db, googleProvider } from "./firebase-config.js";
+import { app, auth, db, googleProvider } from "./firebase-config.js";
 import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -20,13 +20,14 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         // ADMIN EMAIL SET AS REQUESTED
+        // WARNING: Frontend validation can be bypassed. Ensure you implement Firestore Security Rules.
         isAdmin = (user.email === 'lrodricg30@gmail.com');
         
         authSection.style.display = 'none';
         
         if (isAdmin) {
             adminDashboard.style.display = 'block';
-            await checkAndSeedProducts();
+            await loadAdminProducts();
             loadAdminData();
         } else {
             userDashboard.style.display = 'block';
@@ -64,30 +65,16 @@ googleLoginBtn.onclick = async () => {
         }
     } catch(e) {
         console.error("Google Login Error", e);
-        alert("Error al iniciar sesiÃ³n con Google. (Recuerda que debes usar Live Server o GitHub Pages).");
+        alert("Error al iniciar sesión con Google. (Recuerda que debes usar Live Server o GitHub Pages).");
     }
 };
 
 logoutBtn.onclick = () => signOut(auth);
 adminLogoutBtn.onclick = () => signOut(auth);
 
-// --- SEEDING FUNCTION ---
-async function checkAndSeedProducts() {
+// Load Products from Firebase
+async function loadAdminProducts() {
     try {
-        if (typeof products !== 'undefined') {
-            let seededAny = false;
-            for (const p of products) {
-                const docRef = doc(db, "products", String(p.id));
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    await setDoc(docRef, p);
-                    seededAny = true;
-                }
-            }
-            if(seededAny) console.log("Seeding complete.");
-        }
-        
-        // Load products array from Firestore for Admin usage
         const freshSnap = await getDocs(collection(db, "products"));
         allProducts = [];
         freshSnap.forEach(docSnap => {
@@ -96,11 +83,8 @@ async function checkAndSeedProducts() {
         // Sort by numeric id if possible
         allProducts.sort((a,b) => parseInt(a.id) - parseInt(b.id));
     } catch(e) {
-        console.error("Error al cargar/sembrar productos:", e);
-        alert("âš ï¸ No se pudieron cargar los productos en el panel.");
-        if (typeof products !== 'undefined') {
-            allProducts = [...products];
-        }
+        console.error("Error al cargar productos:", e);
+        alert("⚠️ No se pudieron cargar los productos en el panel.");
     }
 }
 
@@ -122,7 +106,7 @@ async function loadUserData() {
     tbody.innerHTML = '';
     
     if (querySnapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-secondary);">No tienes pedidos registrados aÃºn.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-secondary);">No tienes pedidos registrados aún.</td></tr>';
     } else {
         // Sort orders in memory (descending by timestamp)
         let userOrders = [];
@@ -353,7 +337,7 @@ window.confirmDeliveryAction = async () => {
                     if (commission > 0) {
                         const newBalance = (referrerSnap.data().balance || 0) + commission;
                         await updateDoc(referrerRef, { balance: newBalance });
-                        console.log(`ComisiÃ³n de $${commission} MXN otorgada a ${referrerUid}`);
+                        console.log(`Comisión de $${commission} MXN otorgada a ${referrerUid}`);
                     }
                 }
             }
@@ -361,7 +345,7 @@ window.confirmDeliveryAction = async () => {
         // ---------------------------------
         
         window.closeDeliveryModal();
-        alert("Pedido completado y entregado con Ã©xito.");
+        alert("Pedido completado y entregado con éxito.");
         loadAdminOrders();
         loadAdminInventory();
         updateAdminStats();
@@ -376,7 +360,7 @@ async function loadAdminInventory() {
     tbody.innerHTML = '';
 
     if (allProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catÃ¡logo.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catálogo.</td></tr>';
         return;
     }
 
@@ -396,7 +380,7 @@ async function loadAdminInventory() {
                     </select>
                 </td>
                 <td>
-                    <textarea id="pool_${prod.id}" class="admin-input-styled" style="height: 60px; font-family: monospace; font-size: 0.85rem; padding: 8px 12px;" placeholder="Pega una credencial por lÃ­nea...">${stockData.credentialsPool || ''}</textarea>
+                    <textarea id="pool_${prod.id}" class="admin-input-styled" style="height: 60px; font-family: monospace; font-size: 0.85rem; padding: 8px 12px;" placeholder="Pega una credencial por línea...">${stockData.credentialsPool || ''}</textarea>
                 </td>
                 <td>
                     <button class="admin-btn-action" onclick="window.saveInventory('${prod.id}')"><i class="fas fa-save"></i> Guardar</button>
@@ -412,7 +396,7 @@ async function loadAdminCatalog() {
     tbody.innerHTML = '';
 
     if (allProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catÃ¡logo.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catálogo.</td></tr>';
         return;
     }
 
@@ -449,15 +433,15 @@ window.saveProduct = async () => {
         if(id) {
             // Edit
             await updateDoc(doc(db, "products", id), { name, description: desc, price, category, image });
-            alert("Producto actualizado con Ã©xito");
+            alert("Producto actualizado con éxito");
         } else {
             // Create
             const newId = Date.now().toString();
             await setDoc(doc(db, "products", newId), { id: parseInt(newId), name, description: desc, price, category, image });
-            alert("Producto creado con Ã©xito");
+            alert("Producto creado con éxito");
         }
         window.resetProductForm();
-        await checkAndSeedProducts(); // Reloads allProducts array
+        await loadAdminProducts(); // Reloads allProducts array
         loadAdminCatalog();
         loadAdminInventory();
         updateAdminStats();
@@ -499,12 +483,12 @@ window.resetProductForm = () => {
 };
 
 window.deleteProduct = async (id) => {
-    if(confirm("Â¿Seguro que quieres eliminar este producto?")) {
+    if(confirm("¿Seguro que quieres eliminar este producto?")) {
         try {
             await deleteDoc(doc(db, "products", id));
             await deleteDoc(doc(db, "products_stock", id));
-            alert("Producto eliminado con Ã©xito");
-            await checkAndSeedProducts();
+            alert("Producto eliminado con éxito");
+            await loadAdminProducts();
             loadAdminCatalog();
             loadAdminInventory();
             updateAdminStats();
@@ -525,7 +509,7 @@ window.saveInventory = async (productId) => {
             status: status,
             credentialsPool: pool
         }, { merge: true });
-        alert("Stock actualizado con Ã©xito.");
+        alert("Stock actualizado con éxito.");
         updateAdminStats();
     } catch(e) {
         console.error(e);
@@ -560,7 +544,7 @@ window.searchUser = async () => {
                 <td>
                     <div style="display:flex; gap: 8px; align-items:center;">
                         <input type="number" id="addBalance_${docSnap.id}" class="admin-input-styled" style="width: 100px; padding: 8px;" placeholder="Monto">
-                        <button class="admin-btn-action" style="padding: 8px 16px;" onclick="window.addBalance('${docSnap.id}', ${data.balance})"><i class="fas fa-plus"></i> AÃ±adir</button>
+                        <button class="admin-btn-action" style="padding: 8px 16px;" onclick="window.addBalance('${docSnap.id}', ${data.balance})"><i class="fas fa-plus"></i> Añadir</button>
                     </div>
                 </td>
             </tr>
@@ -571,7 +555,7 @@ window.searchUser = async () => {
 window.addBalance = async (uid, currentBalance) => {
     const amount = parseFloat(document.getElementById(`addBalance_${uid}`).value);
     if(isNaN(amount) || amount <= 0) {
-        alert("Ingresa una cantidad vÃ¡lida a sumar.");
+        alert("Ingresa una cantidad válida a sumar.");
         return;
     }
     
@@ -579,11 +563,11 @@ window.addBalance = async (uid, currentBalance) => {
         await updateDoc(doc(db, "users", uid), {
             balance: currentBalance + amount
         });
-        alert("Saldo aÃ±adido exitosamente.");
+        alert("Saldo añadido exitosamente.");
         window.searchUser(); // refresh search table
     } catch(e) {
         console.error(e);
-        alert("Error al aÃ±adir saldo.");
+        alert("Error al añadir saldo.");
     }
 };
 
@@ -602,7 +586,7 @@ async function loadAdminPaymentMethods() {
     });
 
     if (allPaymentMethods.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay mÃ©todos de pago registrados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay métodos de pago registrados.</td></tr>';
         return;
     }
 
@@ -639,17 +623,17 @@ window.savePaymentMethod = async () => {
     try {
         if(id) {
             await updateDoc(doc(db, "payment_methods", id), { bank, name, account, concept, active });
-            alert("MÃ©todo de pago actualizado");
+            alert("Método de pago actualizado");
         } else {
             const newId = Date.now().toString();
             await setDoc(doc(db, "payment_methods", newId), { bank, name, account, concept, active, createdAt: Date.now() });
-            alert("MÃ©todo de pago guardado");
+            alert("Método de pago guardado");
         }
         window.resetPaymentMethodForm();
         loadAdminPaymentMethods();
     } catch (e) {
         console.error(e);
-        alert("Error al guardar mÃ©todo de pago");
+        alert("Error al guardar método de pago");
     }
 };
 
@@ -663,8 +647,8 @@ window.editPaymentMethod = (id) => {
     document.getElementById('newPayMethodConcept').value = m.concept || '';
     document.getElementById('newPayMethodActive').checked = m.active !== false;
     
-    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-edit"></i> Editar MÃ©todo de Pago';
-    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar MÃ©todo';
+    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Método de Pago';
+    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar Método';
     document.getElementById('cancelPayMethodBtn').style.display = "inline-flex";
     document.getElementById('tab-paymentMethods').scrollIntoView({ behavior: "smooth" });
 };
@@ -677,16 +661,16 @@ window.resetPaymentMethodForm = () => {
     document.getElementById('newPayMethodConcept').value = "";
     document.getElementById('newPayMethodActive').checked = true;
     
-    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-plus"></i> Crear MÃ©todo de Pago';
-    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-check"></i> Guardar MÃ©todo';
+    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-plus"></i> Crear Método de Pago';
+    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-check"></i> Guardar Método';
     document.getElementById('cancelPayMethodBtn').style.display = "none";
 };
 
 window.deletePaymentMethod = async (id) => {
-    if(confirm("Â¿Seguro que quieres eliminar este mÃ©todo de pago?")) {
+    if(confirm("¿Seguro que quieres eliminar este método de pago?")) {
         try {
             await deleteDoc(doc(db, "payment_methods", id));
-            alert("MÃ©todo de pago eliminado");
+            alert("Método de pago eliminado");
             loadAdminPaymentMethods();
         } catch(e) {
             console.error(e);
