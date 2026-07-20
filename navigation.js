@@ -137,21 +137,21 @@ function injectNavigation() {
             }
         }
 
-        dockLinksHtml += \`
-            <a href="javascript:void(0)" onclick="pageTransitionTo('\${item.href}')" class="dock-item \${isActive}">
-                <div class="dock-icon"><i class="\${item.icon}"></i></div>
-                <div class="dock-label">\${item.label}</div>
+        dockLinksHtml += `
+            <a href="javascript:void(0)" onclick="pageTransitionTo('${item.href}')" class="dock-item ${isActive}">
+                <div class="dock-icon"><i class="${item.icon}"></i></div>
+                <div class="dock-label">${item.label}</div>
             </a>
-        \`;
+        `;
     });
 
-    const dockHtml = \`
+    const dockHtml = `
         <div class="dock-outer">
             <div class="dock-panel">
-                \${dockLinksHtml}
+                ${dockLinksHtml}
             </div>
         </div>
-    \`;
+    `;
 
     const appContainer = document.querySelector('.app-container');
     const mainContent = document.querySelector('.main-content');
@@ -202,15 +202,15 @@ function initMacDock() {
                 scale = 1 + ((distance - mouseDistance) / distance) * ((maxSize - baseSize) / baseSize);
             }
             
-            item.style.width = \`\${baseSize * scale}px\`;
-            item.style.height = \`\${baseSize * scale}px\`;
+            item.style.width = `${baseSize * scale}px`;
+            item.style.height = `${baseSize * scale}px`;
         });
     };
 
     const handlePointerLeave = () => {
         items.forEach(item => {
-            item.style.width = \`\${baseSize}px\`;
-            item.style.height = \`\${baseSize}px\`;
+            item.style.width = `${baseSize}px`;
+            item.style.height = `${baseSize}px`;
         });
     };
 
