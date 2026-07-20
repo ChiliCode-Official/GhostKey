@@ -543,8 +543,27 @@
 
                         <!-- Wishlist -->
                         <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;"><i class="fas fa-heart" style="color:var(--accent-red);"></i> Mi Lista de Deseos</h3>
-                        <div class="products-grid" id="userWishlistGrid">
+                        <div class="products-grid" id="userWishlistGrid" style="margin-bottom: 40px;">
                             <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Recharges History -->
+                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;"><i class="fas fa-wallet" style="color:var(--accent-blue);"></i> Historial de Recargas</h3>
+                        <div class="apple-table-card" style="margin-bottom: 40px;">
+                            <div style="overflow-x: auto;">
+                                <table class="apple-table" id="userRechargesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Monto Solicitado</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -588,6 +607,7 @@
                             <button class="apple-tab-btn" onclick="switchAdminTab('inventory')"><i class="fas fa-warehouse"></i> Inventario de Claves</button>
                             <button class="apple-tab-btn" onclick="switchAdminTab('products')"><i class="fas fa-tags"></i> Editar Catálogo</button>
                             <button class="apple-tab-btn" onclick="switchAdminTab('paymentMethods')"><i class="fas fa-university"></i> Métodos de Pago</button>
+                            <button class="apple-tab-btn" onclick="switchAdminTab('recharges')"><i class="fas fa-hand-holding-usd"></i> Solicitudes de Saldo</button>
                         </div>
 
                         <!-- Orders Tab -->

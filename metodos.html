@@ -54,6 +54,36 @@
                         <p style="color: var(--text-secondary); font-size: 1.1rem;">Usa las siguientes cuentas para transferir y agregar saldo o pagar pedidos directamente. Guarda tu comprobante.</p>
                     </div>
 
+                    <!-- RECHARGE SECTION -->
+                    <div style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); margin-bottom: 40px;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--text-primary); text-align: center;">Solicitar Recarga de Saldo</h3>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                            <button class="btn btn-white" onclick="document.getElementById('rechargeAmount').value = 100">$100</button>
+                            <button class="btn btn-white" onclick="document.getElementById('rechargeAmount').value = 200">$200</button>
+                            <button class="btn btn-white" onclick="document.getElementById('rechargeAmount').value = 500">$500</button>
+                            <button class="btn btn-white" onclick="document.getElementById('rechargeAmount').value = 1000">$1000</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; max-width: 400px; margin: 0 auto; margin-bottom: 20px;">
+                            <input type="number" id="rechargeAmount" placeholder="Otro monto" style="flex:1; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; font-size: 1rem; outline: none;">
+                            <button class="btn btn-blue" onclick="window.requestRecharge()" style="background: #25D366; color: black; font-weight: bold;"><i class="fab fa-whatsapp"></i> Solicitar</button>
+                        </div>
+                        
+                        <!-- T&C Checkbox -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <label class="gl-checkbox">
+                              <input class="gl-checkbox__input" type="checkbox" id="rechargeTermsCheckbox" />
+                              <span class="gl-checkbox__box">
+                                <svg class="gl-checkbox__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              </span>
+                              <span class="gl-checkbox__label">Acepto los <a href="privacidad.html" target="_blank" style="color: var(--accent-yellow); text-decoration: none;">términos y condiciones</a></span>
+                            </label>
+                        </div>
+                        <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 15px;">Al solicitar, te redirigiremos a WhatsApp. Tu saldo aparecerá como "Pendiente" hasta que un administrador verifique el comprobante de pago.</p>
+                    </div>
+
+                    <h3 style="font-size: 1.8rem; margin-bottom: 20px;">Cuentas Disponibles</h3>
                     <div style="display: grid; gap: 24px;" id="methodsGrid">
                         <div style="text-align:center; padding:40px; color:var(--text-secondary);">Cargando métodos de pago...</div>
                     </div>
@@ -65,8 +95,8 @@
     <script src="navigation.js"></script>
     <script type="module" src="friends.js"></script>
     <script type="module">
-        import { db } from "./firebase-config.js";
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { db, auth } from "./firebase-config.js";
+        import { collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         document.addEventListener("DOMContentLoaded", async () => {
             gsap.registerPlugin(ScrollTrigger);
@@ -148,10 +178,71 @@
 
         window.copyToClipboard = (text) => {
             navigator.clipboard.writeText(text).then(() => {
-                alert("¡Número de cuenta copiado: " + text + "!");
+                alert("¡Cuenta copiada al portapapeles!");
             });
+        };
+
+        window.requestRecharge = async () => {
+            const termsCheckbox = document.getElementById('rechargeTermsCheckbox');
+            if (!termsCheckbox.checked) {
+                alert("Debes aceptar los términos y condiciones antes de recargar saldo.");
+                return;
+            }
+
+            const amountInput = document.getElementById('rechargeAmount').value;
+            const amount = parseFloat(amountInput);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("Por favor, ingresa un monto válido a recargar.");
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                alert("Debes iniciar sesión primero para solicitar saldo.");
+                pageTransitionTo('perfil.html');
+                return;
+            }
+
+            try {
+                // Fetch user data to get username
+                const userRef = doc(db, "users", currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                let username = currentUser.email;
+                if (userSnap.exists() && userSnap.data().username) {
+                    username = userSnap.data().username;
+                }
+
+                // Create Recharge Request in Firestore
+                const requestId = "req_" + Date.now() + "_" + Math.floor(Math.random()*1000);
+                const requestRef = doc(db, "recharge_requests", requestId);
+                
+                await setDoc(requestRef, {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    username: username,
+                    amount: amount,
+                    status: "pending",
+                    timestamp: new Date().toISOString()
+                });
+
+                if (window.showHamsterLoading) {
+                    window.showHamsterLoading('Procesando solicitud de recarga...');
+                }
+
+                // Open WhatsApp after animation
+                const whatsText = encodeURIComponent(`Hola, acabo de solicitar una recarga de $${amount} MXN. Mi usuario es ${username} y mi correo es ${currentUser.email}. Adjunto mi comprobante de pago.`);
+                
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/525574123521?text=${whatsText}`;
+                    document.getElementById('rechargeAmount').value = '';
+                }, 3500);
+
+            } catch (e) {
+                console.error("Error al registrar recarga: ", e);
+                alert("Hubo un error al registrar la recarga. Intenta de nuevo.");
+            }
         };
     </script>
 </body>
 </html>
-

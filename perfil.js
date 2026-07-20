@@ -184,6 +184,9 @@ async function loadUserData() {
             });
         }
     }
+    
+    // Render Recharges History
+    await loadUserRecharges();
 }
 
 // Admin Data Loading
@@ -192,6 +195,7 @@ async function loadAdminData() {
     loadAdminInventory();
     loadAdminCatalog();
     loadAdminPaymentMethods();
+    loadAdminRecharges();
     updateAdminStats();
 }
 
@@ -681,4 +685,127 @@ window.deletePaymentMethod = async (id) => {
         }
     }
 };
+};
 
+// --- RECHARGES LOGIC ---
+async function loadUserRecharges() {
+    const tbody = document.getElementById('userRechargesTable').querySelector('tbody');
+    if (!tbody) return;
+    
+    const q = query(collection(db, "recharge_requests"), where("uid", "==", currentUser.uid));
+    const snap = await getDocs(q);
+    
+    let recharges = [];
+    snap.forEach(doc => recharges.push({ id: doc.id, ...doc.data() }));
+    recharges.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    tbody.innerHTML = '';
+    
+    if (recharges.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color:var(--text-secondary);">No tienes solicitudes de saldo.</td></tr>';
+        return;
+    }
+    
+    recharges.forEach(req => {
+        let statusHtml = '';
+        if (req.status === 'pending') statusHtml = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+        else if (req.status === 'approved') statusHtml = '<span class="status-pill delivered"><i class="fas fa-check"></i> Aprobado</span>';
+        else if (req.status === 'rejected') statusHtml = '<span class="status-pill pending" style="background:rgba(244,63,94,0.1); color:var(--accent-red); border-color:rgba(244,63,94,0.3);"><i class="fas fa-times"></i> Rechazado</span>';
+        
+        const date = new Date(req.timestamp).toLocaleDateString();
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${date}</td>
+                <td style="font-weight: bold;">$${req.amount.toFixed(2)} MXN</td>
+                <td>${statusHtml}</td>
+            </tr>
+        `;
+    });
+}
+
+async function loadAdminRecharges() {
+    const tbody = document.getElementById('adminRechargesTable');
+    if (!tbody) return;
+    
+    const snap = await getDocs(collection(db, "recharge_requests"));
+    
+    let recharges = [];
+    snap.forEach(doc => recharges.push({ id: doc.id, ...doc.data() }));
+    recharges.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    tbody.innerHTML = '';
+    
+    if (recharges.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-secondary);">No hay solicitudes de saldo.</td></tr>';
+        return;
+    }
+    
+    recharges.forEach(req => {
+        let statusHtml = '';
+        let actionBtns = '';
+        
+        if (req.status === 'pending') {
+            statusHtml = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+            actionBtns = `
+                <button class="admin-btn-action" style="padding: 6px 10px;" onclick="window.approveRecharge('${req.id}', '${req.uid}', ${req.amount})"><i class="fas fa-check"></i></button>
+                <button class="admin-btn-action danger" style="padding: 6px 10px;" onclick="window.rejectRecharge('${req.id}')"><i class="fas fa-times"></i></button>
+            `;
+        } else if (req.status === 'approved') {
+            statusHtml = '<span class="status-pill delivered"><i class="fas fa-check"></i> Aprobado</span>';
+            actionBtns = '<span style="color:var(--text-secondary);"><i class="fas fa-check"></i></span>';
+        } else if (req.status === 'rejected') {
+            statusHtml = '<span class="status-pill pending" style="background:rgba(244,63,94,0.1); color:var(--accent-red); border-color:rgba(244,63,94,0.3);"><i class="fas fa-times"></i> Rechazado</span>';
+            actionBtns = '<span style="color:var(--text-secondary);"><i class="fas fa-times"></i></span>';
+        }
+        
+        const date = new Date(req.timestamp).toLocaleDateString();
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${date}</td>
+                <td>${req.username || req.email}</td>
+                <td style="font-size:0.85rem; color:var(--text-secondary);">${req.email}</td>
+                <td style="font-weight: bold; color: var(--accent-yellow);">$${req.amount.toFixed(2)} MXN</td>
+                <td>${statusHtml}</td>
+                <td style="display: flex; gap: 8px;">${actionBtns}</td>
+            </tr>
+        `;
+    });
+}
+
+window.approveRecharge = async (reqId, uid, amount) => {
+    if(!confirm(\`¿Aprobar recarga de $${amount} MXN?\`)) return;
+    
+    try {
+        // Update request status
+        await updateDoc(doc(db, "recharge_requests", reqId), { status: 'approved' });
+        
+        // Update user balance
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const currentBalance = userSnap.data().balance || 0;
+            await updateDoc(userRef, { balance: currentBalance + amount });
+        }
+        
+        alert("Recarga aprobada y saldo actualizado.");
+        loadAdminRecharges();
+    } catch (e) {
+        console.error(e);
+        alert("Error al aprobar recarga.");
+    }
+};
+
+window.rejectRecharge = async (reqId) => {
+    if(!confirm("¿Rechazar esta solicitud?")) return;
+    
+    try {
+        await updateDoc(doc(db, "recharge_requests", reqId), { status: 'rejected' });
+        alert("Solicitud rechazada.");
+        loadAdminRecharges();
+    } catch (e) {
+        console.error(e);
+        alert("Error al rechazar recarga.");
+    }
+};

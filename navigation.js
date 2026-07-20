@@ -83,13 +83,14 @@ function injectNavigation() {
                     <span class="tab" id="tabRequests" style="cursor:pointer; color:var(--text-secondary);">Requests <span class="badge-red friends-req-badge" id="badgeRequests" style="background:rgba(244,63,94,0.2); color:#f43f5e; padding:2px 6px; border-radius:10px; font-size:0.75rem; display:none;">0</span></span>
                 </div>
                 
-                <div class="search-friend-bar" style="display:flex; align-items:center; gap:10px; margin-bottom: 15px;">
-                    <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:10px; padding:8px 12px; display:flex; align-items:center; gap:10px;">
-                        <i class="fas fa-search" style="color:var(--text-secondary); font-size:0.8rem;"></i>
-                        <input type="text" id="friendSearchInput" placeholder="Search a friend" style="background:transparent; border:none; color:white; font-size:0.85rem; outline:none; width:100%;">
+                <div class="search-friend-bar" style="display:flex; align-items:flex-end; gap:15px; margin-bottom: 25px; margin-top: 15px;">
+                    <div class="inputbox" style="flex:1; width:auto;">
+                        <input required="required" type="text" id="friendSearchInput">
+                        <span>Buscar usuario o UID</span>
+                        <i></i>
                     </div>
-                    <div style="width:32px; height:32px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;" id="addFriendBtn">
-                        <i class="fas fa-user-plus" style="color:var(--text-secondary); font-size:0.8rem;"></i>
+                    <div style="width:44px; height:44px; background:rgba(161, 130, 232, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; color: #A182E8; flex-shrink: 0; box-shadow: 0 4px 15px rgba(161, 130, 232, 0.15);" id="addFriendBtn">
+                        <i class="fas fa-user-plus" style="font-size:1.2rem;"></i>
                     </div>
                 </div>
 
@@ -136,18 +137,21 @@ function injectNavigation() {
             }
         }
 
-        dockLinksHtml += `
-            <a href="javascript:void(0)" onclick="pageTransitionTo('${item.href}')" class="dock-item ${isActive}">
-                <div class="dock-icon"><i class="${item.icon}"></i></div>
+        dockLinksHtml += \`
+            <a href="javascript:void(0)" onclick="pageTransitionTo('\${item.href}')" class="dock-item \${isActive}">
+                <div class="dock-icon"><i class="\${item.icon}"></i></div>
+                <div class="dock-label">\${item.label}</div>
             </a>
-        `;
+        \`;
     });
 
-    const dockHtml = `
-        <div class="mobile-dock">
-            ${dockLinksHtml}
+    const dockHtml = \`
+        <div class="dock-outer">
+            <div class="dock-panel">
+                \${dockLinksHtml}
+            </div>
         </div>
-    `;
+    \`;
 
     const appContainer = document.querySelector('.app-container');
     const mainContent = document.querySelector('.main-content');
@@ -171,7 +175,50 @@ function injectNavigation() {
         
         // Dispatch event so friends.js knows DOM is ready
         window.dispatchEvent(new Event('sidebarLoaded'));
+        
+        // Init Mobile Mac OS Dock Magnification
+        initMacDock();
     }
+}
+
+function initMacDock() {
+    const dock = document.querySelector('.dock-panel');
+    const items = document.querySelectorAll('.dock-item');
+    if (!dock || items.length === 0) return;
+
+    const baseSize = 50;
+    const maxSize = 70;
+    const distance = 150;
+
+    const handlePointerMove = (e) => {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        items.forEach(item => {
+            const rect = item.getBoundingClientRect();
+            const itemCenterX = rect.left + rect.width / 2;
+            const mouseDistance = Math.abs(clientX - itemCenterX);
+            
+            let scale = 1;
+            if (mouseDistance < distance) {
+                scale = 1 + ((distance - mouseDistance) / distance) * ((maxSize - baseSize) / baseSize);
+            }
+            
+            item.style.width = \`\${baseSize * scale}px\`;
+            item.style.height = \`\${baseSize * scale}px\`;
+        });
+    };
+
+    const handlePointerLeave = () => {
+        items.forEach(item => {
+            item.style.width = \`\${baseSize}px\`;
+            item.style.height = \`\${baseSize}px\`;
+        });
+    };
+
+    dock.addEventListener('mousemove', handlePointerMove);
+    dock.addEventListener('touchmove', handlePointerMove, { passive: true });
+    
+    dock.addEventListener('mouseleave', handlePointerLeave);
+    dock.addEventListener('touchend', handlePointerLeave);
 }
 
 // Intercept Links for Transitions
