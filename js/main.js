@@ -13,9 +13,16 @@ import {
     getDocs,
     limit,
     query,
-    where
+    where,
+    orderBy,
+    addDoc,
+    updateDoc,
+    serverTimestamp,
+    arrayUnion,
+    arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initWishlistButtons } from './wishlist.js';
+import './friends-panel.js';
 
 let currentUser = null;
 let currentUserWishlist = [];
@@ -201,7 +208,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-function getGhostLoaderHTML(message = 'Cargando…') {
+export function getGhostLoaderHTML(message = 'Cargando…') {
     return `
         <div class="loading-state">
             <div class="ghost-loader" aria-hidden="true">
@@ -246,6 +253,29 @@ function getGhostLoaderHTML(message = 'Cargando…') {
         </div>
     `;
 }
+
+// Right panel toggle logic
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('panel-toggle');
+    const rightPanel = document.querySelector('.right-panel');
+    if (toggleBtn && rightPanel) {
+        toggleBtn.addEventListener('click', () => {
+            rightPanel.classList.toggle('collapsed');
+            const icon = toggleBtn.querySelector('i');
+            if (rightPanel.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+                toggleBtn.style.right = 'auto';
+                toggleBtn.style.left = '-40px';
+            } else {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+                toggleBtn.style.left = 'auto';
+                toggleBtn.style.right = '20px';
+            }
+        });
+    }
+});
 
 async function loadIndexProducts() {
     const container = document.getElementById('products-container');
@@ -299,14 +329,24 @@ async function loadIndexProducts() {
             }
 
             container.innerHTML += `
-                <a href="producto.html?id=${d.id}" class="product-card" style="opacity:0;">
-                    <div class="product-img-wrapper">
-                        <span class="stock-badge" style="background:${statusColor}">${stockLabel}</span>
-                        <button class="wishlist-btn" data-id="${d.id}"><i class="fa-solid fa-heart"></i></button>
-                        <img src="${p.image}" alt="${p.name}" class="product-img">
+                <a href="producto.html?id=${d.id}" class="card" style="opacity:0;">
+                  <div class="card__shine"></div>
+                  <div class="card__glow"></div>
+                  <div class="card__content">
+                    <div class="card__badge" style="background:${statusColor}">${stockLabel}</div>
+                    <button class="wishlist-btn" data-id="${d.id}" style="position:absolute; top:12px; left:12px; z-index:4; background:var(--bg-panel); border:1px solid var(--glass-border); color:var(--text-muted); border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-heart"></i></button>
+                    <div class="card__image" style="background-image: url('${p.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}');"></div>
+                    <div class="card__text">
+                      <p class="card__title">${p.name}</p>
+                      <p class="card__description">Item Premium</p>
                     </div>
-                    <h3 class="product-title">${p.name}</h3>
-                    <p class="product-price">$${p.price}</p>
+                    <div class="card__footer">
+                      <div class="card__price">$${p.price}</div>
+                      <div class="card__button">
+                        <svg height="16" width="16" viewBox="0 0 24 24"><path stroke-width="2" stroke="currentColor" d="M4 12H20M12 4V20" fill="currentColor"></path></svg>
+                      </div>
+                    </div>
+                  </div>
                 </a>
             `;
         });
@@ -314,7 +354,7 @@ async function loadIndexProducts() {
         initWishlistButtons(currentUserWishlist);
 
         gsap.from(".hero-banner", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" });
-        gsap.to(".product-card", {
+        gsap.to(".card", {
             opacity: 1,
             y: 0,
             duration: 0.6,

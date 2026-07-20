@@ -15,9 +15,10 @@ const authMsg = document.getElementById('auth-state-message');
 const buyControls = document.getElementById('buy-controls');
 const userBalanceDisplay = document.getElementById('user-current-balance');
 const btnBuy = document.getElementById('btn-buy');
+const btnBuyLabel = document.querySelector('.btn-buy-stars__label');
 const buyError = document.getElementById('buy-error');
 
-const giftCheckbox = document.getElementById('is-gift-checkbox');
+const btnGift = document.getElementById('btn-gift');
 const giftInputs = document.getElementById('gift-inputs');
 const giftEmail = document.getElementById('gift-email');
 
@@ -25,12 +26,14 @@ let productData = null;
 let stockData = null;
 let currentUser = null;
 let userDocData = null;
+let isGiftMode = false;
 
-giftCheckbox.addEventListener('change', (e) => {
-    if (e.target.checked) {
-        giftInputs.classList.add('active');
-    } else {
-        giftInputs.classList.remove('active');
+btnGift?.addEventListener('click', () => {
+    isGiftMode = !isGiftMode;
+    btnGift.classList.toggle('is-active', isGiftMode);
+    giftInputs.classList.toggle('active', isGiftMode);
+    if (!isGiftMode) {
+        giftEmail.value = '';
     }
 });
 
@@ -61,6 +64,7 @@ async function loadProductDetails() {
                         pBadge.textContent = `Agotado`;
                         pBadge.style.background = 'var(--danger)';
                         btnBuy.disabled = true;
+                        btnGift.disabled = true;
                     }
                 } else if (stockData.status === 'bajo_pedido') {
                     pBadge.textContent = `Bajo pedido`;
@@ -69,6 +73,7 @@ async function loadProductDetails() {
                     pBadge.textContent = `Agotado`;
                     pBadge.style.background = 'var(--danger)';
                     btnBuy.disabled = true;
+                    btnGift.disabled = true;
                 }
             }
         }
@@ -89,7 +94,7 @@ onAuthStateChanged(auth, async (user) => {
                 userDocData = userSnap.data();
                 userBalanceDisplay.textContent = `$${userDocData.balance.toFixed(2)}`;
                 buyControls.style.display = 'flex';
-                
+
                 if (userDocData.balance < productData?.price) {
                     buyError.textContent = "Saldo insuficiente. Recarga en tu perfil.";
                     buyError.style.display = 'block';
@@ -108,8 +113,8 @@ onAuthStateChanged(auth, async (user) => {
 
 btnBuy.addEventListener('click', async () => {
     if (!currentUser || !productData || !stockData || !userDocData) return;
-    
-    const isGift = giftCheckbox.checked;
+
+    const isGift = isGiftMode;
     const gEmail = giftEmail.value.trim();
     if (isGift && !gEmail) {
         buyError.textContent = "Ingresa el correo del amigo.";
@@ -118,7 +123,7 @@ btnBuy.addEventListener('click', async () => {
     }
 
     btnBuy.disabled = true;
-    btnBuy.textContent = "Procesando...";
+    if (btnBuyLabel) btnBuyLabel.textContent = "Procesando…";
 
     try {
         await runTransaction(db, async (transaction) => {
@@ -184,7 +189,7 @@ btnBuy.addEventListener('click', async () => {
         buyError.textContent = e;
         buyError.style.display = 'block';
         btnBuy.disabled = false;
-        btnBuy.textContent = "Comprar ahora";
+        if (btnBuyLabel) btnBuyLabel.textContent = "Comprar";
     }
 });
 

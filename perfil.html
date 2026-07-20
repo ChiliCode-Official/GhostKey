@@ -156,7 +156,7 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="dashboard-container no-right-panel">
         <!-- Sidebar (PC) -->
         <aside class="sidebar">
             <a href="index.html" class="brand-logo">GKey</a>
@@ -189,13 +189,29 @@
             </div>
 
             <div id="profile-content" style="display: none;">
-                <div class="profile-header">
-                    <img src="" alt="Avatar" class="profile-avatar-lg user-avatar">
-                    <div>
-                        <h2 id="profile-name">User Name</h2>
-                        <p id="profile-email" class="text-muted">user@example.com</p>
+                <div class="profile-header" style="flex-direction: column; align-items: center; gap: 1rem;">
+                    <!-- GhostCard (Uiverse.io by CodeM7710) -->
+                    <div class="main-container">
+                      <div class="border">
+                        <div class="card-membership">
+                          <div class="shadow">
+                            <div class="content">
+                              <p class="rev">GhostCard</p>
+                              <p class="ultra-text">TARJETA DE MIEMBRO</p>
+                              <p class="master-text">GhostKey</p>
+                              <p class="card-number" id="card-uid">Cargando...</p>
+                              <p class="card-holder" id="card-name">Cargando...</p>
+                              <p class="master one"></p>
+                              <p class="master two"></p>
+                              <svg version="1.1" class="chip" xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 50 50">
+                                <image width="50" height="50" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB6VBMVEUAAACNcTiVeUKVeUOYfEaafEeUeUSYfEWZfEaykleyklaXe0SWekSZZjOYfEWYe0WXfUWXe0WcgEicfkiXe0SVekSXekSWekKYe0a9nF67m12ZfUWUeEaXfESVekOdgEmVeUWWekSniU+VeUKVeUOrjFKYfEWliE6WeESZe0GSe0WYfES7ml2Xe0WXeESUeEOWfEWcf0eWfESXe0SXfEWYekSVeUKXfEWxklawkVaZfEWWekOUekOWekSYfESZe0eXekWYfEWZe0WZe0eVeUSWeETAnmDCoWLJpmbxy4P1zoXwyoLIpWbjvXjivnjgu3bfu3beunWvkFWxkle/nmDivXiWekTnwXvkwHrCoWOuj1SXe0TEo2TDo2PlwHratnKZfEbQrWvPrWuafUfbt3PJp2agg0v0zYX0zYSfgkvKp2frxX7mwHrlv3rsxn/yzIPgvHfduXWXe0XuyIDzzISsjVO1lVm0lFitjVPzzIPqxX7duna0lVncuHTLqGjvyIHeuXXxyYGZfUayk1iyk1e2lln1zYTEomO2llrbtnOafkjFpGSbfkfZtXLhvHfkv3nqxH3mwXujhU3KqWizlFilh06khk2fgkqsjlPHpWXJp2erjVOhg0yWe0SliE+XekShhEvAn2D///+gx8TWAAAARnRSTlMACVCTtsRl7Pv7+vxkBab7pZv5+ZlL/UnU/f3SJCVe+Fx39naA9/75XSMh0/3SSkia+pil/KRj7Pr662JPkrbP7OLQ0JFOijI1MwAAAAFiS0dEorDd34wAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfnAg0IDx2lsiuJAAACLElEQVRIx2NgGAXkAUYmZhZWPICFmYkRVQcbOwenmzse4MbFzc6DpIGXj8PD04sA8PbhF+CFaxEU8iWkAQT8hEVgOkTF/InR4eUVICYO1SIhCRMLDAoKDvFDVhUaEhwUFAjjSUlDdMiEhcOEItzdI6OiYxA6YqODIt3dI2DcuDBZsBY5eVTr4xMSYcyk5BRUOXkFsBZFJTQnp6alQxgZmVloUkrKYC0qqmji2WE5EEZuWB6alKoKdi35YQUQRkFYPpFaCouKIYzi6EDitJSUlsGY5RWVRGjJLyxNy4ZxqtIqqvOxaVELQwZFZdkIJVU1RSiSalAt6rUwUBdWG1CP6pT6gNqwOrgCdQyHNYR5YQFhDXj8MiK1IAeyN6aORiyBjByVTc0FqBoKWpqwRCVSgilOaY2OaUPw29qjOzqLvTAchpos47u6EZyYnngUSRwpuTe6D+6qaFQdOPNLRzOM1dzhRZyW+CZouHk3dWLXglFcFIflQhj9YWjJGlZcaKAVSvjyPrRQ0oQVKDAQHlYFYUwIm4gqExGmBSkutaVQJeomwViTJqPK6OhCy2Q9sQBk8cY0DxjTJw0lAQWK6cOKfgNhpKK7ZMpUeF3jPa28BCETamiEqJKM+X1gxvWXpoUjVIVPnwErw71nmpgiqiQGBjNzbgs3j1nus+fMndc+Cwm0T52/oNR9lsdCS24ra7Tq1cbWjpXV3sHRCb1idXZ0sGdltXNxRateRwHRAACYHutzk/2I5QAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMy0wMi0xM1QwODoxNToyOSswMDowMEUnN7UAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjMtMDItMTNUMDg6MTU6MjkrMDA6MDA0eo8JAAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDIzLTAyLTEzVDA4OjE1OjI5KzAwOjAwY2+u1gAAAABJRU5ErkJggg=="></image>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div style="margin-left: auto;">
+                    <div>
                         <a href="info.html" class="btn-secondary"><i class="fa-solid fa-circle-info"></i> Ayuda y Referidos</a>
                     </div>
                 </div>
@@ -358,15 +374,35 @@
         </div>
     </div>
 
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+        <div class="mobile-menu__backdrop" id="mobile-menu-backdrop"></div>
+        <div class="mobile-menu__panel">
+            <p class="mobile-menu__title">Más opciones</p>
+            <a href="index.html" class="mobile-menu__link"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="catalogo.html" class="mobile-menu__link"><i class="fa-solid fa-gamepad"></i> Catálogo</a>
+            <a href="perfil.html" class="mobile-menu__link"><i class="fa-solid fa-user"></i> Perfil</a>
+            <a href="info.html" class="mobile-menu__link"><i class="fa-solid fa-circle-info"></i> Información</a>
+        </div>
+    </div>
+
     <!-- Mobile Dock -->
     <nav class="mobile-dock">
         <a href="index.html" class="dock-item"><i class="fa-solid fa-house"></i></a>
         <a href="catalogo.html" class="dock-item"><i class="fa-solid fa-gamepad"></i></a>
+        <label class="hamburger dock-item" style="margin: 0; padding: 0;">
+          <input type="checkbox" id="mobile-menu-toggle-perfil">
+          <svg viewBox="0 0 32 32">
+            <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+            <path class="line" d="M7 16 27 16"></path>
+          </svg>
+        </label>
+        <a href="#" class="dock-item"><i class="fa-solid fa-users"></i></a>
         <a href="perfil.html" class="dock-item active"><i class="fa-solid fa-user"></i></a>
     </nav>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/perfil.js"></script>
+    <script type="module" src="js/mobile-nav.js"></script>
     
     <script>
         // Modal logic (UI)

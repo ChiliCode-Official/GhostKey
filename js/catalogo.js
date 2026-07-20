@@ -2,6 +2,7 @@ import { db, auth } from './firebase-config.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { initWishlistButtons } from './wishlist.js';
+import { getGhostLoaderHTML } from './main.js';
 
 const catalogGrid = document.getElementById('catalog-grid');
 const filterBtns = document.querySelectorAll('.filter-btn');
@@ -22,6 +23,7 @@ async function fetchUserWishlist(uid) {
 }
 
 async function loadProducts() {
+    catalogGrid.innerHTML = getGhostLoaderHTML('Cargando catálogo...');
     try {
         const querySnapshot = await getDocs(collection(db, "products"));
         allProducts = [];
@@ -71,23 +73,33 @@ function renderProducts(products) {
 
         const card = document.createElement('a');
         card.href = `producto.html?id=${prod.id}`;
-        card.className = 'product-card';
+        card.className = 'card';
         card.style.opacity = 0;
         card.innerHTML = `
-            <div class="product-img-wrapper">
-                <span class="stock-badge" style="background:${statusColor}">${stockLabel}</span>
-                <button class="wishlist-btn" data-id="${prod.id}"><i class="fa-solid fa-heart"></i></button>
-                <img src="${prod.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}" alt="${prod.name}" class="product-img">
+            <div class="card__shine"></div>
+            <div class="card__glow"></div>
+            <div class="card__content">
+            <div class="card__badge" style="background:${statusColor}">${stockLabel}</div>
+            <button class="wishlist-btn" data-id="${prod.id}" style="position:absolute; top:12px; left:12px; z-index:4; background:var(--bg-panel); border:1px solid var(--glass-border); color:var(--text-muted); border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-heart"></i></button>
+            <div class="card__image" style="background-image: url('${prod.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}');"></div>
+            <div class="card__text">
+                <p class="card__title">${prod.name}</p>
+                <p class="card__description">Item Premium</p>
             </div>
-            <h3 class="product-title">${prod.name}</h3>
-            <p class="product-price">$${prod.price}</p>
+            <div class="card__footer">
+                <div class="card__price">$${prod.price}</div>
+                <div class="card__button">
+                <svg height="16" width="16" viewBox="0 0 24 24"><path stroke-width="2" stroke="currentColor" d="M4 12H20M12 4V20" fill="currentColor"></path></svg>
+                </div>
+            </div>
+            </div>
         `;
         catalogGrid.appendChild(card);
     });
 
     initWishlistButtons(currentUserWishlist);
 
-    gsap.to('.product-card', {
+    gsap.to('.card', {
         opacity: 1,
         y: -10,
         duration: 0.5,

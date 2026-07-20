@@ -33,17 +33,18 @@
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
-                <div class="search-bar">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" placeholder="Search...">
+                <div class="inputbox">
+                    <input required="required" type="text" placeholder="">
+                    <span>Search...</span>
+                    <i></i>
                 </div>
                 
                 <div class="top-actions">
                     <button class="action-btn"><i class="fa-solid fa-bell"></i></button>
                     <button class="action-btn"><i class="fa-solid fa-bag-shopping"></i></button>
                     <div class="user-profile user-profile--loading" id="user-profile-btn" title="Cargando sesión…">
-                        <img id="user-avatar" class="user-avatar user-avatar--skeleton" alt="">
-                        <span id="user-name" class="user-name--skeleton"></span>
+                        <img id="user-avatar" class="user-avatar" alt="">
+                        <span id="user-name"></span>
                     </div>
                 </div>
             </header>
@@ -154,46 +155,111 @@
                     </div>
                 </div>
             </section>
+            <!-- Community Reviews Section -->
+            <section class="reviews-section" style="margin-top: 3rem; margin-bottom: 3rem;">
+                <h2 class="section-title">Nuestra Comunidad</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">¿Qué opinan nuestros usuarios?</p>
+                
+                <div id="review-form-container" style="background: var(--bg-card); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--glass-border); margin-bottom: 2rem; display: none;">
+                    <h3 style="margin-bottom: 1rem;">Comparte tu experiencia</h3>
+                    <textarea id="review-text" rows="3" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-main); padding: 10px; margin-bottom: 10px; resize: none;" placeholder="Escribe tu opinión aquí..."></textarea>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div class="rating">
+                          <input value="5" name="rate" id="star5" type="radio">
+                          <label title="5 stars" for="star5"></label>
+                          <input value="4" name="rate" id="star4" type="radio">
+                          <label title="4 stars" for="star4"></label>
+                          <input value="3" name="rate" id="star3" type="radio" checked="">
+                          <label title="3 stars" for="star3"></label>
+                          <input value="2" name="rate" id="star2" type="radio">
+                          <label title="2 stars" for="star2"></label>
+                          <input value="1" name="rate" id="star1" type="radio">
+                          <label title="1 star" for="star1"></label>
+                        </div>
+                        <button id="btn-submit-review" class="btn-primary" style="padding: 0.5rem 1.5rem;">Publicar</button>
+                    </div>
+                </div>
+
+                <div id="reviews-container" style="display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 1rem;">
+                    <!-- Reviews will be injected here -->
+                </div>
+            </section>
 
         </main>
 
         <!-- Right Panel -->
-        <aside class="right-panel">
-            <div class="panel-section">
-                <h3 class="panel-title">Friends Online - 6 / 45</h3>
-                <div class="list-item">
-                    <div class="list-icon"><img src="https://ui-avatars.com/api/?name=FA" alt="avatar"></div>
-                    <div class="list-info">
-                        <p class="list-name">Fahim Auditor</p>
-                        <p class="list-desc">Apex</p>
+        <aside class="right-panel" id="friends-panel">
+            <button type="button" class="panel-collapse-btn" id="friends-panel-toggle" aria-expanded="true" aria-label="Ocultar panel de amigos">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="right-panel__inner">
+                <div class="panel-section">
+                    <h3 class="panel-title">Amigos en línea · 6 / 45</h3>
+                    <div class="list-item">
+                        <div class="list-icon"><img src="https://ui-avatars.com/api/?name=FA" alt="avatar"></div>
+                        <div class="list-info">
+                            <p class="list-name">Fahim Auditor</p>
+                            <p class="list-desc">Apex</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon"><img src="https://ui-avatars.com/api/?name=KF" alt="avatar"></div>
+                        <div class="list-info">
+                            <p class="list-name">Killer Freake</p>
+                            <p class="list-desc">Dota 2</p>
+                        </div>
                     </div>
                 </div>
-                 <div class="list-item">
-                    <div class="list-icon"><img src="https://ui-avatars.com/api/?name=KF" alt="avatar"></div>
-                    <div class="list-info">
-                        <p class="list-name">Killer Freake</p>
-                        <p class="list-desc">Dota 2</p>
-                    </div>
-                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">Parties</h3>
+                    <div class="list-item glass-panel">
+                        <div class="list-icon" style="background: var(--accent-primary); color: white;"><i class="fa-solid fa-rocket"></i></div>
+                        <div class="list-info">
+            <div class="panel-header">
+                <h3>Amigos & Referidos</h3>
+            </div>
+            
+            <div class="friends-list" id="friends-list">
+                <!-- Se llena dinámicamente -->
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Cargando amigos...</p>
             </div>
 
-            <div class="panel-section">
-                <h3 class="panel-title">Parties</h3>
-                <div class="list-item glass-panel">
-                    <div class="list-icon" style="background: var(--accent-primary); color: white;"><i class="fa-solid fa-rocket"></i></div>
-                    <div class="list-info">
-                        <p class="list-name">Rocket League</p>
-                        <p class="list-desc">Pushing to the right</p>
-                    </div>
+            <div class="referral-box">
+                <h4>Tu Enlace de Invitación</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">¡Gana 3% en saldo cuando tus amigos compren usando tu link!</p>
+                <div style="display:flex; gap: 5px;">
+                    <input type="text" id="ref-link-input" readonly value="..." style="flex: 1; padding: 5px; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
+                    <button class="btn-primary" id="copy-ref-btn" style="padding: 5px 10px;"><i class="fa-solid fa-copy"></i></button>
                 </div>
             </div>
         </aside>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+        <div class="mobile-menu__backdrop" id="mobile-menu-backdrop"></div>
+        <div class="mobile-menu__panel">
+            <p class="mobile-menu__title">Más opciones</p>
+            <a href="index.html" class="mobile-menu__link"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="catalogo.html" class="mobile-menu__link"><i class="fa-solid fa-gamepad"></i> Catálogo</a>
+            <a href="perfil.html" class="mobile-menu__link"><i class="fa-solid fa-user"></i> Perfil</a>
+            <a href="info.html" class="mobile-menu__link"><i class="fa-solid fa-circle-info"></i> Información</a>
+        </div>
     </div>
 
     <!-- Mobile Dock -->
     <nav class="mobile-dock">
         <a href="index.html" class="dock-item active"><i class="fa-solid fa-house"></i></a>
         <a href="catalogo.html" class="dock-item"><i class="fa-solid fa-gamepad"></i></a>
+        <label class="hamburger dock-item" style="margin: 0; padding: 0;">
+          <input type="checkbox" id="mobile-menu-toggle">
+          <svg viewBox="0 0 32 32">
+            <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+            <path class="line" d="M7 16 27 16"></path>
+          </svg>
+        </label>
+        <a href="#" class="dock-item"><i class="fa-solid fa-users"></i></a>
         <a href="perfil.html" class="dock-item"><i class="fa-solid fa-user"></i></a>
     </nav>
 
@@ -201,5 +267,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/mobile-nav.js"></script>
 </body>
 </html>

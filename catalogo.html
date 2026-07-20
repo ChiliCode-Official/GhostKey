@@ -35,7 +35,7 @@
 </head>
 <body>
 
-    <div class="dashboard-container">
+    <div class="dashboard-container no-right-panel">
         <!-- Sidebar -->
         <aside class="sidebar">
             <a href="index.html" class="brand-logo">GKey</a>
@@ -56,9 +56,10 @@
         <!-- Main Content -->
         <main class="main-content" style="grid-column: 2 / span 2;">
             <header class="top-bar">
-                <div class="search-bar">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Buscar productos...">
+                <div class="inputbox">
+                    <input required="required" type="text" id="search-input">
+                    <span>Buscar productos...</span>
+                    <i></i>
                 </div>
                 <div class="top-actions">
                     <a href="perfil.html" class="user-profile">
@@ -79,23 +80,39 @@
 
                 <div class="catalog-grid" id="catalog-grid">
                     <!-- Products injected by JS -->
-                    <div style="text-align:center; padding: 2rem; color: var(--text-muted); grid-column: 1/-1;">
-                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-                        <p style="margin-top: 10px;">Cargando catálogo...</p>
-                    </div>
                 </div>
             </section>
         </main>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+        <div class="mobile-menu__backdrop" id="mobile-menu-backdrop"></div>
+        <div class="mobile-menu__panel">
+            <p class="mobile-menu__title">Más opciones</p>
+            <a href="index.html" class="mobile-menu__link"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="catalogo.html" class="mobile-menu__link"><i class="fa-solid fa-gamepad"></i> Catálogo</a>
+            <a href="perfil.html" class="mobile-menu__link"><i class="fa-solid fa-user"></i> Perfil</a>
+            <a href="info.html" class="mobile-menu__link"><i class="fa-solid fa-circle-info"></i> Información</a>
+        </div>
     </div>
 
     <!-- Mobile Dock -->
     <nav class="mobile-dock">
         <a href="index.html" class="dock-item"><i class="fa-solid fa-house"></i></a>
         <a href="catalogo.html" class="dock-item active"><i class="fa-solid fa-gamepad"></i></a>
+        <label class="hamburger dock-item" style="margin: 0; padding: 0;">
+          <input type="checkbox" id="mobile-menu-toggle-cat">
+          <svg viewBox="0 0 32 32">
+            <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+            <path class="line" d="M7 16 27 16"></path>
+          </svg>
+        </label>
+        <a href="#" class="dock-item"><i class="fa-solid fa-users"></i></a>
         <a href="perfil.html" class="dock-item"><i class="fa-solid fa-user"></i></a>
     </nav>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/catalogo.js"></script>
+    <script type="module" src="js/mobile-nav.js"></script>
 </body>
 </html>

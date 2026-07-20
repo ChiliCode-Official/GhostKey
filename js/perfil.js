@@ -13,8 +13,8 @@ const adminView = document.getElementById('admin-view');
 const btnLogout = document.getElementById('logout-btn');
 const btnLoginGuard = document.getElementById('login-btn-guard');
 
-const profileName = document.getElementById('profile-name');
-const profileEmail = document.getElementById('profile-email');
+const cardUid = document.getElementById('card-uid');
+const cardName = document.getElementById('card-name');
 const userBalance = document.getElementById('user-balance');
 const userAvatars = document.querySelectorAll('.user-avatar');
 
@@ -24,9 +24,9 @@ onAuthStateChanged(auth, async (user) => {
         authGuard.style.display = 'none';
         profileContent.style.display = 'block';
         
-        // Render basic info
-        profileName.textContent = user.displayName || 'Usuario';
-        profileEmail.textContent = user.email;
+        // Render basic info on GhostCard
+        if (cardName) cardName.textContent = user.displayName || user.email;
+        if (cardUid) cardUid.textContent = user.uid;
         userAvatars.forEach(img => {
             img.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=A182E8&color=fff`;
         });
