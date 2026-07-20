@@ -208,6 +208,232 @@ body {
   border-radius: 50%;
   object-fit: cover;
   background: var(--bg-card);
+  flex-shrink: 0;
+}
+
+#user-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+
+.user-profile--loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.user-avatar--skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-panel) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+.user-name--skeleton {
+  display: inline-block;
+  width: 72px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-panel) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Loading States & Ghost Loader (Uiverse.io by BlackisPlay) --- */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.loading-state--inline {
+  min-height: 280px;
+}
+
+.loading-text {
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.hero-skeleton {
+  width: 100%;
+  min-height: 350px;
+  border-radius: var(--border-radius-lg);
+  background: var(--bg-panel);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ghost-loader {
+  position: relative;
+  scale: 0.8;
+}
+
+.ghost-red {
+  animation: ghostUpNDown infinite 0.5s;
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  grid-template-rows: repeat(14, 1fr);
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  grid-template-areas:
+    "a1  a2  a3  a4  a5  top0  top0  top0  top0  a10 a11 a12 a13 a14"
+    "b1  b2  b3  top1 top1 top1 top1 top1 top1 top1 top1 b12 b13 b14"
+    "c1 c2 top2 top2 top2 top2 top2 top2 top2 top2 top2 top2 c13 c14"
+    "d1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 d14"
+    "e1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 e14"
+    "f1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 f14"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+    "st0 st0 an4 st1 an7 st2 an10 an10 st3 an13 st4 an16 st5 st5"
+    "an1 an2 an3 an5 an6 an8 an9 an9 an11 an12 an14 an15 an17 an18";
+}
+
+@keyframes ghostUpNDown {
+  0%, 49% { transform: translateY(0); }
+  50%, 100% { transform: translateY(-10px); }
+}
+
+.ghost-top0, .ghost-top1, .ghost-top2, .ghost-top3, .ghost-top4,
+.ghost-st0, .ghost-st1, .ghost-st2, .ghost-st3, .ghost-st4, .ghost-st5 {
+  background-color: #ef4444;
+}
+
+.ghost-top0 { grid-area: top0; }
+.ghost-top1 { grid-area: top1; }
+.ghost-top2 { grid-area: top2; }
+.ghost-top3 { grid-area: top3; }
+.ghost-top4 { grid-area: top4; }
+.ghost-st0 { grid-area: st0; }
+.ghost-st1 { grid-area: st1; }
+.ghost-st2 { grid-area: st2; }
+.ghost-st3 { grid-area: st3; }
+.ghost-st4 { grid-area: st4; }
+.ghost-st5 { grid-area: st5; }
+
+.ghost-an1, .ghost-an18 { animation: ghostFlicker0 infinite 0.5s; }
+.ghost-an2, .ghost-an17, .ghost-an3, .ghost-an16, .ghost-an4, .ghost-an15 { animation: ghostFlicker1 infinite 0.5s; }
+.ghost-an6, .ghost-an12, .ghost-an7, .ghost-an13, .ghost-an8, .ghost-an11 { animation: ghostFlicker0 infinite 0.5s; }
+.ghost-an9, .ghost-an10 { animation: ghostFlicker1 infinite 0.5s; }
+
+.ghost-an1 { grid-area: an1; }
+.ghost-an2 { grid-area: an2; }
+.ghost-an3 { grid-area: an3; }
+.ghost-an4 { grid-area: an4; }
+.ghost-an5 { grid-area: an5; }
+.ghost-an6 { grid-area: an6; }
+.ghost-an7 { grid-area: an7; }
+.ghost-an8 { grid-area: an8; }
+.ghost-an9 { grid-area: an9; }
+.ghost-an10 { grid-area: an10; }
+.ghost-an11 { grid-area: an11; }
+.ghost-an12 { grid-area: an12; }
+.ghost-an13 { grid-area: an13; }
+.ghost-an14 { grid-area: an14; }
+.ghost-an15 { grid-area: an15; }
+.ghost-an16 { grid-area: an16; }
+.ghost-an17 { grid-area: an17; }
+.ghost-an18 { grid-area: an18; }
+
+@keyframes ghostFlicker0 {
+  0%, 49% { background-color: #ef4444; }
+  50%, 100% { background-color: transparent; }
+}
+
+@keyframes ghostFlicker1 {
+  0%, 49% { background-color: transparent; }
+  50%, 100% { background-color: #ef4444; }
+}
+
+.ghost-eye {
+  width: 40px;
+  height: 50px;
+  position: absolute;
+  top: 30px;
+  left: 10px;
+}
+
+.ghost-eye::before {
+  content: "";
+  background-color: white;
+  width: 20px;
+  height: 50px;
+  transform: translateX(10px);
+  display: block;
+  position: absolute;
+}
+
+.ghost-eye::after {
+  content: "";
+  background-color: white;
+  width: 40px;
+  height: 30px;
+  transform: translateY(10px);
+  display: block;
+  position: absolute;
+}
+
+.ghost-eye1 {
+  left: auto;
+  right: 30px;
+}
+
+.ghost-pupil {
+  width: 20px;
+  height: 20px;
+  background-color: #3b82f6;
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  z-index: 1;
+  animation: ghostEyesMovement infinite 3s;
+}
+
+.ghost-pupil1 {
+  left: auto;
+  right: 50px;
+}
+
+@keyframes ghostEyesMovement {
+  0%, 49% { transform: translateX(0); }
+  50%, 99% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+.ghost-shadow {
+  background-color: black;
+  width: 140px;
+  height: 140px;
+  position: absolute;
+  border-radius: 50%;
+  transform: rotateX(80deg);
+  filter: blur(20px);
+  top: 80%;
+  animation: ghostShadowMovement infinite 0.5s;
+}
+
+@keyframes ghostShadowMovement {
+  0%, 49% { opacity: 0.5; }
+  50%, 100% { opacity: 0.2; }
 }
 
 /* --- Main Content Area --- */

@@ -1,33 +1,44 @@
-import { auth, provider } from './firebase-config.js';
-import { signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { app } from './firebase-config.js';
+import { db, auth, provider } from './firebase-config.js';
+import {
+    signInWithPopup,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    getDocs,
+    limit,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initWishlistButtons } from './wishlist.js';
 
-const db = getFirestore(app);
+let currentUser = null;
+let currentUserWishlist = [];
 
 // --- GSAP Animations (GooeyNav & Dock) ---
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const indicator = document.querySelector('.nav-indicator');
-    
-    // Set initial position
+
     if (navItems.length > 0 && indicator) {
         const activeItem = document.querySelector('.nav-item.active');
-        if(activeItem) {
+        if (activeItem) {
             indicator.style.top = `${activeItem.offsetTop}px`;
         }
     }
 
     navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            // Remove active from all
+        item.addEventListener('click', () => {
             navItems.forEach(nav => nav.classList.remove('active'));
-            // Add to clicked
             item.classList.add('active');
-            // Move indicator
-            if(indicator) {
+            if (indicator) {
                 indicator.style.top = `${item.offsetTop}px`;
-                createParticles(item.offsetTop + 22); // Center of the 45px icon
+                createParticles(item.offsetTop + 22);
             }
         });
     });
@@ -35,8 +46,8 @@ function initNavigation() {
 
 function createParticles(yPos) {
     const sidebar = document.querySelector('.sidebar');
-    if(!sidebar) return;
-    
+    if (!sidebar) return;
+
     for (let i = 0; i < 5; i++) {
         const particle = document.createElement('div');
         particle.style.position = 'absolute';
@@ -44,19 +55,18 @@ function createParticles(yPos) {
         particle.style.height = '8px';
         particle.style.background = 'var(--accent-primary)';
         particle.style.borderRadius = '50%';
-        particle.style.left = '40px'; // center of sidebar
+        particle.style.left = '40px';
         particle.style.top = `${yPos}px`;
         particle.style.pointerEvents = 'none';
         particle.style.zIndex = '0';
-        
+
         sidebar.appendChild(particle);
-        
-        // Math for particles
+
         const angle = Math.random() * Math.PI * 2;
         const velocity = 20 + Math.random() * 30;
         const tx = Math.cos(angle) * velocity;
         const ty = Math.sin(angle) * velocity;
-        
+
         gsap.to(particle, {
             x: tx,
             y: ty,
@@ -68,11 +78,9 @@ function createParticles(yPos) {
     }
 }
 
-// --- Mobile Dock Magnetic Effect ---
 function initMobileDock() {
     const dockItems = document.querySelectorAll('.dock-item');
     dockItems.forEach(item => {
-        // We use hover in CSS, but can add touch events for mobile scaling if needed
         item.addEventListener('touchstart', () => {
             gsap.to(item, { scale: 1.2, y: -5, duration: 0.2 });
         });
@@ -82,34 +90,74 @@ function initMobileDock() {
     });
 }
 
-import { app, db, auth, provider } from './firebase-config.js';
-import { signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, getDoc, collection, getDocs, limit, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { initWishlistButtons } from './wishlist.js';
-
-let currentUser = null;
-let currentUserWishlist = [];
-
-// ... (keep navigation functions intact, just updating the load logic)
-
-// --- Auth Handling ---
+// --- Auth UI ---
 const userProfileBtn = document.getElementById('user-profile-btn');
 const userNameDisplay = document.getElementById('user-name');
-const userAvatars = document.querySelectorAll('.user-avatar');
+const userAvatar = document.getElementById('user-avatar');
+
+function setUserProfileLoading(isLoading) {
+    if (!userProfileBtn) return;
+    userProfileBtn.classList.toggle('user-profile--loading', isLoading);
+    if (userNameDisplay) {
+        userNameDisplay.classList.toggle('user-name--skeleton', isLoading);
+        if (isLoading) userNameDisplay.textContent = '';
+    }
+    if (userAvatar) {
+        userAvatar.classList.toggle('user-avatar--skeleton', isLoading);
+        if (isLoading) {
+            userAvatar.removeAttribute('src');
+            userAvatar.alt = '';
+        }
+    }
+}
+
+function updateUserProfileUI(user) {
+    if (!userProfileBtn) return;
+
+    userProfileBtn.classList.remove('user-profile--loading');
+
+    if (user) {
+        if (userNameDisplay) {
+            userNameDisplay.classList.remove('user-name--skeleton');
+            const displayName = user.displayName || user.email.split('@')[0];
+            userNameDisplay.textContent = displayName.length > 12
+                ? `${displayName.substring(0, 12)}…`
+                : displayName;
+        }
+        if (userAvatar) {
+            userAvatar.classList.remove('user-avatar--skeleton');
+            userAvatar.src = user.photoURL
+                || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&background=A182E8&color=fff`;
+            userAvatar.alt = user.displayName || user.email;
+        }
+        userProfileBtn.title = 'Ver perfil';
+    } else {
+        if (userNameDisplay) {
+            userNameDisplay.classList.remove('user-name--skeleton');
+            userNameDisplay.textContent = 'Iniciar sesión';
+        }
+        if (userAvatar) {
+            userAvatar.classList.remove('user-avatar--skeleton');
+            userAvatar.src = 'https://ui-avatars.com/api/?name=?&background=1C222E&color=9CA3AF';
+            userAvatar.alt = 'Invitado';
+        }
+        userProfileBtn.title = 'Iniciar sesión con Google';
+    }
+}
 
 async function handleLogin() {
     if (currentUser) {
         window.location.href = 'perfil.html';
         return;
     }
-    
+
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        
+
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
-        
+
         if (!userSnap.exists()) {
             await setDoc(userRef, {
                 email: user.email,
@@ -120,7 +168,9 @@ async function handleLogin() {
             });
         }
     } catch (error) {
-        console.error("Login Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+            console.error("Login Error:", error);
+        }
     }
 }
 
@@ -128,42 +178,87 @@ if (userProfileBtn) {
     userProfileBtn.addEventListener('click', handleLogin);
 }
 
+setPersistence(auth, browserLocalPersistence).catch(console.error);
+
 onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+
+    updateUserProfileUI(user);
+
     if (user) {
-        currentUser = user;
-        if(userNameDisplay) {
-            let displayName = user.displayName || user.email.split('@')[0];
-            userNameDisplay.textContent = displayName.length > 10 ? displayName.substring(0, 10) + '...' : displayName;
-        }
-        userAvatars.forEach(img => {
-            img.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=A182E8&color=fff`;
-        });
-        
         const uSnap = await getDoc(doc(db, 'users', user.uid));
-        if(uSnap.exists()) {
+        if (uSnap.exists()) {
             currentUserWishlist = uSnap.data().wishlist || [];
+        } else {
+            currentUserWishlist = [];
         }
     } else {
-        currentUser = null;
         currentUserWishlist = [];
-        if(userNameDisplay) userNameDisplay.textContent = 'Login';
-        userAvatars.forEach(img => {
-            img.src = `https://ui-avatars.com/api/?name=User&background=A182E8&color=fff`;
-        });
     }
-    
-    // Only fetch index products if we are on index.html
+
     if (document.getElementById('products-container')) {
         loadIndexProducts();
     }
 });
 
+function getGhostLoaderHTML(message = 'Cargando…') {
+    return `
+        <div class="loading-state">
+            <div class="ghost-loader" aria-hidden="true">
+                <div class="ghost-red">
+                    <div class="ghost-pupil"></div>
+                    <div class="ghost-pupil ghost-pupil1"></div>
+                    <div class="ghost-eye"></div>
+                    <div class="ghost-eye ghost-eye1"></div>
+                    <div class="ghost-top0"></div>
+                    <div class="ghost-top1"></div>
+                    <div class="ghost-top2"></div>
+                    <div class="ghost-top3"></div>
+                    <div class="ghost-top4"></div>
+                    <div class="ghost-st0"></div>
+                    <div class="ghost-st1"></div>
+                    <div class="ghost-st2"></div>
+                    <div class="ghost-st3"></div>
+                    <div class="ghost-st4"></div>
+                    <div class="ghost-st5"></div>
+                    <div class="ghost-an1"></div>
+                    <div class="ghost-an2"></div>
+                    <div class="ghost-an3"></div>
+                    <div class="ghost-an4"></div>
+                    <div class="ghost-an5"></div>
+                    <div class="ghost-an6"></div>
+                    <div class="ghost-an7"></div>
+                    <div class="ghost-an8"></div>
+                    <div class="ghost-an9"></div>
+                    <div class="ghost-an10"></div>
+                    <div class="ghost-an11"></div>
+                    <div class="ghost-an12"></div>
+                    <div class="ghost-an13"></div>
+                    <div class="ghost-an14"></div>
+                    <div class="ghost-an15"></div>
+                    <div class="ghost-an16"></div>
+                    <div class="ghost-an17"></div>
+                    <div class="ghost-an18"></div>
+                </div>
+                <div class="ghost-shadow"></div>
+            </div>
+            <p class="loading-text">${message}</p>
+        </div>
+    `;
+}
+
 async function loadIndexProducts() {
+    const container = document.getElementById('products-container');
+    const heroSkeleton = document.getElementById('hero-skeleton');
+
+    if (container) {
+        container.innerHTML = getGhostLoaderHTML('Cargando productos…');
+    }
+
     try {
-        // 1. Fetch featured product
         const qHero = query(collection(db, "products"), where("isFeatured", "==", true), limit(1));
         const heroSnap = await getDocs(qHero);
-        
+
         if (!heroSnap.empty) {
             const heroProd = heroSnap.docs[0];
             const hData = heroProd.data();
@@ -174,27 +269,27 @@ async function loadIndexProducts() {
             document.getElementById('hero-price').textContent = `$${hData.price}`;
             document.getElementById('hero-buy-btn').href = `producto.html?id=${heroProd.id}`;
         }
-        
-        // 2. Fetch recent products for horizontal carousel
+
+        if (heroSkeleton) heroSkeleton.style.display = 'none';
+
         const qProds = query(collection(db, "products"), limit(6));
         const prodsSnap = await getDocs(qProds);
-        
-        const container = document.getElementById('products-container');
+
         container.innerHTML = '';
-        
+
         const stockSnapshot = await getDocs(collection(db, "products_stock"));
         const stockData = {};
         stockSnapshot.forEach((d) => { stockData[d.id] = d.data(); });
-        
+
         prodsSnap.forEach((d) => {
             const p = d.data();
-            
+
             let statusColor = 'var(--danger)';
             let stockLabel = 'Agotado';
             if (stockData[d.id]) {
                 const sd = stockData[d.id];
                 if (sd.status === 'disponible') {
-                    let count = (sd.credentialsPool || "").split('\n').filter(l => l.trim() !== "").length;
+                    const count = (sd.credentialsPool || "").split('\n').filter(l => l.trim() !== "").length;
                     stockLabel = count > 0 ? `En stock (${count})` : 'Agotado';
                     statusColor = count > 0 ? 'var(--success)' : 'var(--danger)';
                 } else if (sd.status === 'bajo_pedido') {
@@ -215,27 +310,29 @@ async function loadIndexProducts() {
                 </a>
             `;
         });
-        
+
         initWishlistButtons(currentUserWishlist);
-        
-        // Animaciones
+
         gsap.from(".hero-banner", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" });
-        gsap.to(".product-card", { 
+        gsap.to(".product-card", {
             opacity: 1,
-            y: 0, 
-            duration: 0.6, 
-            stagger: 0.1, 
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
             ease: "power3.out",
             delay: 0.3
         });
-        
-    } catch(e) {
+    } catch (e) {
         console.error("Error loading products on index", e);
+        if (heroSkeleton) heroSkeleton.style.display = 'none';
+        if (container) {
+            container.innerHTML = `<p style="color:var(--danger); width:100%; text-align:center; padding:2rem;">No se pudieron cargar los productos.</p>`;
+        }
     }
 }
 
-// Initialize on DOM Load
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initMobileDock();
+    setUserProfileLoading(true);
 });

@@ -41,12 +41,57 @@
                 <div class="top-actions">
                     <button class="action-btn"><i class="fa-solid fa-bell"></i></button>
                     <button class="action-btn"><i class="fa-solid fa-bag-shopping"></i></button>
-                    <div class="user-profile" id="user-profile-btn">
-                        <img src="https://ui-avatars.com/api/?name=User&background=A182E8&color=fff" alt="User" class="user-avatar">
-                        <span id="user-name" style="font-weight: bold; font-size: 0.9rem;">Login</span>
+                    <div class="user-profile user-profile--loading" id="user-profile-btn" title="Cargando sesión…">
+                        <img id="user-avatar" class="user-avatar user-avatar--skeleton" alt="">
+                        <span id="user-name" class="user-name--skeleton"></span>
                     </div>
                 </div>
             </header>
+
+            <!-- Hero Skeleton -->
+            <section class="hero-skeleton" id="hero-skeleton" aria-busy="true" aria-label="Cargando destacado">
+                <div class="loading-state loading-state--inline">
+                    <div class="ghost-loader" aria-hidden="true">
+                        <div class="ghost-red">
+                            <div class="ghost-pupil"></div>
+                            <div class="ghost-pupil ghost-pupil1"></div>
+                            <div class="ghost-eye"></div>
+                            <div class="ghost-eye ghost-eye1"></div>
+                            <div class="ghost-top0"></div>
+                            <div class="ghost-top1"></div>
+                            <div class="ghost-top2"></div>
+                            <div class="ghost-top3"></div>
+                            <div class="ghost-top4"></div>
+                            <div class="ghost-st0"></div>
+                            <div class="ghost-st1"></div>
+                            <div class="ghost-st2"></div>
+                            <div class="ghost-st3"></div>
+                            <div class="ghost-st4"></div>
+                            <div class="ghost-st5"></div>
+                            <div class="ghost-an1"></div>
+                            <div class="ghost-an2"></div>
+                            <div class="ghost-an3"></div>
+                            <div class="ghost-an4"></div>
+                            <div class="ghost-an5"></div>
+                            <div class="ghost-an6"></div>
+                            <div class="ghost-an7"></div>
+                            <div class="ghost-an8"></div>
+                            <div class="ghost-an9"></div>
+                            <div class="ghost-an10"></div>
+                            <div class="ghost-an11"></div>
+                            <div class="ghost-an12"></div>
+                            <div class="ghost-an13"></div>
+                            <div class="ghost-an14"></div>
+                            <div class="ghost-an15"></div>
+                            <div class="ghost-an16"></div>
+                            <div class="ghost-an17"></div>
+                            <div class="ghost-an18"></div>
+                        </div>
+                        <div class="ghost-shadow"></div>
+                    </div>
+                    <p class="loading-text">Buscando lo destacado…</p>
+                </div>
+            </section>
 
             <!-- Hero Banner -->
             <section class="hero-banner" id="hero-banner" style="display:none;">
@@ -66,8 +111,46 @@
                 </div>
                 
                 <div class="horizontal-scroll" id="products-container">
-                    <div style="text-align:center; padding: 2rem; color: var(--text-muted); width:100%;">
-                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                    <div class="loading-state">
+                        <div class="ghost-loader" aria-hidden="true">
+                            <div class="ghost-red">
+                                <div class="ghost-pupil"></div>
+                                <div class="ghost-pupil ghost-pupil1"></div>
+                                <div class="ghost-eye"></div>
+                                <div class="ghost-eye ghost-eye1"></div>
+                                <div class="ghost-top0"></div>
+                                <div class="ghost-top1"></div>
+                                <div class="ghost-top2"></div>
+                                <div class="ghost-top3"></div>
+                                <div class="ghost-top4"></div>
+                                <div class="ghost-st0"></div>
+                                <div class="ghost-st1"></div>
+                                <div class="ghost-st2"></div>
+                                <div class="ghost-st3"></div>
+                                <div class="ghost-st4"></div>
+                                <div class="ghost-st5"></div>
+                                <div class="ghost-an1"></div>
+                                <div class="ghost-an2"></div>
+                                <div class="ghost-an3"></div>
+                                <div class="ghost-an4"></div>
+                                <div class="ghost-an5"></div>
+                                <div class="ghost-an6"></div>
+                                <div class="ghost-an7"></div>
+                                <div class="ghost-an8"></div>
+                                <div class="ghost-an9"></div>
+                                <div class="ghost-an10"></div>
+                                <div class="ghost-an11"></div>
+                                <div class="ghost-an12"></div>
+                                <div class="ghost-an13"></div>
+                                <div class="ghost-an14"></div>
+                                <div class="ghost-an15"></div>
+                                <div class="ghost-an16"></div>
+                                <div class="ghost-an17"></div>
+                                <div class="ghost-an18"></div>
+                            </div>
+                            <div class="ghost-shadow"></div>
+                        </div>
+                        <p class="loading-text">Cargando productos…</p>
                     </div>
                 </div>
             </section>
