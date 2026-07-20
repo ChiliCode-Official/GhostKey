@@ -105,7 +105,7 @@ function injectNavigation() {
             </div>
 
             <div class="referral-box" style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.02); border-radius:12px; text-align:center; border-top:1px solid rgba(255,255,255,0.05);">
-                <h4 style="margin:0 0 10px 0; font-size:0.9rem; color:#a78bfa;"><i class="fas fa-gift"></i> Gana 3% de Comisi&oacute;n</h4>
+                <h4 style="margin:0 0 10px 0; font-size:0.9rem; color:#A182E8;"><i class="fas fa-gift"></i> Gana 3% de Comisi&oacute;n</h4>
                 <p style="margin:0 0 15px 0; font-size:0.8rem; color:var(--text-secondary);">Invita a un amigo y gana cr&eacute;ditos.</p>
                 <button class="btn btn-blue" id="copyReferralBtn" style="width:100%; font-size:0.8rem;">Copiar Link</button>
             </div>

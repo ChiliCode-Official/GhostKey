@@ -60,7 +60,7 @@ function initLineSidebar(containerId, itemsData, onItemClick) {
     
     // Configuration
     const config = {
-        accentColor: '#A855F7',
+        accentColor: '#A182E8',
         textColor: '#c4c4c4',
         markerColor: '#6c6c6c',
         showIndex: true,

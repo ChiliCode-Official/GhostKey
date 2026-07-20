@@ -9,7 +9,7 @@
     --accent-blue: #3b82f6; 
     --accent-green: #10b981;
     --accent-red: #f43f5e;
-    --accent-yellow: #8b5cf6;
+    --accent-yellow: #A182E8; /* requested purple */
     --border-color: rgba(255, 255, 255, 0.05);
     --glass-bg: rgba(20, 22, 32, 0.85);
     --glass-border: rgba(255, 255, 255, 0.05);
@@ -1190,10 +1190,10 @@ body::before, body::after {
     .mobile-only { display: block; }
     
     .main-content { border-radius: 0; border: none; padding-bottom: 100px; min-height: 100vh; background: transparent; }
-    .topbar { padding: 16px; }
+    .topbar { padding: 16px 20px !important; }
+    .content-scroll { padding: 0 20px 20px 20px !important; }
     
     .hero-banner { border-radius: 0; height: 300px; margin-bottom: 24px; }
-    .content-scroll { padding: 0 16px 20px; overflow-y: visible; }
     .custom-horizontal-grid { grid-template-columns: 1fr; }
     
     .mobile-dock {
