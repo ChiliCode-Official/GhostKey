@@ -620,12 +620,12 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="sparks.js"></script>
-    <script src="navigation.js"></script>
-    <script type="module" src="wishlist.js"></script>
-    <script type="module" src="friends.js"></script>
-    <script type="module" src="main.js"></script>
-    <script src="components.js"></script>
+    
+    
+    
+    
+    
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Init SplitText on the hero title
@@ -675,10 +675,2572 @@
         });
     </script>
 
+
 <!-- INJECTED SPA SCRIPTS -->
 <script type="module">
-import { db, auth } from "./firebase-config.js";
-import { collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { auth, db, app, googleProvider } from "./firebase-config.js";
+import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+
+
+// --- components.js ---
+// --- SplitText Vanilla JS (Custom Implementation) ---
+function splitTextNode(el) {
+    const text = el.innerText;
+    el.innerHTML = '';
+    const chars = [];
+    text.split(' ').forEach((word, wordIndex) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'split-word';
+        wordSpan.style.display = 'inline-block';
+        wordSpan.style.whiteSpace = 'nowrap';
+        
+        word.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.className = 'split-char';
+            charSpan.style.display = 'inline-block';
+            charSpan.style.opacity = '0';
+            charSpan.style.transform = 'translateY(40px)';
+            charSpan.innerText = char;
+            wordSpan.appendChild(charSpan);
+            chars.push(charSpan);
+        });
+        
+        el.appendChild(wordSpan);
+        if (wordIndex < text.split(' ').length - 1) {
+            el.appendChild(document.createTextNode(' '));
+        }
+    });
+    return chars;
+}
+
+function initSplitText(selector) {
+    if (typeof gsap === 'undefined') {
+        console.warn('GSAP not loaded');
+        return;
+    }
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+        const chars = splitTextNode(el);
+        gsap.to(chars, 
+            {
+                opacity: 1, 
+                y: 0,
+                duration: 1.25,
+                ease: "power3.out",
+                stagger: 0.05,
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                    once: true
+                }
+            }
+        );
+    });
+}
+
+// --- LineSidebar Vanilla JS ---
+function initLineSidebar(containerId, itemsData, onItemClick) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Configuration
+    const config = {
+        accentColor: '#A182E8',
+        textColor: '#c4c4c4',
+        markerColor: '#6c6c6c',
+        showIndex: true,
+        showMarker: true,
+        proximityRadius: 100,
+        maxShift: 30,
+        markerLength: 60,
+        markerGap: 0,
+        tickScale: 0.5,
+        scaleTick: true,
+        itemGap: 20,
+        fontSize: 1.1,
+        smoothing: 100
+    };
+
+    // Apply CSS variables to container
+    container.className = `line-sidebar ${config.showMarker ? 'line-sidebar--markers' : ''} ${config.scaleTick ? 'line-sidebar--scale-tick' : ''}`;
+    container.style.setProperty('--accent-color', config.accentColor);
+    container.style.setProperty('--text-color', config.textColor);
+    container.style.setProperty('--marker-color', config.markerColor);
+    container.style.setProperty('--marker-length', `${config.markerLength}px`);
+    container.style.setProperty('--marker-gap', `${config.markerGap}px`);
+    container.style.setProperty('--tick-scale', config.tickScale);
+    container.style.setProperty('--max-shift', `${config.maxShift}px`);
+    container.style.setProperty('--item-gap', `${config.itemGap}px`);
+    container.style.setProperty('--font-size', `${config.fontSize}rem`);
+    container.style.setProperty('--smoothing', `${config.smoothing}ms`);
+
+    const ul = document.createElement('ul');
+    ul.className = 'line-sidebar__list';
+    container.appendChild(ul);
+
+    let activeIndex = 0;
+    const itemElements = [];
+    const targets = [];
+    const currentVals = [];
+    
+    const smoothFalloff = p => p * p * (3 - 2 * p);
+
+    itemsData.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'line-sidebar__item';
+        if (index === activeIndex) li.setAttribute('aria-current', 'true');
+        
+        li.addEventListener('click', () => {
+            activeIndex = index;
+            itemElements.forEach((el, i) => {
+                if (i === activeIndex) el.setAttribute('aria-current', 'true');
+                else el.removeAttribute('aria-current');
+            });
+            if (onItemClick) onItemClick(index, item.label);
+        });
+
+        if (config.showMarker) {
+            const marker = document.createElement('span');
+            marker.className = 'line-sidebar__marker';
+            marker.setAttribute('aria-hidden', 'true');
+            li.appendChild(marker);
+        }
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'line-sidebar__label';
+
+        if (config.showIndex) {
+            const idxSpan = document.createElement('span');
+            idxSpan.className = 'line-sidebar__index';
+            idxSpan.textContent = String(index + 1).padStart(2, '0');
+            labelSpan.appendChild(idxSpan);
+        }
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'line-sidebar__text';
+        textSpan.textContent = item.label;
+        labelSpan.appendChild(textSpan);
+
+        li.appendChild(labelSpan);
+        ul.appendChild(li);
+        
+        itemElements.push(li);
+        targets.push(0);
+        currentVals.push(0);
+    });
+
+    let rafId = null;
+    let lastTime = 0;
+
+    const runFrame = (now) => {
+        const dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        const tau = Math.max(config.smoothing, 1) / 1000;
+        const k = 1 - Math.exp(-dt / tau);
+
+        let moving = false;
+        for (let i = 0; i < itemElements.length; i++) {
+            const el = itemElements[i];
+            const target = Math.max(targets[i] || 0, activeIndex === i ? 1 : 0);
+            const cur = currentVals[i] || 0;
+            const next = cur + (target - cur) * k;
+            const settled = Math.abs(target - next) < 0.0015;
+            const value = settled ? target : next;
+            currentVals[i] = value;
+            el.style.setProperty('--effect', value.toFixed(4));
+            if (!settled) moving = true;
+        }
+
+        if (moving) {
+            rafId = requestAnimationFrame(runFrame);
+        } else {
+            rafId = null;
+        }
+    };
+
+    const startLoop = () => {
+        if (rafId !== null) return;
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(runFrame);
+    };
+
+    ul.addEventListener('pointermove', (e) => {
+        const rect = ul.getBoundingClientRect();
+        const pointerY = e.clientY - rect.top;
+        
+        for (let i = 0; i < itemElements.length; i++) {
+            const el = itemElements[i];
+            const center = el.offsetTop + el.offsetHeight / 2;
+            const distance = Math.abs(pointerY - center);
+            targets[i] = smoothFalloff(Math.max(0, 1 - distance / config.proximityRadius));
+        }
+        startLoop();
+    });
+
+    ul.addEventListener('pointerleave', () => {
+        for (let i = 0; i < targets.length; i++) targets[i] = 0;
+        startLoop();
+    });
+
+    startLoop(); // Initial render
+}
+
+
+// --- Dock Vanilla JS ---
+function initDock(containerId, itemsData) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Config
+    const baseItemSize = 50;
+    const magnification = 70;
+    const distance = 200;
+
+    const dockOuter = document.createElement('div');
+    dockOuter.className = 'dock-outer';
+    
+    const dockPanel = document.createElement('div');
+    dockPanel.className = 'dock-panel';
+    dockPanel.setAttribute('role', 'toolbar');
+    
+    let isHovered = false;
+    let mouseX = Infinity;
+
+    const itemElements = [];
+
+    itemsData.forEach(item => {
+        const dockItem = document.createElement('div');
+        dockItem.className = 'dock-item';
+        dockItem.setAttribute('role', 'button');
+        dockItem.setAttribute('tabindex', '0');
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'dock-icon';
+        iconDiv.innerHTML = item.icon; // Using fontawesome or raw html
+        
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'dock-label';
+        labelDiv.textContent = item.label;
+
+        dockItem.appendChild(iconDiv);
+        dockItem.appendChild(labelDiv);
+        dockPanel.appendChild(dockItem);
+        
+        dockItem.addEventListener('click', item.onClick);
+        
+        itemElements.push({
+            el: dockItem,
+            labelEl: labelDiv
+        });
+    });
+
+    dockOuter.appendChild(dockPanel);
+    container.appendChild(dockOuter);
+
+    const updateDock = () => {
+        if (!isHovered) {
+            itemElements.forEach(({el, labelEl}) => {
+                gsap.to(el, {width: baseItemSize, height: baseItemSize, duration: 0.3, ease: "power2.out"});
+                gsap.to(labelEl, {opacity: 0, y: 0, duration: 0.2});
+            });
+            gsap.to(dockPanel, {height: 68, duration: 0.3, ease: "power2.out"});
+            return;
+        }
+
+        const maxHeight = magnification + magnification / 2 + 4;
+        gsap.to(dockPanel, {height: maxHeight, duration: 0.3, ease: "power2.out"});
+
+        itemElements.forEach(({el, labelEl}) => {
+            const rect = el.getBoundingClientRect();
+            // Calculate distance from mouse to center of item
+            const itemCenterX = rect.x + rect.width / 2;
+            const mouseDistance = mouseX - itemCenterX;
+            
+            // Map distance to size (from -distance to distance)
+            let newSize = baseItemSize;
+            if (Math.abs(mouseDistance) < distance) {
+                // Map distance to magnification
+                const normalized = 1 - Math.abs(mouseDistance) / distance;
+                newSize = baseItemSize + (magnification - baseItemSize) * normalized;
+            }
+            
+            gsap.to(el, {width: newSize, height: newSize, duration: 0.1});
+            
+            // Show label if hovered closely
+            if (Math.abs(mouseDistance) < baseItemSize / 2) {
+                gsap.to(labelEl, {opacity: 1, y: -10, duration: 0.2});
+            } else {
+                gsap.to(labelEl, {opacity: 0, y: 0, duration: 0.2});
+            }
+        });
+    };
+
+    dockPanel.addEventListener('mousemove', (e) => {
+        isHovered = true;
+        mouseX = e.clientX;
+        updateDock();
+    });
+
+    dockPanel.addEventListener('mouseleave', () => {
+        isHovered = false;
+        mouseX = Infinity;
+        updateDock();
+    });
+}
+
+// --- Spring Modal Vanilla JS ---
+function openSpringModal() {
+    const overlay = document.getElementById('spring-modal');
+    if (!overlay) return;
+    overlay.classList.remove('closing');
+    overlay.classList.add('active');
+}
+
+function closeSpringModal() {
+    const overlay = document.getElementById('spring-modal');
+    if (!overlay) return;
+    
+    // Add closing class to trigger exit animation on content
+    overlay.classList.add('closing');
+    overlay.classList.remove('active');
+    
+    // Remove closing class after animation completes so it's ready for next open
+    setTimeout(() => {
+        overlay.classList.remove('closing');
+    }, 300);
+}
+
+// --- Gift Modal Vanilla JS ---
+function openGiftModal() {
+    const overlay = document.getElementById('gift-modal');
+    if (!overlay) return;
+    overlay.classList.remove('closing');
+    overlay.classList.add('active');
+}
+
+function closeGiftModal() {
+    const overlay = document.getElementById('gift-modal');
+    if (!overlay) return;
+    
+    overlay.classList.add('closing');
+    overlay.classList.remove('active');
+    
+    setTimeout(() => {
+        overlay.classList.remove('closing');
+    }, 300);
+}
+
+// --- friends.js ---
+
+
+
+
+let currentUid = null;
+let userData = null;
+
+// UI is now injected by navigation.js into the left sidebar.
+
+// Initialize event listeners after sidebar is loaded
+window.addEventListener('sidebarLoaded', () => {
+    const tabFriends = document.getElementById('tabFriends');
+    const tabRequests = document.getElementById('tabRequests');
+    const addFriendBtn = document.getElementById('addFriendBtn');
+    const copyReferralBtn = document.getElementById('copyReferralBtn');
+
+    if (tabFriends) {
+        tabFriends.addEventListener('click', (e) => {
+            e.target.classList.add('active');
+            if(tabRequests) tabRequests.classList.remove('active');
+            const flc = document.getElementById('friendsListContainer');
+            if(flc) flc.parentElement.style.display = 'block';
+            const rlc = document.getElementById('requestsListContainer');
+            if(rlc) rlc.style.display = 'none';
+        });
+    }
+
+    if (tabRequests) {
+        tabRequests.addEventListener('click', (e) => {
+            e.target.classList.add('active');
+            if(tabFriends) tabFriends.classList.remove('active');
+            const flc = document.getElementById('friendsListContainer');
+            if(flc) flc.parentElement.style.display = 'none';
+            const rlc = document.getElementById('requestsListContainer');
+            if(rlc) rlc.style.display = 'block';
+        });
+    }
+
+    if (addFriendBtn) {
+        addFriendBtn.addEventListener('click', async () => {
+            const input = document.getElementById('friendSearchInput').value.trim();
+            if(!input) return;
+
+            if (!currentUid || !userData) {
+                alert("Debes iniciar sesión para agregar amigos.");
+                return;
+            }
+
+            if(input === currentUid || input === userData.email) {
+                alert("No puedes agregarte a ti mismo.");
+                return;
+            }
+
+            try {
+                let targetUid = input;
+                
+                if(input.includes('@')) {
+                    const q = query(collection(db, "users"), where("email", "==", input));
+                    const snap = await getDocs(q);
+                    if(snap.empty) {
+                        alert("Usuario no encontrado.");
+                        return;
+                    }
+                    targetUid = snap.docs[0].id;
+                }
+
+                const targetSnap = await getDoc(doc(db, "users", targetUid));
+                if(!targetSnap.exists()) {
+                    alert("Usuario no encontrado por UID.");
+                    return;
+                }
+
+                const q1 = query(collection(db, "friendships"), where("uid1", "==", currentUid), where("uid2", "==", targetUid));
+                const q2 = query(collection(db, "friendships"), where("uid1", "==", targetUid), where("uid2", "==", currentUid));
+                const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+                
+                if(!s1.empty || !s2.empty) {
+                    alert("Ya tienes una solicitud o amistad con este usuario.");
+                    return;
+                }
+
+                const newRef = doc(collection(db, "friendships"));
+                await setDoc(newRef, {
+                    uid1: currentUid,
+                    uid2: targetUid,
+                    status: 'pending',
+                    createdAt: Date.now()
+                });
+
+                document.getElementById('friendSearchInput').value = '';
+                alert("Solicitud de amistad enviada.");
+                loadFriends();
+
+            } catch(e) {
+                console.error(e);
+                alert("Error al enviar solicitud: " + e.message);
+            }
+        });
+    }
+
+    if (copyReferralBtn) {
+        copyReferralBtn.addEventListener('click', () => {
+            if(!currentUid) return;
+            const url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + `index.html?ref=${currentUid}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("¡Enlace de referido copiado! Compártelo con tus amigos.");
+            });
+        });
+    }
+});
+
+// Auth State
+onAuthStateChanged(auth, async (user) => {
+    const friendsContainer = document.getElementById('friendsListContainer');
+    const requestsContainer = document.getElementById('requestsListContainer');
+
+    if (user) {
+        currentUid = user.uid;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            userData = userDoc.data();
+            userData.uid = user.uid;
+        }
+        
+        // Update Global Avatar
+        document.querySelectorAll('#globalUserAvatar').forEach(el => {
+            el.src = user.photoURL || 'https://i.imgur.com/S00u4EI.png';
+        });
+
+        loadFriends();
+    } else {
+        currentUid = null;
+        userData = null;
+        
+        document.querySelectorAll('#globalUserAvatar').forEach(el => {
+            el.src = 'https://i.imgur.com/S00u4EI.png';
+        });
+
+        if (friendsContainer) {
+            friendsContainer.innerHTML = `
+                <div style="text-align:center; margin-top:20px; padding: 20px; color:var(--text-secondary); font-size:0.85rem;">
+                    <i class="fas fa-sign-in-alt" style="font-size:2rem; margin-bottom:12px; color:var(--accent-yellow);"></i>
+                    <p style="margin-bottom:15px;">Inicia sesión para ver y agregar amigos.</p>
+                    <button class="btn btn-blue" onclick="pageTransitionTo('perfil.html')" style="font-size:0.8rem; padding:8px 16px; width: 100%;">Iniciar Sesión</button>
+                </div>
+            `;
+        }
+        if (requestsContainer) {
+            requestsContainer.innerHTML = '';
+        }
+        const badgeReq = document.getElementById('badgeRequests');
+        if (badgeReq) badgeReq.style.display = 'none';
+    }
+});
+
+// Load Friends & Requests
+async function loadFriends() {
+    if(!currentUid) return;
+    
+    try {
+        const q1 = query(collection(db, "friendships"), where("uid1", "==", currentUid));
+        const q2 = query(collection(db, "friendships"), where("uid2", "==", currentUid));
+        
+        const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+        let friendships = [];
+        snap1.forEach(doc => friendships.push({ id: doc.id, ...doc.data() }));
+        snap2.forEach(doc => friendships.push({ id: doc.id, ...doc.data() }));
+
+        const friendsContainer = document.getElementById('friendsListContainer');
+        const requestsContainer = document.getElementById('requestsListContainer');
+        
+        let friendsHtml = '';
+        let requestsHtml = '';
+        let pendingCount = 0;
+
+        for (const f of friendships) {
+            const otherUid = (f.uid1 === currentUid) ? f.uid2 : f.uid1;
+            const otherSnap = await getDoc(doc(db, "users", otherUid));
+            if(!otherSnap.exists()) continue;
+            const otherData = otherSnap.data();
+            const displayName = otherData.username || otherData.email.split('@')[0];
+            const avatar = "https://i.pravatar.cc/100?u=" + otherUid;
+
+            if (f.status === 'accepted') {
+                friendsHtml += `
+                    <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px;">
+                        <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                        <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                            <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                            <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Play Fortnite</span>
+                        </div>
+                        <img src="https://i.imgur.com/3XpcBuu.png" alt="Game" class="friend-game-icon" style="width:20px; height:20px; border-radius:4px; object-fit:cover;">
+                    </div>
+                `;
+            } else if (f.status === 'pending') {
+                if (f.uid2 === currentUid) {
+                    pendingCount++;
+                    requestsHtml += `
+                        <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px;">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                            <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                                <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                                <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Quiere ser tu amigo</span>
+                            </div>
+                            <i class="fas fa-check" onclick="acceptFriend('${f.id}')" style="color:#4ade80; cursor:pointer; font-size:1rem; background:rgba(74,222,128,0.1); padding:6px; border-radius:50%;"></i>
+                        </div>
+                    `;
+                } else {
+                    requestsHtml += `
+                        <div class="friend-item" style="display:flex; align-items:center; gap:12px; margin-bottom:15px; padding: 5px; opacity:0.5;">
+                            <img src="${avatar}" alt="Avatar" class="friend-avatar" style="width:32px; height:32px; border-radius:50%;">
+                            <div class="friend-info" style="flex:1; display:flex; flex-direction:column; line-height:1.3;">
+                                <span class="friend-name" style="font-weight:600; font-size:0.85rem;">${displayName}</span>
+                                <span class="friend-playing" style="color:var(--text-secondary); font-size:0.75rem;">Solicitud enviada</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        friendsContainer.innerHTML = friendsHtml || '<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5); font-size:0.8rem;">A&uacute;n no tienes amigos.</div>';
+        requestsContainer.innerHTML = requestsHtml || '<div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5); font-size:0.8rem;">No hay solicitudes.</div>';
+        
+        const badgeReq = document.getElementById('badgeRequests');
+        if(pendingCount > 0) {
+            badgeReq.style.display = 'inline-block';
+            badgeReq.innerText = pendingCount;
+        } else {
+            badgeReq.style.display = 'none';
+        }
+
+    } catch(e) {
+        console.error("Error loading friends:", e);
+    }
+}
+
+// Copied from within the sidebarLoaded listener above (lines 263-270 were the original ones). Wait, I already moved the addFriend and copyReferral event listeners inside the sidebarLoaded event. I should delete the old ones down here.
+
+// Expose toggle sidebar globally
+window.toggleFriendsSidebar = () => {
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+        appContainer.classList.toggle('left-sidebar-mobile-active');
+    }
+};
+
+// --- main.js ---
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. GSAP Animations with container scroller fix
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Initial reveal for elements (watching .content-scroll)
+    
+    // BlurText utility using GSAP
+    const applyBlurText = (selector) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            const text = el.innerText;
+            const words = text.split(' ');
+            el.innerHTML = '';
+            words.forEach((word, i) => {
+                const span = document.createElement('span');
+                span.innerText = word + (i < words.length - 1 ? '\u00A0' : '');
+                span.style.display = 'inline-block';
+                span.style.filter = 'blur(10px)';
+                span.style.opacity = '0';
+                span.style.transform = 'translateY(-20px)';
+                el.appendChild(span);
+            });
+
+            gsap.to(el.querySelectorAll('span'), {
+                scrollTrigger: {
+                    trigger: el,
+                    scroller: ".content-scroll",
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                filter: 'blur(0px)',
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+        });
+    };
+    applyBlurText('.blur-text');
+
+    gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+        gsap.to(elem, {
+            scrollTrigger: {
+                trigger: elem,
+                scroller: ".content-scroll", // FIX: Watch the scroll container, not the window!
+                start: "top 85%",
+                toggleActions: "play none none reverse"
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out"
+        });
+    });
+
+    // 2. Render Products in Index
+    const featuredContainer = document.getElementById('featuredProducts');
+    const mayoreoContainer = document.getElementById('mayoreoProducts');
+
+    const renderProducts = async () => {
+        let allProducts = [];
+        let fetchedProducts = [];
+        let stockMap = {};
+
+        // Fetch products and stock from Firestore concurrently
+        try {
+            const [prodSnap, stockSnap] = await Promise.all([
+                getDocs(collection(db, "products")).catch(e => {
+                    console.error("Firebase connection issue for products:", e);
+                    return null;
+                }),
+                getDocs(collection(db, "products_stock")).catch(e => {
+                    console.error("Firestore offline or configuration issue for stock:", e);
+                    return null;
+                })
+            ]);
+            
+            if (prodSnap && typeof prodSnap.forEach === 'function') {
+                prodSnap.forEach(docSnap => {
+                    fetchedProducts.push({ id: docSnap.id, ...docSnap.data() });
+                });
+            }
+
+            if (stockSnap && typeof stockSnap.forEach === 'function') {
+                stockSnap.forEach(docSnap => {
+                    stockMap[docSnap.id] = docSnap.data();
+                });
+            }
+        } catch (e) {
+            console.error("General Fetch Error:", e);
+        }
+
+        if (fetchedProducts.length > 0) {
+            allProducts = fetchedProducts;
+        }
+
+        if (allProducts.length === 0) return;
+
+        const renderProductCard = (product) => {
+            const prodStock = stockMap[product.id] || { status: 'disponible', credentialsPool: '' };
+            
+            let badgeClass = 'stock-disponible';
+            let label = 'Disponible';
+            let isDisabled = false;
+
+            const pool = prodStock.credentialsPool || "";
+            const lines = pool.split('\n').filter(l => l.trim() !== '');
+            const count = lines.length;
+
+            if (count > 0) {
+                label = `En Stock (${count})`;
+                badgeClass = 'stock-disponible';
+            } else if (prodStock.status === 'bajo_pedido') {
+                badgeClass = 'stock-bajo-pedido';
+                label = 'Bajo pedido';
+            } else if (prodStock.status === 'agotado') {
+                badgeClass = 'stock-agotado';
+                label = 'Agotado';
+                isDisabled = true;
+            }
+
+            const badgeHtml = `<div class="product-badge stock-badge ${badgeClass}">${label}</div>`;
+            
+            return `
+                <div class="product-card" style="${isDisabled ? 'opacity: 0.7;' : ''}">
+                    <div class="product-image-container" onclick="window.location.href='producto.html?id=${product.id}'" style="cursor:pointer;">
+                        <img src="${product.image}" alt="${product.name}">
+                        ${badgeHtml}
+                    </div>
+                    <div class="product-info">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h4 class="product-title" style="margin-bottom:0; cursor:pointer;" onclick="window.location.href='producto.html?id=${product.id}'">${product.name}</h4>
+                            <button class="wishlist-btn" data-productid="${product.id}" onclick="event.stopPropagation(); window.toggleWishlist('${product.id}')" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="far fa-heart"></i></button>
+                        </div>
+                        <p class="product-desc" style="margin-top:8px; cursor:pointer;" onclick="window.location.href='producto.html?id=${product.id}'">${product.description}</p>
+                        <div class="product-footer">
+                            <div class="price-box">
+                                <span class="price-tag">MXN</span>
+                                <span class="price">${product.price.toFixed(2)}</span>
+                            </div>
+                            <button class="buy-btn" ${isDisabled ? 'disabled' : ''} onclick="window.location.href='producto.html?id=${product.id}'"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        if (featuredContainer) {
+            const featured = allProducts.filter(p => p.category === 'vbucks' || p.category === 'crew').slice(0, 4);
+            featuredContainer.innerHTML = featured.map(renderProductCard).join('');
+        }
+
+        if (mayoreoContainer) {
+            const mayoreo = allProducts.filter(p => p.category === 'mayoreo').slice(0, 4);
+            mayoreoContainer.innerHTML = mayoreo.map(renderProductCard).join('');
+        }
+
+        // Trigger ScrollTrigger refresh since we just dynamically added elements
+        ScrollTrigger.refresh();
+    };
+
+    renderProducts();
+
+    // 3. Carousel Logic (Simple click rotation)
+    const cards = document.querySelectorAll('.carousel-card');
+    if (cards.length === 3) {
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const clickedPos = card.getAttribute('data-pos');
+                if (clickedPos === 'center') return; // Already center
+
+                let currentCenter, currentLeft, currentRight;
+                cards.forEach(c => {
+                    const p = c.getAttribute('data-pos');
+                    if (p === 'center') currentCenter = c;
+                    if (p === 'left') currentLeft = c;
+                    if (p === 'right') currentRight = c;
+                });
+
+                if (clickedPos === 'left') {
+                    currentLeft.setAttribute('data-pos', 'center');
+                    currentCenter.setAttribute('data-pos', 'right');
+                    currentRight.setAttribute('data-pos', 'left');
+                } else if (clickedPos === 'right') {
+                    currentRight.setAttribute('data-pos', 'center');
+                    currentCenter.setAttribute('data-pos', 'left');
+                    currentLeft.setAttribute('data-pos', 'right');
+                }
+            });
+        });
+    }
+
+    // 4. Update Profile Info in Topbar (Firebase)
+    onAuthStateChanged(auth, async (user) => {
+        const userNameElem = document.querySelector('.user-name');
+        const userLinkElem = document.querySelector('.user-link');
+        const userAvatars = document.querySelectorAll('.user-avatar');
+
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            
+            // Update profile picture globally
+            if (user.photoURL) {
+                userAvatars.forEach(avatar => {
+                    avatar.src = user.photoURL;
+                });
+            }
+
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                if (userNameElem) userNameElem.textContent = data.username || user.displayName || user.email.split('@')[0];
+                if (userLinkElem) {
+                    userLinkElem.textContent = `${data.balance.toFixed(2)} MXN`;
+                    userLinkElem.href = 'perfil.html';
+                }
+            }
+        } else {
+            if (userNameElem) userNameElem.textContent = "Invitado";
+            if (userLinkElem) {
+                userLinkElem.textContent = "Ingresar";
+                userLinkElem.href = 'perfil.html';
+            }
+        }
+    });
+
+    // 5. Functional Search Bar on Landing Page
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `catalogo.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+});
+
+
+// --- navigation.js ---
+// navigation.js - Injects the modern 3-column Left Sidebar and Mobile Dock and handles SPA Routing
+
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    if (ref) {
+        localStorage.setItem('referralUid', ref);
+    }
+})();
+
+const NAV_ITEMS = [
+    { label: 'Inicio', icon: 'fas fa-home', href: 'index.html', viewId: 'view-home' },
+    { label: 'Cat&aacute;logo', icon: 'fas fa-search', href: 'catalogo.html', viewId: 'view-catalogo' },
+    { label: 'M&eacute;todos', icon: 'fas fa-wallet', href: 'metodos.html', viewId: 'view-metodos' },
+    { label: 'Biblioteca', icon: 'fas fa-gamepad', href: 'perfil.html', viewId: 'view-perfil' },
+    { label: 'Contacto', icon: 'fas fa-envelope', href: 'contacto.html', viewId: 'view-contacto' },
+    { label: 'Discord', icon: 'fab fa-discord', href: 'discord.html', viewId: 'view-discord' }
+];
+
+let currentActiveViewId = 'view-home';
+
+function injectNavigation() {
+    let navLinksHtml = '';
+    NAV_ITEMS.forEach((item) => {
+        const isActive = item.viewId === currentActiveViewId ? 'active' : '';
+        navLinksHtml += `
+            <a href="javascript:void(0)" onclick="switchView('${item.viewId}')" class="nav-item ${isActive}" data-view="${item.viewId}">
+                <i class="${item.icon}"></i>
+                <span>${item.label}</span>
+            </a>
+        `;
+    });
+
+    const leftSidebarHtml = `
+        <aside class="sidebar left-sidebar">
+            <div class="sidebar-header" style="display:flex; justify-content:space-between; margin-bottom: 20px;">
+                <div style="display:flex; gap: 5px;">
+                    <div style="width:10px; height:10px; border-radius:50%; background:#f87171;"></div>
+                    <div style="width:10px; height:10px; border-radius:50%; background:#fbbf24;"></div>
+                    <div style="width:10px; height:10px; border-radius:50%; background:#34d399;"></div>
+                </div>
+                <div style="display:flex; gap: 10px; color: var(--text-secondary); font-size: 0.8rem;">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+            <div class="brand" style="margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap: 10px;">
+                    <img src="https://i.imgur.com/S00u4EI.png" class="brand-icon" style="width:24px; height:24px; border-radius:50%; background:var(--accent-blue);" alt="GhostKey">
+                    <span style="font-weight:600; font-size: 0.9rem;">GhostKey</span>
+                </div>
+                <div style="display:flex; align-items:center; gap: 5px;">
+                    <img src="https://i.imgur.com/S00u4EI.png" style="width:20px; height:20px; border-radius:50%;" alt="User">
+                    <i class="fas fa-chevron-down" style="font-size: 0.6rem; color: var(--text-secondary);"></i>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                ${navLinksHtml}
+            </nav>
+            <div class="sidebar-section-title" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <span>My favorites</span>
+                <i class="fas fa-plus" style="cursor:pointer; padding:5px;"></i>
+            </div>
+            <div class="fast-launch" style="flex: none; margin-bottom: 20px;">
+                <div class="game-item" onclick="switchView('view-catalogo')">
+                    <img src="https://i.imgur.com/3XpcBuu.png" class="game-icon" style="border-radius:6px; width:28px; height:28px;" alt="Crew">
+                    <div style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span class="game-name" style="font-size:0.85rem;">Fortnite Crew</span>
+                        <span style="font-size:0.7rem; color:var(--text-secondary);">Game</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="friends-sidebar-content" style="flex:1; display:flex; flex-direction:column; overflow:hidden; min-height: 250px;">
+                <div class="tabs" style="display:flex; gap:15px; font-weight:600; font-size:0.9rem; margin-bottom:10px;">
+                    <span class="tab active" id="tabFriends" style="cursor:pointer; color:var(--text-primary);">Friends <span class="friends-req-badge" id="badgeFriends" style="display:none;">0</span></span>
+                    <span class="tab" id="tabRequests" style="cursor:pointer; color:var(--text-secondary);">Requests <span class="badge-red friends-req-badge" id="badgeRequests" style="background:rgba(244,63,94,0.2); color:#f43f5e; padding:2px 6px; border-radius:10px; font-size:0.75rem; display:none;">0</span></span>
+                </div>
+                
+                <div class="search-friend-bar" style="display:flex; align-items:flex-end; gap:15px; margin-bottom: 25px; margin-top: 15px;">
+                    <div class="inputbox" style="flex:1; width:auto;">
+                        <input required="required" type="text" id="friendSearchInput">
+                        <span>Buscar usuario o UID</span>
+                        <i></i>
+                    </div>
+                    <div style="width:44px; height:44px; background:rgba(161, 130, 232, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; color: #A182E8; flex-shrink: 0; box-shadow: 0 4px 15px rgba(161, 130, 232, 0.15);" id="addFriendBtn">
+                        <i class="fas fa-user-plus" style="font-size:1.2rem;"></i>
+                    </div>
+                </div>
+
+                <div class="friends-category" style="flex:1; overflow-y:auto; overflow-x:hidden;">
+                    <div class="friends-list" id="friendsListContainer">
+                        <div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">Cargando...</div>
+                    </div>
+                </div>
+                
+                <div class="friends-category" id="requestsListContainer" style="display:none; flex:1; overflow-y:auto; overflow-x:hidden;">
+                    <div class="friends-list"></div>
+                </div>
+            </div>
+
+            <div class="referral-box" style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.02); border-radius:12px; text-align:center; border-top:1px solid rgba(255,255,255,0.05);">
+                <h4 style="margin:0 0 10px 0; font-size:0.9rem; color:#A182E8;"><i class="fas fa-gift"></i> Gana 3% de Comisi&oacute;n</h4>
+                <p style="margin:0 0 15px 0; font-size:0.8rem; color:var(--text-secondary);">Invita a un amigo y gana cr&eacute;ditos.</p>
+                <button class="btn btn-blue" id="copyReferralBtn" style="width:100%; font-size:0.8rem;">Copiar Link</button>
+            </div>
+        </aside>
+    `;
+
+    let dockLinksHtml = '';
+    const dockItems = [
+        NAV_ITEMS[0],
+        NAV_ITEMS[1],
+        { label: 'Wishlist', icon: 'fas fa-heart', viewId: 'view-perfil', isWishlist: true },
+        NAV_ITEMS[2],
+        NAV_ITEMS[3]
+    ];
+
+    dockItems.forEach((item) => {
+        let isActive = item.viewId === currentActiveViewId ? 'active' : '';
+        dockLinksHtml += `
+            <a href="javascript:void(0)" onclick="switchView('${item.viewId}')" class="dock-item ${isActive}" data-view="${item.viewId}">
+                <div class="dock-icon"><i class="${item.icon}"></i></div>
+                <div class="dock-label">${item.label}</div>
+            </a>
+        `;
+    });
+
+    const dockHtml = `
+        <div class="dock-outer mobile-only">
+            <div class="dock-panel">
+                ${dockLinksHtml}
+            </div>
+        </div>
+    `;
+
+    const appContainer = document.querySelector('.app-container');
+    
+    if (appContainer && !document.querySelector('.sidebar.left-sidebar')) {
+        appContainer.insertAdjacentHTML('afterbegin', leftSidebarHtml);
+        document.body.insertAdjacentHTML('beforeend', dockHtml);
+        window.dispatchEvent(new Event('sidebarLoaded'));
+        if(typeof initMacDock === 'function') initMacDock();
+    }
+}
+
+window.switchView = function(viewIdOrHref) {
+    let viewId = viewIdOrHref;
+    if (viewId.includes('.html')) {
+        viewId = viewId.replace('.html', '');
+        viewId = 'view-' + viewId;
+    }
+    
+    if (viewId === 'view-index') viewId = 'view-home';
+
+    if (viewId === currentActiveViewId) return;
+
+    const currentView = document.getElementById(currentActiveViewId);
+    const nextView = document.getElementById(viewId);
+
+    if (!nextView) return;
+
+    document.querySelectorAll('.nav-item, .dock-item').forEach(el => {
+        el.classList.remove('active');
+        if (el.getAttribute('data-view') === viewId) el.classList.add('active');
+    });
+
+    currentActiveViewId = viewId;
+
+    if (currentView && window.gsap) {
+        gsap.to(currentView, { opacity: 0, y: 20, duration: 0.2, onComplete: () => {
+            currentView.style.display = 'none';
+            currentView.classList.remove('active');
+            
+            nextView.style.display = 'block';
+            nextView.classList.add('active');
+            
+            setTimeout(() => { if (window.ScrollTrigger) ScrollTrigger.refresh(); }, 100);
+            gsap.fromTo(nextView, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
+        }});
+    } else {
+        if(currentView) {
+            currentView.style.display = 'none';
+            currentView.classList.remove('active');
+        }
+        nextView.style.display = 'block';
+        nextView.classList.add('active');
+    }
+};
+
+window.pageTransitionTo = window.switchView;
+
+document.addEventListener("DOMContentLoaded", () => {
+    injectNavigation();
+    const pageLoader = document.getElementById('page-loader');
+    if (pageLoader) {
+        pageLoader.classList.add('hidden');
+        setTimeout(() => pageLoader.remove(), 500);
+    }
+});
+
+// --- perfil.js ---
+
+
+
+
+// DOM Elements
+const authSection = document.getElementById('authSection');
+const userDashboard = document.getElementById('userDashboard');
+const adminDashboard = document.getElementById('adminDashboard');
+
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+
+let currentUser = null;
+let isAdmin = false;
+let allProducts = [];
+
+// Real-time Auth State
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        // ADMIN EMAIL SET AS REQUESTED
+        // WARNING: Frontend validation can be bypassed. Ensure you implement Firestore Security Rules.
+        isAdmin = (user.email === 'lrodricg30@gmail.com');
+        
+        authSection.style.display = 'none';
+        
+        if (isAdmin) {
+            adminDashboard.style.display = 'block';
+            await loadAdminProducts();
+            loadAdminData();
+        } else {
+            userDashboard.style.display = 'block';
+            loadUserData();
+        }
+    } else {
+        currentUser = null;
+        isAdmin = false;
+        authSection.style.display = 'block';
+        userDashboard.style.display = 'none';
+        adminDashboard.style.display = 'none';
+    }
+});
+
+// Auth Functions
+googleLoginBtn.onclick = async () => {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        // Check if user doc exists, if not create
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            const referralUid = localStorage.getItem('referralUid');
+            const newUserData = {
+                email: user.email,
+                username: user.displayName || user.email.split('@')[0],
+                balance: 0,
+                createdAt: new Date().toISOString()
+            };
+            if (referralUid) {
+                newUserData.referredBy = referralUid;
+            }
+            await setDoc(userRef, newUserData);
+        }
+    } catch(e) {
+        console.error("Google Login Error", e);
+        alert("Error al iniciar sesión con Google. (Recuerda que debes usar Live Server o GitHub Pages).");
+    }
+};
+
+logoutBtn.onclick = () => signOut(auth);
+adminLogoutBtn.onclick = () => signOut(auth);
+
+// Load Products from Firebase
+async function loadAdminProducts() {
+    try {
+        const freshSnap = await getDocs(collection(db, "products"));
+        allProducts = [];
+        freshSnap.forEach(docSnap => {
+            allProducts.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        // Sort by numeric id if possible
+        allProducts.sort((a,b) => parseInt(a.id) - parseInt(b.id));
+    } catch(e) {
+        console.error("Error al cargar productos:", e);
+        alert("⚠️ No se pudieron cargar los productos en el panel.");
+    }
+}
+
+// User Data Loading
+async function loadUserData() {
+    document.getElementById('userUidDisplay').innerText = currentUser.uid;
+    
+    const userRef = doc(db, "users", currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    let userData = null;
+    if (userSnap.exists()) {
+        userData = userSnap.data();
+        document.getElementById('userBalance').innerText = `${userData.balance.toFixed(2)} MXN`;
+    }
+
+    const q = query(collection(db, "orders"), where("uid", "==", currentUser.uid));
+    const querySnapshot = await getDocs(q);
+    const tbody = document.querySelector('#userOrdersTable tbody');
+    tbody.innerHTML = '';
+    
+    if (querySnapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 30px; color:var(--text-secondary);">No tienes pedidos registrados aún.</td></tr>';
+    } else {
+        // Sort orders in memory (descending by timestamp)
+        let userOrders = [];
+        querySnapshot.forEach(docSnap => userOrders.push({ id: docSnap.id, ...docSnap.data() }));
+        userOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        userOrders.forEach(data => {
+            let statusBadge = '';
+            let deliveryContent = '';
+
+            if (data.status === 'pendiente') {
+                statusBadge = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+                deliveryContent = '<span style="color:var(--text-secondary); font-size:0.85rem; font-style:italic;">Preparando tu entrega...</span>';
+            } else if (data.status === 'confirmado') {
+                statusBadge = '<span class="status-pill delivered"><i class="fas fa-check-circle"></i> Entregado</span>';
+                const escText = (data.textDelivered || '').replace(/'/g, "\\'");
+                
+                let giftHtml = '';
+                if (data.giftMessage) {
+                    giftHtml = `<div style="margin-top:8px; font-size:0.8rem; color:var(--accent-yellow); background:rgba(255,215,0,0.1); padding:8px; border-radius:6px; border:1px dashed var(--accent-yellow);">
+                        <i class="fas fa-gift"></i> <strong>Mensaje de regalo:</strong> "${data.giftMessage}"
+                    </div>`;
+                }
+
+                deliveryContent = `
+                    <div class="credential-box">
+                        <span style="font-weight:600; font-size:0.9rem; word-break:break-all;">${data.textDelivered}</span>
+                        <button class="copy-btn" onclick="copyToClipboard('${escText}', this)"><i class="far fa-copy"></i> Copiar</button>
+                    </div>
+                    ${giftHtml}
+                `;
+            }
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-family:monospace; font-size:0.8rem; color:rgba(255,255,255,0.4);">${data.id.substring(0,8)}...</td>
+                    <td style="font-weight:600;">${data.productName}</td>
+                    <td>${statusBadge}</td>
+                    <td>${deliveryContent}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Render Wishlist
+    const wishlistGrid = document.getElementById('userWishlistGrid');
+    if (wishlistGrid) {
+        wishlistGrid.innerHTML = '';
+        const wishlistIds = userData?.wishlist || [];
+        if (wishlistIds.length === 0) {
+            wishlistGrid.innerHTML = '<p style="color:var(--text-secondary); padding: 10px 0;">No tienes productos agregados a tu lista de deseos.</p>';
+        } else {
+            const productsSnap = await getDocs(collection(db, "products"));
+            let productsMap = {};
+            productsSnap.forEach(d => { productsMap[d.id] = {id: d.id, ...d.data()} });
+            
+            wishlistIds.forEach(pid => {
+                const p = productsMap[pid];
+                if (p) {
+                    wishlistGrid.innerHTML += `
+                        <div class="product-card" onclick="window.location.href='producto.html?id=${p.id}'" style="cursor:pointer; display:flex; flex-direction:column;">
+                            <div class="product-image-container" style="height:140px;">
+                                <img src="${p.image}" alt="${p.name}">
+                            </div>
+                            <div class="product-info" style="padding:16px;">
+                                <h4 class="product-title" style="font-size:0.95rem; margin-bottom:8px;">${p.name}</h4>
+                                <div class="product-footer">
+                                    <span class="price">${p.price.toFixed(2)} MXN</span>
+                                    <button class="wishlist-btn active" data-productid="${p.id}" onclick="event.stopPropagation(); toggleWishlist('${p.id}'); this.closest('.product-card').remove();" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-size:1.2rem; transition:color 0.3s; z-index:10;"><i class="fas fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+    }
+    
+    // Render Recharges History
+    await loadUserRecharges();
+}
+
+// Admin Data Loading
+async function loadAdminData() {
+    loadAdminOrders();
+    loadAdminInventory();
+    loadAdminCatalog();
+    loadAdminPaymentMethods();
+    loadAdminRecharges();
+    updateAdminStats();
+}
+
+async function updateAdminStats() {
+    try {
+        const ordersSnap = await getDocs(collection(db, "orders"));
+        const productsSnap = await getDocs(collection(db, "products"));
+        
+        let pending = 0;
+        ordersSnap.forEach(d => {
+            if(d.data().status === 'pendiente') pending++;
+        });
+
+        document.getElementById('statOrdersCount').innerText = ordersSnap.size;
+        document.getElementById('statPendingCount').innerText = pending;
+        document.getElementById('statProductsCount').innerText = productsSnap.size;
+    } catch(e) {
+        console.error("Stats error:", e);
+    }
+}
+
+async function loadAdminOrders() {
+    const querySnapshot = await getDocs(collection(db, "orders"));
+    const tbody = document.getElementById('adminOrdersTable');
+    tbody.innerHTML = '';
+    
+    let ordersList = [];
+    querySnapshot.forEach(docSnap => ordersList.push({ id: docSnap.id, ...docSnap.data() }));
+    ordersList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    if (ordersList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay pedidos registrados.</td></tr>';
+        return;
+    }
+
+    ordersList.forEach(data => {
+        let statusBadge = '';
+        let actionBtn = '';
+        if (data.status === 'pendiente') {
+            statusBadge = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+            actionBtn = `<button class="admin-btn-action" onclick="openDeliveryModal('${data.id}', '${data.productId}')"><i class="fas fa-paper-plane"></i> Entregar</button>`;
+        } else {
+            statusBadge = '<span class="status-pill delivered"><i class="fas fa-check-circle"></i> Entregado</span>';
+            actionBtn = `<span style="font-size:0.85rem; color:var(--text-secondary); font-weight:600;"><i class="fas fa-check"></i> Completado</span>`;
+        }
+
+        tbody.innerHTML += `
+            <tr>
+                <td style="font-family:monospace; font-size:0.8rem; color:rgba(255,255,255,0.4);">${data.id.substring(0,8)}...</td>
+                <td style="font-weight:600;">${data.userEmail}</td>
+                <td style="font-weight:600;">${data.productName}</td>
+                <td style="text-transform: capitalize; color: var(--accent-yellow); font-weight:600;">${data.price.toFixed(2)} (${data.method})</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
+            </tr>
+        `;
+    });
+}
+
+// Sleek Modal delivery popups
+window.openDeliveryModal = async (orderId, productId) => {
+    document.getElementById('modalOrderId').value = orderId;
+    document.getElementById('modalProductId').value = productId;
+    
+    // Check if there are keys in the credentials pool
+    let prefilledKey = "";
+    try {
+        const stockDoc = await getDoc(doc(db, "products_stock", productId));
+        if (stockDoc.exists()) {
+            const pool = stockDoc.data().credentialsPool || "";
+            const lines = pool.split('\n').filter(l => l.trim() !== '');
+            if (lines.length > 0) {
+                prefilledKey = lines[0]; // Propose the first available key
+            }
+        }
+    } catch(e) {
+        console.error(e);
+    }
+    
+    document.getElementById('modalDeliveryText').value = prefilledKey;
+    document.getElementById('deliveryModal').classList.add('active');
+};
+
+window.closeDeliveryModal = () => {
+    document.getElementById('deliveryModal').classList.remove('active');
+};
+
+window.confirmDeliveryAction = async () => {
+    const orderId = document.getElementById('modalOrderId').value;
+    const productId = document.getElementById('modalProductId').value;
+    const textToDeliver = document.getElementById('modalDeliveryText').value.trim();
+
+    if(!textToDeliver) {
+        alert("Escribe una clave o credencial para entregar.");
+        return;
+    }
+
+    try {
+        const stockRef = doc(db, "products_stock", productId);
+        const stockSnap = await getDoc(stockRef);
+        
+        if (stockSnap.exists()) {
+            const pool = stockSnap.data().credentialsPool || "";
+            let lines = pool.split('\n').filter(l => l.trim() !== '');
+            
+            // If the delivered text matches the proposed first key, remove it from the pool
+            if (lines.length > 0 && lines[0] === textToDeliver) {
+                lines.shift();
+                await updateDoc(stockRef, {
+                    credentialsPool: lines.join('\n'),
+                    status: lines.length === 0 ? 'agotado' : stockSnap.data().status
+                });
+            }
+        }
+        
+        // Update order in Firestore
+        const orderRef = doc(db, "orders", orderId);
+        const orderSnap = await getDoc(orderRef);
+        
+        await updateDoc(orderRef, {
+            status: 'confirmado',
+            textDelivered: textToDeliver
+        });
+        
+        // --- Referral Commission Logic ---
+        if (orderSnap.exists()) {
+            const orderData = orderSnap.data();
+            // Determine the true buyer (if gifted, giftedBy paid for it)
+            const trueBuyerUid = orderData.giftedBy ? orderData.giftedBy : orderData.uid;
+            
+            // Fetch true buyer to check if they were referred
+            const buyerRef = doc(db, "users", trueBuyerUid);
+            const buyerSnap = await getDoc(buyerRef);
+            
+            if (buyerSnap.exists() && buyerSnap.data().referredBy) {
+                const referrerUid = buyerSnap.data().referredBy;
+                const referrerRef = doc(db, "users", referrerUid);
+                const referrerSnap = await getDoc(referrerRef);
+                
+                if (referrerSnap.exists()) {
+                    // Calculate 3% of the price (we need product price, which we have in orderData.price)
+                    const commission = (orderData.price || 0) * 0.03;
+                    if (commission > 0) {
+                        const newBalance = (referrerSnap.data().balance || 0) + commission;
+                        await updateDoc(referrerRef, { balance: newBalance });
+                        console.log(`Comisión de ${commission} MXN otorgada a ${referrerUid}`);
+                    }
+                }
+            }
+        }
+        // ---------------------------------
+        
+        window.closeDeliveryModal();
+        alert("Pedido completado y entregado con éxito.");
+        loadAdminOrders();
+        loadAdminInventory();
+        updateAdminStats();
+    } catch(e) {
+        console.error(e);
+        alert("Error al entregar el pedido.");
+    }
+};
+
+async function loadAdminInventory() {
+    const tbody = document.getElementById('adminInventoryTable');
+    tbody.innerHTML = '';
+
+    if (allProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catálogo.</td></tr>';
+        return;
+    }
+
+    for (const prod of allProducts) {
+        const stockRef = doc(db, "products_stock", prod.id);
+        const stockSnap = await getDoc(stockRef);
+        let stockData = stockSnap.exists() ? stockSnap.data() : { status: 'disponible', credentialsPool: '' };
+        
+        tbody.innerHTML += `
+            <tr>
+                <td style="font-weight:600;">${prod.name}</td>
+                <td>
+                    <select id="status_${prod.id}" class="admin-input-styled" style="width: auto; padding: 8px 12px;">
+                        <option value="disponible" ${stockData.status==='disponible'?'selected':''}>En Stock / Disponible</option>
+                        <option value="bajo_pedido" ${stockData.status==='bajo_pedido'?'selected':''}>Bajo Pedido</option>
+                        <option value="agotado" ${stockData.status==='agotado'?'selected':''}>Agotado</option>
+                    </select>
+                </td>
+                <td>
+                    <textarea id="pool_${prod.id}" class="admin-input-styled" style="height: 60px; font-family: monospace; font-size: 0.85rem; padding: 8px 12px;" placeholder="Pega una credencial por línea...">${stockData.credentialsPool || ''}</textarea>
+                </td>
+                <td>
+                    <button class="admin-btn-action" onclick="window.saveInventory('${prod.id}')"><i class="fas fa-save"></i> Guardar</button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// CATALOG CRUD FUNCTIONS
+async function loadAdminCatalog() {
+    const tbody = document.getElementById('adminCatalogTable');
+    tbody.innerHTML = '';
+
+    if (allProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay productos en el catálogo.</td></tr>';
+        return;
+    }
+
+    for (const prod of allProducts) {
+        tbody.innerHTML += `
+            <tr>
+                <td><img src="${prod.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border:1px solid rgba(255,255,255,0.05);"></td>
+                <td style="font-weight:600;">${prod.name}</td>
+                <td style="font-weight:700; color:var(--text-primary);">${prod.price.toFixed(2)} MXN</td>
+                <td><span class="status-pill pending" style="background: rgba(122,61,214,0.1); color: var(--text-primary); border: 1px solid rgba(122,61,214,0.3); font-size:0.7rem;">${prod.category}</span></td>
+                <td>
+                    <button class="admin-btn-action secondary" style="padding: 8px 12px;" onclick="window.editProduct('${prod.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="admin-btn-action danger" style="padding: 8px 12px;" onclick="window.deleteProduct('${prod.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+window.saveProduct = async () => {
+    const id = document.getElementById('editProdId').value;
+    const name = document.getElementById('newProdName').value.trim();
+    const desc = document.getElementById('newProdDesc').value.trim();
+    const price = parseFloat(document.getElementById('newProdPrice').value);
+    const category = document.getElementById('newProdCategory').value;
+    const image = document.getElementById('newProdImage').value.trim();
+
+    if(!name || isNaN(price) || !image) {
+        alert("Llena los campos obligatorios (Nombre, Precio, Imagen)");
+        return;
+    }
+
+    try {
+        if(id) {
+            // Edit
+            await updateDoc(doc(db, "products", id), { name, description: desc, price, category, image });
+            alert("Producto actualizado con éxito");
+        } else {
+            // Create
+            const newId = Date.now().toString();
+            await setDoc(doc(db, "products", newId), { id: parseInt(newId), name, description: desc, price, category, image });
+            alert("Producto creado con éxito");
+        }
+        window.resetProductForm();
+        await loadAdminProducts(); // Reloads allProducts array
+        loadAdminCatalog();
+        loadAdminInventory();
+        updateAdminStats();
+    } catch (e) {
+        console.error(e);
+        alert("Error al guardar producto");
+    }
+};
+
+window.editProduct = (id) => {
+    const p = allProducts.find(x => String(x.id) === String(id));
+    if(!p) {
+        console.error("Product not found:", id, allProducts);
+        return;
+    }
+    document.getElementById('editProdId').value = p.id;
+    document.getElementById('newProdName').value = p.name;
+    document.getElementById('newProdDesc').value = p.description;
+    document.getElementById('newProdPrice').value = p.price;
+    document.getElementById('newProdCategory').value = p.category;
+    document.getElementById('newProdImage').value = p.image;
+    
+    document.getElementById('formCatalogTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Producto';
+    document.getElementById('saveProdBtn').innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar Producto';
+    document.getElementById('cancelProdBtn').style.display = "inline-flex";
+    
+    // Scroll to form
+    document.getElementById('tab-products').scrollIntoView({ behavior: "smooth" });
+};
+
+window.resetProductForm = () => {
+    document.getElementById('editProdId').value = "";
+    document.getElementById('newProdName').value = "";
+    document.getElementById('newProdDesc').value = "";
+    document.getElementById('newProdPrice').value = "";
+    document.getElementById('newProdCategory').value = "vbucks";
+    document.getElementById('newProdImage').value = "";
+    
+    document.getElementById('formCatalogTitle').innerHTML = '<i class="fas fa-plus"></i> Crear Nuevo Producto';
+    document.getElementById('saveProdBtn').innerHTML = '<i class="fas fa-check"></i> Guardar Producto';
+    document.getElementById('cancelProdBtn').style.display = "none";
+};
+
+window.deleteProduct = async (id) => {
+    if(confirm("¿Seguro que quieres eliminar este producto?")) {
+        try {
+            await deleteDoc(doc(db, "products", id));
+            await deleteDoc(doc(db, "products_stock", id));
+            alert("Producto eliminado con éxito");
+            await loadAdminProducts();
+            loadAdminCatalog();
+            loadAdminInventory();
+            updateAdminStats();
+        } catch(e) {
+            console.error(e);
+            alert("Error al eliminar el producto");
+        }
+    }
+};
+
+window.saveInventory = async (productId) => {
+    const status = document.getElementById(`status_${productId}`).value;
+    const pool = document.getElementById(`pool_${productId}`).value;
+    
+    try {
+        await setDoc(doc(db, "products_stock", productId), {
+            productId: productId,
+            status: status,
+            credentialsPool: pool
+        }, { merge: true });
+        alert("Stock actualizado con éxito.");
+        updateAdminStats();
+    } catch(e) {
+        console.error(e);
+        alert("Error al guardar el stock.");
+    }
+};
+
+window.searchUser = async () => {
+    const email = document.getElementById('searchUserEmail').value.trim();
+    if(!email) {
+        alert("Ingresa un email para buscar.");
+        return;
+    }
+    const q = query(collection(db, "users"), where("email", "==", email));
+    const snap = await getDocs(q);
+    
+    const tbody = document.getElementById('adminUsersTable');
+    tbody.innerHTML = '';
+    
+    if (snap.empty) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-secondary);">Usuario no encontrado.</td></tr>';
+        return;
+    }
+
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        tbody.innerHTML += `
+            <tr>
+                <td style="font-weight:600;">${data.email}</td>
+                <td style="font-family:monospace; font-size: 0.8rem; color:rgba(255,255,255,0.5);">${docSnap.id}</td>
+                <td style="font-weight:700; color:var(--accent-yellow);">${data.balance.toFixed(2)} MXN</td>
+                <td>
+                    <div style="display:flex; gap: 8px; align-items:center;">
+                        <input type="number" id="addBalance_${docSnap.id}" class="admin-input-styled" style="width: 100px; padding: 8px;" placeholder="Monto">
+                        <button class="admin-btn-action" style="padding: 8px 16px;" onclick="window.addBalance('${docSnap.id}', ${data.balance})"><i class="fas fa-plus"></i> Añadir</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+};
+
+window.addBalance = async (uid, currentBalance) => {
+    const amount = parseFloat(document.getElementById(`addBalance_${uid}`).value);
+    if(isNaN(amount) || amount <= 0) {
+        alert("Ingresa una cantidad válida a sumar.");
+        return;
+    }
+    
+    try {
+        await updateDoc(doc(db, "users", uid), {
+            balance: currentBalance + amount
+        });
+        alert("Saldo añadido exitosamente.");
+        window.searchUser(); // refresh search table
+    } catch(e) {
+        console.error(e);
+        alert("Error al añadir saldo.");
+    }
+};
+
+// --- PAYMENT METHODS CRUD ---
+let allPaymentMethods = [];
+
+async function loadAdminPaymentMethods() {
+    const tbody = document.getElementById('adminPaymentMethodsTable');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    allPaymentMethods = [];
+
+    const snap = await getDocs(collection(db, "payment_methods"));
+    snap.forEach(docSnap => {
+        allPaymentMethods.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    if (allPaymentMethods.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-secondary);">No hay métodos de pago registrados.</td></tr>';
+        return;
+    }
+
+    allPaymentMethods.forEach(method => {
+        const statusIcon = method.active ? '<span class="status-pill delivered"><i class="fas fa-check"></i> Activo</span>' : '<span class="status-pill pending" style="background:rgba(244,63,94,0.1); color:var(--accent-red); border-color:rgba(244,63,94,0.3);"><i class="fas fa-times"></i> Inactivo</span>';
+        tbody.innerHTML += `
+            <tr>
+                <td>${statusIcon}</td>
+                <td style="font-weight:600;">${method.bank}</td>
+                <td style="font-family:monospace; font-size:0.85rem;">${method.account}</td>
+                <td style="font-weight:600;">${method.name}</td>
+                <td>
+                    <button class="admin-btn-action secondary" style="padding: 8px 12px;" onclick="window.editPaymentMethod('${method.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="admin-btn-action danger" style="padding: 8px 12px;" onclick="window.deletePaymentMethod('${method.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+window.savePaymentMethod = async () => {
+    const id = document.getElementById('editPayMethodId').value;
+    const bank = document.getElementById('newPayMethodBank').value.trim();
+    const name = document.getElementById('newPayMethodName').value.trim();
+    const account = document.getElementById('newPayMethodAccount').value.trim();
+    const concept = document.getElementById('newPayMethodConcept').value.trim();
+    const active = document.getElementById('newPayMethodActive').checked;
+
+    if(!bank || !name || !account) {
+        alert("Llena los campos obligatorios (Banco, Nombre, Cuenta)");
+        return;
+    }
+
+    try {
+        if(id) {
+            await updateDoc(doc(db, "payment_methods", id), { bank, name, account, concept, active });
+            alert("Método de pago actualizado");
+        } else {
+            const newId = Date.now().toString();
+            await setDoc(doc(db, "payment_methods", newId), { bank, name, account, concept, active, createdAt: Date.now() });
+            alert("Método de pago guardado");
+        }
+        window.resetPaymentMethodForm();
+        loadAdminPaymentMethods();
+    } catch (e) {
+        console.error(e);
+        alert("Error al guardar método de pago");
+    }
+};
+
+window.editPaymentMethod = (id) => {
+    const m = allPaymentMethods.find(x => x.id === id);
+    if(!m) return;
+    document.getElementById('editPayMethodId').value = m.id;
+    document.getElementById('newPayMethodBank').value = m.bank || '';
+    document.getElementById('newPayMethodName').value = m.name || '';
+    document.getElementById('newPayMethodAccount').value = m.account || '';
+    document.getElementById('newPayMethodConcept').value = m.concept || '';
+    document.getElementById('newPayMethodActive').checked = m.active !== false;
+    
+    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Método de Pago';
+    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar Método';
+    document.getElementById('cancelPayMethodBtn').style.display = "inline-flex";
+    document.getElementById('tab-paymentMethods').scrollIntoView({ behavior: "smooth" });
+};
+
+window.resetPaymentMethodForm = () => {
+    document.getElementById('editPayMethodId').value = "";
+    document.getElementById('newPayMethodBank').value = "";
+    document.getElementById('newPayMethodName').value = "";
+    document.getElementById('newPayMethodAccount').value = "";
+    document.getElementById('newPayMethodConcept').value = "";
+    document.getElementById('newPayMethodActive').checked = true;
+    
+    document.getElementById('formPayTitle').innerHTML = '<i class="fas fa-plus"></i> Crear Método de Pago';
+    document.getElementById('savePayMethodBtn').innerHTML = '<i class="fas fa-check"></i> Guardar Método';
+    document.getElementById('cancelPayMethodBtn').style.display = "none";
+};
+
+window.deletePaymentMethod = async (id) => {
+    if(confirm("¿Seguro que quieres eliminar este método de pago?")) {
+        try {
+            await deleteDoc(doc(db, "payment_methods", id));
+            alert("Método de pago eliminado");
+            loadAdminPaymentMethods();
+        } catch(e) {
+            console.error(e);
+            alert("Error al eliminar");
+        }
+    }
+};
+};
+
+// --- RECHARGES LOGIC ---
+async function loadUserRecharges() {
+    const tbody = document.getElementById('userRechargesTable').querySelector('tbody');
+    if (!tbody) return;
+    
+    const q = query(collection(db, "recharge_requests"), where("uid", "==", currentUser.uid));
+    const snap = await getDocs(q);
+    
+    let recharges = [];
+    snap.forEach(doc => recharges.push({ id: doc.id, ...doc.data() }));
+    recharges.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    tbody.innerHTML = '';
+    
+    if (recharges.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color:var(--text-secondary);">No tienes solicitudes de saldo.</td></tr>';
+        return;
+    }
+    
+    recharges.forEach(req => {
+        let statusHtml = '';
+        if (req.status === 'pending') statusHtml = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+        else if (req.status === 'approved') statusHtml = '<span class="status-pill delivered"><i class="fas fa-check"></i> Aprobado</span>';
+        else if (req.status === 'rejected') statusHtml = '<span class="status-pill pending" style="background:rgba(244,63,94,0.1); color:var(--accent-red); border-color:rgba(244,63,94,0.3);"><i class="fas fa-times"></i> Rechazado</span>';
+        
+        const date = new Date(req.timestamp).toLocaleDateString();
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${date}</td>
+                <td style="font-weight: bold;">${req.amount.toFixed(2)} MXN</td>
+                <td>${statusHtml}</td>
+            </tr>
+        `;
+    });
+}
+
+async function loadAdminRecharges() {
+    const tbody = document.getElementById('adminRechargesTable');
+    if (!tbody) return;
+    
+    const snap = await getDocs(collection(db, "recharge_requests"));
+    
+    let recharges = [];
+    snap.forEach(doc => recharges.push({ id: doc.id, ...doc.data() }));
+    recharges.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    tbody.innerHTML = '';
+    
+    if (recharges.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-secondary);">No hay solicitudes de saldo.</td></tr>';
+        return;
+    }
+    
+    recharges.forEach(req => {
+        let statusHtml = '';
+        let actionBtns = '';
+        
+        if (req.status === 'pending') {
+            statusHtml = '<span class="status-pill pending"><i class="fas fa-clock"></i> Pendiente</span>';
+            actionBtns = `
+                <button class="admin-btn-action" style="padding: 6px 10px;" onclick="window.approveRecharge('${req.id}', '${req.uid}', ${req.amount})"><i class="fas fa-check"></i></button>
+                <button class="admin-btn-action danger" style="padding: 6px 10px;" onclick="window.rejectRecharge('${req.id}')"><i class="fas fa-times"></i></button>
+            `;
+        } else if (req.status === 'approved') {
+            statusHtml = '<span class="status-pill delivered"><i class="fas fa-check"></i> Aprobado</span>';
+            actionBtns = '<span style="color:var(--text-secondary);"><i class="fas fa-check"></i></span>';
+        } else if (req.status === 'rejected') {
+            statusHtml = '<span class="status-pill pending" style="background:rgba(244,63,94,0.1); color:var(--accent-red); border-color:rgba(244,63,94,0.3);"><i class="fas fa-times"></i> Rechazado</span>';
+            actionBtns = '<span style="color:var(--text-secondary);"><i class="fas fa-times"></i></span>';
+        }
+        
+        const date = new Date(req.timestamp).toLocaleDateString();
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${date}</td>
+                <td>${req.username || req.email}</td>
+                <td style="font-size:0.85rem; color:var(--text-secondary);">${req.email}</td>
+                <td style="font-weight: bold; color: var(--accent-yellow);">${req.amount.toFixed(2)} MXN</td>
+                <td>${statusHtml}</td>
+                <td style="display: flex; gap: 8px;">${actionBtns}</td>
+            </tr>
+        `;
+    });
+}
+
+window.approveRecharge = async (reqId, uid, amount) => {
+    if(!confirm(\`¿Aprobar recarga de ${amount} MXN?\`)) return;
+    
+    try {
+        // Update request status
+        await updateDoc(doc(db, "recharge_requests", reqId), { status: 'approved' });
+        
+        // Update user balance
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const currentBalance = userSnap.data().balance || 0;
+            await updateDoc(userRef, { balance: currentBalance + amount });
+        }
+        
+        alert("Recarga aprobada y saldo actualizado.");
+        loadAdminRecharges();
+    } catch (e) {
+        console.error(e);
+        alert("Error al aprobar recarga.");
+    }
+};
+
+window.rejectRecharge = async (reqId) => {
+    if(!confirm("¿Rechazar esta solicitud?")) return;
+    
+    try {
+        await updateDoc(doc(db, "recharge_requests", reqId), { status: 'rejected' });
+        alert("Solicitud rechazada.");
+        loadAdminRecharges();
+    } catch (e) {
+        console.error(e);
+        alert("Error al rechazar recarga.");
+    }
+};
+
+// --- sparks.js ---
+﻿// Vanilla JS implementation of ClickSpark and CursorGrid (adapted from React Bits)
+// Theme colors: Purple #5113fa
+
+document.addEventListener("DOMContentLoaded", () => {
+    // ----------------------------------------------------
+    // 1. ClickSpark Implementation
+    // ----------------------------------------------------
+    const sparkCanvas = document.createElement("canvas");
+    sparkCanvas.style.position = "fixed";
+    sparkCanvas.style.top = "0";
+    sparkCanvas.style.left = "0";
+    sparkCanvas.style.width = "100vw";
+    sparkCanvas.style.height = "100vh";
+    sparkCanvas.style.pointerEvents = "none";
+    sparkCanvas.style.zIndex = "99999";
+    document.body.appendChild(sparkCanvas);
+
+    const sparkCtx = sparkCanvas.getContext("2d");
+    let sparks = [];
+    const sparkColor = '#5113fa'; // Purple Eneba
+    const sparkSize = 10;
+    const sparkRadius = 15;
+    const sparkCount = 8;
+    const duration = 400;
+
+    const resizeSparkCanvas = () => {
+        sparkCanvas.width = window.innerWidth;
+        sparkCanvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", resizeSparkCanvas);
+    resizeSparkCanvas();
+
+    const drawSparks = (timestamp) => {
+        sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+        
+        sparks = sparks.filter(spark => {
+            const elapsed = timestamp - spark.startTime;
+            if (elapsed >= duration) return false;
+
+            const progress = elapsed / duration;
+            const eased = progress * (2 - progress); // ease-out
+
+            const distance = eased * sparkRadius;
+            const lineLength = sparkSize * (1 - eased);
+
+            const x1 = spark.x + distance * Math.cos(spark.angle);
+            const y1 = spark.y + distance * Math.sin(spark.angle);
+            const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
+            const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
+
+            sparkCtx.strokeStyle = sparkColor;
+            sparkCtx.lineWidth = 2;
+            sparkCtx.beginPath();
+            sparkCtx.moveTo(x1, y1);
+            sparkCtx.lineTo(x2, y2);
+            sparkCtx.stroke();
+
+            return true;
+        });
+
+        requestAnimationFrame(drawSparks);
+    };
+    requestAnimationFrame(drawSparks);
+
+    document.addEventListener("click", (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        const now = performance.now();
+        
+        const newSparks = Array.from({ length: sparkCount }, (_, i) => ({
+            x,
+            y,
+            angle: (2 * Math.PI * i) / sparkCount,
+            startTime: now
+        }));
+
+        sparks.push(...newSparks);
+    });
+
+    // ----------------------------------------------------
+    // 2. CursorGrid Implementation
+    // ----------------------------------------------------
+    const gridContainer = document.createElement("div");
+    gridContainer.style.position = "fixed";
+    gridContainer.style.top = "0";
+    gridContainer.style.left = "0";
+    gridContainer.style.width = "100vw";
+    gridContainer.style.height = "100vh";
+    gridContainer.style.zIndex = "-1";
+    gridContainer.style.pointerEvents = "none";
+    document.body.appendChild(gridContainer);
+
+    const gridCanvas = document.createElement("canvas");
+    gridCanvas.style.display = "block";
+    gridCanvas.style.width = "100%";
+    gridCanvas.style.height = "100%";
+    gridContainer.appendChild(gridCanvas);
+
+    const ctx = gridCanvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const cellSize = 70;
+    const color = '#5113fa';
+    const radius = 140;
+    const holdTime = 400;
+    const fadeDuration = 800;
+    const lineWidth = 1.2;
+    const maxOpacity = 0.5; // Slightly lower opacity for background subtlety
+    const fillOpacity = 0.05;
+    const gridOpacity = 0.02;
+
+    let cols = 0;
+    let rows = 0;
+    let offX = 0;
+    let offY = 0;
+    let alphas = new Float32Array(0);
+    let touched = new Float64Array(0);
+    let w = 0;
+    let h = 0;
+    let running = false;
+    let lastFrame = 0;
+
+    const rebuildGrid = () => {
+        w = window.innerWidth;
+        h = window.innerHeight;
+        gridCanvas.width = Math.max(1, Math.round(w * dpr));
+        gridCanvas.height = Math.max(1, Math.round(h * dpr));
+        gridCanvas.style.width = `${w}px`;
+        gridCanvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cols = Math.ceil(w / cellSize) + 1;
+        rows = Math.ceil(h / cellSize) + 1;
+        offX = (w - cols * cellSize) / 2;
+        offY = (h - rows * cellSize) / 2;
+        alphas = new Float32Array(cols * rows);
+        touched = new Float64Array(cols * rows);
+    };
+
+    const cellCenter = i => {
+        const cx = offX + (i % cols) * cellSize + cellSize / 2;
+        const cy = offY + Math.floor(i / cols) * cellSize + cellSize / 2;
+        return [cx, cy];
+    };
+
+    const hexToRgb = hex => {
+        const num = parseInt(hex.replace('#', ''), 16);
+        return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    };
+
+    const energize = (x, y) => {
+        const r = Math.max(radius, 1);
+        const now = performance.now();
+        const minCol = Math.max(0, Math.floor((x - r - offX) / cellSize));
+        const maxCol = Math.min(cols - 1, Math.floor((x + r - offX) / cellSize));
+        const minRow = Math.max(0, Math.floor((y - r - offY) / cellSize));
+        const maxRow = Math.min(rows - 1, Math.floor((y + r - offY) / cellSize));
+
+        for (let cRow = minRow; cRow <= maxRow; cRow++) {
+            for (let cCol = minCol; cCol <= maxCol; cCol++) {
+                const i = cRow * cols + cCol;
+                const [cx, cy] = cellCenter(i);
+                const dist = Math.hypot(cx - x, cy - y);
+                if (dist > r) continue;
+                
+                // Smooth falloff
+                const t = 1 - dist / r;
+                const level = (t * t * (3 - 2 * t)) * maxOpacity;
+                
+                if (level > alphas[i]) {
+                    alphas[i] = level;
+                    touched[i] = now;
+                } else if (level > 0) {
+                    touched[i] = now;
+                }
+            }
+        }
+    };
+
+    const drawGrid = now => {
+        const dt = Math.min(now - lastFrame, 50);
+        lastFrame = now;
+        ctx.clearRect(0, 0, w, h);
+        const [cr, cg, cb] = hexToRgb(color);
+
+        // Grid opacity lattice
+        if (gridOpacity > 0) {
+            ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, ${gridOpacity})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let cCol = 0; cCol <= cols; cCol++) {
+                const x = Math.round(offX + cCol * cellSize) + 0.5;
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+            }
+            for (let cRow = 0; cRow <= rows; cRow++) {
+                const y = Math.round(offY + cRow * cellSize) + 0.5;
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+            }
+            ctx.stroke();
+        }
+
+        let anyVisible = false;
+        const fadeStep = dt / Math.max(fadeDuration, 16);
+        const half = cellSize / 2;
+
+        for (let i = 0; i < alphas.length; i++) {
+            let a = alphas[i];
+            if (a <= 0) continue;
+            if (now - touched[i] > holdTime) {
+                a = Math.max(0, a - fadeStep);
+                alphas[i] = a;
+                if (a <= 0) continue;
+            }
+            anyVisible = true;
+
+            const [cx, cy] = cellCenter(i);
+            const gradient = ctx.createRadialGradient(cx, cy, half * 0.1, cx, cy, cellSize);
+            gradient.addColorStop(0, `rgba(${cr}, ${cg}, ${cb}, ${a})`);
+            gradient.addColorStop(1, `rgba(${cr}, ${cg}, ${cb}, 0)`);
+
+            const x = cx - half + 0.5;
+            const y = cy - half + 0.5;
+            const s = cellSize - 1;
+
+            ctx.beginPath();
+            ctx.rect(x, y, s, s);
+            if (fillOpacity > 0) {
+                ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${a * fillOpacity})`;
+                ctx.fill();
+            }
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        if (anyVisible || gridOpacity > 0) {
+            requestAnimationFrame(drawGrid);
+        } else {
+            running = false;
+        }
+    };
+
+    const wakeGrid = () => {
+        if (running) return;
+        running = true;
+        lastFrame = performance.now();
+        requestAnimationFrame(drawGrid);
+    };
+
+    window.addEventListener("pointermove", (e) => {
+        energize(e.clientX, e.clientY);
+        wakeGrid();
+    });
+
+    window.addEventListener("resize", rebuildGrid);
+    rebuildGrid();
+    wakeGrid();
+});
+
+
+// --- wishlist.js ---
+﻿
+
+
+// Global wishlist state for quick UI updates
+let currentUserWishlist = [];
+
+export const initWishlist = () => {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                currentUserWishlist = userSnap.data().wishlist || [];
+                updateAllWishlistIcons();
+            }
+        } else {
+            currentUserWishlist = [];
+            updateAllWishlistIcons();
+        }
+    });
+};
+
+export const toggleWishlist = async (productId) => {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Debes iniciar sesión para añadir a favoritos.");
+        window.location.href = "perfil.html";
+        return;
+    }
+
+    const isWished = currentUserWishlist.includes(productId);
+    const userRef = doc(db, "users", user.uid);
+
+    try {
+        if (isWished) {
+            // Remove
+            await updateDoc(userRef, {
+                wishlist: arrayRemove(productId)
+            });
+            currentUserWishlist = currentUserWishlist.filter(id => id !== productId);
+        } else {
+            // Add
+            await updateDoc(userRef, {
+                wishlist: arrayUnion(productId)
+            });
+            currentUserWishlist.push(productId);
+        }
+        updateAllWishlistIcons();
+    } catch (error) {
+        console.error("Error toggling wishlist:", error);
+    }
+};
+
+const updateAllWishlistIcons = () => {
+    const buttons = document.querySelectorAll('.wishlist-btn');
+    buttons.forEach(btn => {
+        const pid = btn.dataset.productid;
+        if (currentUserWishlist.includes(pid)) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="far fa-heart"></i>';
+        }
+    });
+};
+
+// Make it available globally for inline onclick handlers if needed
+window.toggleWishlist = toggleWishlist;
+
+document.addEventListener("DOMContentLoaded", initWishlist);
+
+
+// --- INLINE SCRIPT FROM producto.html ---
+
+        
+        
+
+        let product = null;
+        let userData = null;
+        let stockStatus = 'disponible'; // Default
+        let defaultCredentials = '';
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (!id) {
+                document.getElementById('prodName').textContent = 'Producto no encontrado';
+                return;
+            }
+
+            // Fetch Product from Firestore
+            try {
+                const prodDoc = await getDoc(doc(db, "products", String(id)));
+                if(prodDoc.exists()) {
+                    product = prodDoc.data();
+                    // We must attach id to the product object manually if it's not inside data()
+                    product.id = prodDoc.id;
+                } else if (typeof products !== 'undefined') {
+                    // Fallback to local products.js if DB is completely empty (before admin seeded)
+                    product = products.find(p => String(p.id) === String(id));
+                }
+            } catch(e) {
+                console.error(e);
+                if (typeof products !== 'undefined') {
+                    product = products.find(p => String(p.id) === String(id));
+                }
+            }
+
+            if (!product) {
+                document.getElementById('prodName').textContent = 'Producto no encontrado';
+                return;
+            }
+
+            // Fill UI basic details
+            document.getElementById('prodName').textContent = product.name;
+            document.getElementById('prodDesc').textContent = product.description;
+            document.getElementById('prodPrice').innerHTML = `${product.price.toFixed(2)} <span style="font-size:1rem; color:var(--text-secondary);">MXN</span>`;
+            document.getElementById('prodImage').src = product.image;
+            document.getElementById('prodCategory').textContent = product.category;
+
+            // Fetch Real-time Stock Config from Firestore
+            try {
+                const stockDoc = await getDoc(doc(db, "products_stock", String(product.id)));
+                if(stockDoc.exists()) {
+                    stockStatus = stockDoc.data().status || 'disponible';
+                    defaultCredentials = stockDoc.data().credentialsPool || '';
+                }
+            } catch(e) {
+                console.error("Error fetching stock configuration:", e);
+            }
+
+            renderStockBadge();
+
+            // Listen to auth
+            onAuthStateChanged(auth, async (user) => {
+                const buyBtn = document.getElementById('buyButton');
+                const balanceText = document.getElementById('userBalanceText');
+                
+                if (user) {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        userData.uid = user.uid;
+                        balanceText.innerHTML = `Tu Saldo: <strong>${userData.balance.toFixed(2)} MXN</strong>`;
+                        
+                        updateBuyButtonState();
+                    }
+                } else {
+                    balanceText.textContent = "Inicia sesión para comprar";
+                    buyBtn.textContent = "Iniciar sesión para comprar";
+                    buyBtn.disabled = false;
+                    buyBtn.onclick = () => window.location.href = 'perfil.html';
+                }
+            });
+        });
+
+        const renderStockBadge = () => {
+            const container = document.getElementById('stockBadgeContainer');
+            let badgeClass = 'stock-disponible';
+            let label = 'Disponible';
+
+            const lines = defaultCredentials.split('\n').filter(l => l.trim() !== '');
+            const count = lines.length;
+
+            if (count > 0) {
+                label = `En Stock (${count})`;
+                badgeClass = 'stock-disponible';
+            } else if (stockStatus === 'bajo_pedido') {
+                badgeClass = 'stock-bajo-pedido';
+                label = 'Bajo pedido';
+            } else if (stockStatus === 'agotado') {
+                badgeClass = 'stock-agotado';
+                label = 'Agotado';
+            }
+
+            container.innerHTML = `<span class="stock-badge ${badgeClass}">${label}</span>`;
+        };
+
+        const updateBuyButtonState = () => {
+            const buyBtn = document.getElementById('buyButton');
+            const balanceInputContainer = document.getElementById('balanceSelectorContainer');
+            const balanceInput = document.getElementById('balanceToUseInput');
+            
+            if (stockStatus === 'agotado') {
+                buyBtn.textContent = "PRODUCTO AGOTADO";
+                buyBtn.disabled = true;
+                buyBtn.onclick = null;
+                balanceInputContainer.style.display = 'none';
+                return;
+            }
+
+            buyBtn.disabled = false;
+
+            const price = product.price;
+            const balance = userData ? userData.balance : 0;
+
+            if (balance > 0) {
+                balanceInputContainer.style.display = 'block';
+                
+                // Max balance they can use is either their full balance, or the price of the product
+                const maxUsable = Math.min(balance, price);
+                balanceInput.max = maxUsable;
+                
+                // Default to max usable on first load
+                if(!balanceInput.dataset.initialized) {
+                    balanceInput.value = maxUsable;
+                    balanceInput.dataset.initialized = 'true';
+                }
+                
+                // Add event listener to update dynamic button text
+                balanceInput.addEventListener('input', () => {
+                    let val = parseFloat(balanceInput.value);
+                    if(isNaN(val)) val = 0;
+                    if(val < 0) balanceInput.value = 0;
+                    if(val > maxUsable) balanceInput.value = maxUsable;
+                    updateBuyButtonText();
+                });
+            } else {
+                balanceInputContainer.style.display = 'none';
+            }
+            
+            updateBuyButtonText();
+        };
+
+        const updateBuyButtonText = () => {
+            const buyBtn = document.getElementById('buyButton');
+            const price = product.price;
+            const balanceInput = document.getElementById('balanceToUseInput');
+            
+            let val = parseFloat(balanceInput.value) || 0;
+            
+            const handleBuyClick = (metodo, amt) => {
+                const termsCheckbox = document.getElementById('buyTermsCheckbox');
+                if (!termsCheckbox.checked) {
+                    alert("Debes aceptar los términos y condiciones antes de comprar.");
+                    return;
+                }
+                procesarCompra(metodo, amt);
+            };
+
+            if (!userData || userData.balance === 0) {
+                buyBtn.textContent = "PAGAR CON TRANSFERENCIA BANCARIA";
+                buyBtn.onclick = () => handleBuyClick('transferencia', 0);
+            } else if (val === price) {
+                buyBtn.textContent = `COMPRAR CON SALDO (${price.toFixed(2)} MXN)`;
+                buyBtn.onclick = () => handleBuyClick('saldo', val);
+            } else if (val > 0) {
+                const restante = price - val;
+                buyBtn.textContent = `COMBINAR: ${val.toFixed(2)} Saldo + ${restante.toFixed(2)} Transf.`;
+                buyBtn.onclick = () => handleBuyClick('combinado', val);
+            } else {
+                buyBtn.textContent = "PAGAR CON TRANSFERENCIA BANCARIA";
+                buyBtn.onclick = () => handleBuyClick('transferencia', 0);
+            }
+        };
+
+        const procesarCompra = async (metodo, balanceUsed, giftFriendUid = null, giftMessage = '') => {
+            const buyBtn = document.getElementById('buyButton');
+            buyBtn.disabled = true;
+            buyBtn.textContent = "Procesando pedido...";
+
+            try {
+                const balance = userData.balance;
+                const price = product.price;
+
+                let finalStatus = 'pendiente';
+                let finalDeliveredText = '';
+                
+                // Subtract exactly the amount the user selected
+                const finalBalance = balance - balanceUsed;
+
+                // Create Order document in Firestore
+                const orderData = {
+                    uid: giftFriendUid ? giftFriendUid : userData.uid, // Assigner
+                    giftedBy: giftFriendUid ? userData.uid : null, // Sender
+                    giftMessage: giftMessage,
+                    userEmail: userData.email, // Kept for contact reference
+                    productId: product.id,
+                    productName: product.name,
+                    price: price,
+                    balanceUsed: balanceUsed,
+                    status: finalStatus,
+                    textDelivered: finalDeliveredText,
+                    method: metodo,
+                    timestamp: Date.now()
+                };
+
+                await addDoc(collection(db, "orders"), orderData);
+
+                // Update User Balance in Firestore
+                if (balanceUsed > 0) {
+                    await updateDoc(doc(db, "users", userData.uid), {
+                        balance: finalBalance
+                    });
+                }
+
+                // Notify User and Redirect based on payment method
+                if (window.showHamsterLoading) {
+                    window.showHamsterLoading('Procesando tu pedido...');
+                }
+
+                if (metodo === 'saldo') {
+                    // Fully paid with balance - no transfer needed
+                    buyBtn.style.background = "var(--accent-green)";
+                    buyBtn.textContent = "¡Pedido Registrado con Éxito!";
+                    
+                    // Show a sleek toast or prompt
+                    const toast = document.createElement('div');
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.background = 'rgba(0, 210, 106, 0.9)';
+                    toast.style.color = '#white';
+                    toast.style.padding = '16px 24px';
+                    toast.style.borderRadius = '12px';
+                    toast.style.zIndex = '9999999';
+                    toast.style.backdropFilter = 'blur(10px)';
+                    toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                    toast.style.fontWeight = '600';
+                    toast.innerHTML = '<i class="fas fa-check-circle"></i> Compra realizada. Redirigiendo a tu perfil para ver tu entrega...';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'perfil.html';
+                    }, 3500);
+                } else {
+                    // Bank transfer or combined - needs WhatsApp confirmation
+                    let whatsText = `Hola, he realizado un pedido en GhostKey:%0A`;
+                    whatsText += `🛒 *${product.name}*%0A`;
+                    whatsText += `💰 Método de pago: *${metodo.toUpperCase()}*%0A`;
+                    
+                    if (metodo === 'combinado') {
+                        const restante = price - balanceUsed;
+                        whatsText += `💵 Combinado: Utilicé ${balanceUsed.toFixed(2)} MXN de mi saldo y transferí el restante de *${restante.toFixed(2)} MXN*.%0A`;
+                    } else if (metodo === 'transferencia') {
+                        whatsText += `💵 Total a transferir: *${price.toFixed(2)} MXN*.%0A`;
+                    }
+                    
+                    whatsText += `👤 Email: *${userData.email}*%0A`;
+                    whatsText += `Adjunto mi comprobante para la entrega.`;
+
+                    buyBtn.style.background = "var(--accent-yellow)";
+                    buyBtn.style.color = "black";
+                    buyBtn.textContent = "Redirigiendo a WhatsApp...";
+                    
+                    setTimeout(() => {
+                        window.location.href = `https://wa.me/525574123521?text=${whatsText}`;
+                    }, 3500);
+                }
+
+            } catch(error) {
+                alert("Error al procesar la compra: " + error.message);
+            }
+        };
+
+        // --- Gifting Logic ---
+        document.getElementById('giftButton').addEventListener('click', async () => {
+            document.getElementById('giftModal').classList.add('active');
+            const select = document.getElementById('giftFriendSelect');
+            select.innerHTML = '<option value="">Cargando amigos...</option>';
+            
+            try {
+                const q1 = query(collection(db, "friendships"), where("uid1", "==", userData.uid), where("status", "==", "accepted"));
+                const q2 = query(collection(db, "friendships"), where("uid2", "==", userData.uid), where("status", "==", "accepted"));
+                
+                const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+                let friends = [];
+                s1.forEach(doc => friends.push({ ...doc.data() }));
+                s2.forEach(doc => friends.push({ ...doc.data() }));
+                
+                select.innerHTML = '<option value="">Selecciona un amigo</option>';
+                for (const f of friends) {
+                    const friendUid = (f.uid1 === userData.uid) ? f.uid2 : f.uid1;
+                    const friendDoc = await getDoc(doc(db, "users", friendUid));
+                    if (friendDoc.exists()) {
+                        const fname = friendDoc.data().username || friendDoc.data().email;
+                        select.innerHTML += `<option value="${friendUid}">${fname}</option>`;
+                    }
+                }
+                
+                if (friends.length === 0) {
+                    select.innerHTML = '<option value="">No tienes amigos agregados</option>';
+                }
+            } catch(e) {
+                console.error(e);
+                select.innerHTML = '<option value="">Error al cargar amigos</option>';
+            }
+        });
+
+        window.closeGiftModal = () => {
+            document.getElementById('giftModal').classList.remove('active');
+        };
+
+        document.getElementById('confirmGiftBtn').addEventListener('click', () => {
+            const friendUid = document.getElementById('giftFriendSelect').value;
+            const message = document.getElementById('giftMessageInput').value.trim();
+            
+            if (!friendUid) {
+                alert("Debes seleccionar a un amigo.");
+                return;
+            }
+            
+            const balanceUsed = parseFloat(document.getElementById('balanceToUseInput').value) || 0;
+            // Determine payment method
+            const price = product.price;
+            let metodo = 'transferencia';
+            if (balanceUsed === price) metodo = 'saldo';
+            else if (balanceUsed > 0) metodo = 'combinado';
+            
+            procesarCompra(metodo, balanceUsed, friendUid, message);
+            closeGiftModal();
+        });
+
+        // Add gifting params to procesarCompra
+        // We will modify the previous procesarCompra to handle gifted orders
+// --- INLINE SCRIPT FROM comprar.html ---
+gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+            gsap.to(elem, {
+                scrollTrigger: { trigger: elem, scroller: ".content-scroll", start: "top 85%" },
+                opacity: 1, y: 0, duration: 0.8, ease: "power3.out"
+            });
+        });
+// --- INLINE SCRIPT FROM contacto.html ---
+gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+            gsap.to(elem, {
+                scrollTrigger: { trigger: elem, scroller: ".content-scroll", start: "top 85%" },
+                opacity: 1, y: 0, duration: 0.8, ease: "power3.out"
+            });
+        });
+// --- PREVIOUS INLINE SCRIPTS ---
+
+
+
 
 
 // --- CATALOGO JS ---
@@ -1001,7 +3563,9 @@ function switchAdminTab(tabId) {
             });
         }
 
+
 </script>
+
 
     <!-- Hamster Loading Modal -->
     <div class="page-loader-overlay" id="hamster-loader" style="display:none; flex-direction:column; gap:20px;">
