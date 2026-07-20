@@ -62,38 +62,52 @@ function injectNavigation() {
             <nav class="nav-menu">
                 ${navLinksHtml}
             </nav>
-            <div class="sidebar-section-title" style="margin-top:10px;">My apps</div>
-            <div class="fast-launch" style="flex: none; margin-bottom: 20px;">
-                <div class="game-item" onclick="window.location.href='catalogo.html?filter=vbucks'">
-                    <div style="width:24px; height:24px; border-radius:6px; background:#1e293b; display:flex; align-items:center; justify-content:center; color:#3b82f6; font-weight:bold; font-size:12px;">V</div>
-                    <span class="game-name" style="font-size:0.85rem;">V-Bucks</span>
-                </div>
-                <div class="game-item" onclick="window.location.href='catalogo.html?filter=discord'">
-                    <div style="width:24px; height:24px; border-radius:6px; background:#ef4444; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"><i class="fab fa-discord"></i></div>
-                    <span class="game-name" style="font-size:0.85rem;">Discord Nitro</span>
-                </div>
-            </div>
-            
-            <div class="sidebar-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="sidebar-section-title" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                 <span>My favorites</span>
                 <i class="fas fa-plus" style="cursor:pointer; padding:5px;"></i>
             </div>
-            <div class="fast-launch">
-                <div class="game-item" onclick="window.location.href='catalogo.html?filter=crew'">
+            <div class="fast-launch" style="flex: none; margin-bottom: 20px;">
+                <div class="game-item" onclick="pageTransitionTo('catalogo.html?filter=crew')">
                     <img src="https://i.imgur.com/3XpcBuu.png" class="game-icon" style="border-radius:6px; width:28px; height:28px;" alt="Crew">
                     <div style="display:flex; flex-direction:column; line-height:1.2;">
                         <span class="game-name" style="font-size:0.85rem;">Fortnite Crew</span>
                         <span style="font-size:0.7rem; color:var(--text-secondary);">Game</span>
                     </div>
                 </div>
-                <div class="game-item">
-                    <div style="width:28px; height:28px; border-radius:6px; background:#8b5cf6; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"><i class="fas fa-ghost"></i></div>
-                    <div style="display:flex; flex-direction:column; line-height:1.2; flex:1;">
-                        <span class="game-name" style="font-size:0.85rem;">Premium</span>
-                        <span style="font-size:0.7rem; color:var(--text-secondary);">Service</span>
-                    </div>
-                    <span style="background:var(--accent-red); color:white; font-size:10px; padding:2px 6px; border-radius:10px;">2</span>
+            </div>
+            
+            <!-- Friends UI Integrated into Left Sidebar -->
+            <div class="friends-sidebar-content" style="flex:1; display:flex; flex-direction:column; overflow:hidden; min-height: 250px;">
+                <div class="tabs" style="display:flex; gap:15px; font-weight:600; font-size:0.9rem; margin-bottom:10px;">
+                    <span class="tab active" id="tabFriends" style="cursor:pointer; color:var(--text-primary);">Friends <span class="friends-req-badge" id="badgeFriends" style="display:none;">0</span></span>
+                    <span class="tab" id="tabRequests" style="cursor:pointer; color:var(--text-secondary);">Requests <span class="badge-red friends-req-badge" id="badgeRequests" style="background:rgba(244,63,94,0.2); color:#f43f5e; padding:2px 6px; border-radius:10px; font-size:0.75rem; display:none;">0</span></span>
                 </div>
+                
+                <div class="search-friend-bar" style="display:flex; align-items:center; gap:10px; margin-bottom: 15px;">
+                    <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:10px; padding:8px 12px; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-search" style="color:var(--text-secondary); font-size:0.8rem;"></i>
+                        <input type="text" id="friendSearchInput" placeholder="Search a friend" style="background:transparent; border:none; color:white; font-size:0.85rem; outline:none; width:100%;">
+                    </div>
+                    <div style="width:32px; height:32px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;" id="addFriendBtn">
+                        <i class="fas fa-user-plus" style="color:var(--text-secondary); font-size:0.8rem;"></i>
+                    </div>
+                </div>
+
+                <div class="friends-category" style="flex:1; overflow-y:auto; overflow-x:hidden;">
+                    <div class="friends-list" id="friendsListContainer">
+                        <div style="text-align:center; margin-top:20px; color:rgba(255,255,255,0.5);">Cargando...</div>
+                    </div>
+                </div>
+                
+                <div class="friends-category" id="requestsListContainer" style="display:none; flex:1; overflow-y:auto; overflow-x:hidden;">
+                    <div class="friends-list"></div>
+                </div>
+            </div>
+
+            <div class="referral-box" style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.02); border-radius:12px; text-align:center; border-top:1px solid rgba(255,255,255,0.05);">
+                <h4 style="margin:0 0 10px 0; font-size:0.9rem; color:#a78bfa;"><i class="fas fa-gift"></i> Gana 3% de Comisi&oacute;n</h4>
+                <p style="margin:0 0 15px 0; font-size:0.8rem; color:var(--text-secondary);">Invita a un amigo y gana cr&eacute;ditos.</p>
+                <button class="btn btn-blue" id="copyReferralBtn" style="width:100%; font-size:0.8rem;">Copiar Link</button>
             </div>
         </aside>
     `;
@@ -113,7 +127,6 @@ function injectNavigation() {
         const cleanHref = item.href.split('?')[0];
         let isActive = cleanPath.includes(cleanHref) ? 'active' : '';
         
-        // Special case handling to avoid double activation on Wishlist and Biblioteca
         if (cleanHref === 'perfil.html') {
             const isWishlistTab = window.location.search.includes('tab=wishlist') || window.location.hash === '#wishlist';
             if (item.label === 'Wishlist') {
@@ -124,7 +137,7 @@ function injectNavigation() {
         }
 
         dockLinksHtml += `
-            <a href="${item.href}" class="dock-item ${isActive}">
+            <a href="javascript:void(0)" onclick="pageTransitionTo('${item.href}')" class="dock-item ${isActive}">
                 <div class="dock-icon"><i class="${item.icon}"></i></div>
             </a>
         `;
@@ -140,7 +153,6 @@ function injectNavigation() {
     const mainContent = document.querySelector('.main-content');
     
     if (appContainer) {
-        // Remove old sidebars if any
         document.querySelectorAll('.sidebar, .mobile-dock').forEach(e => {
             if (!e.classList.contains('left-sidebar') && !e.classList.contains('right-sidebar')) {
                 e.remove();
@@ -149,17 +161,70 @@ function injectNavigation() {
             }
         });
         
-        // Remove left sidebar if it already exists to avoid duplicates
         document.querySelectorAll('.sidebar.left-sidebar').forEach(e => e.remove());
         
-        // Insert left sidebar before main content
         if (mainContent) {
             appContainer.insertAdjacentHTML('afterbegin', leftSidebarHtml);
         }
         
-        // Insert mobile dock at body end
         document.body.insertAdjacentHTML('beforeend', dockHtml);
+        
+        // Dispatch event so friends.js knows DOM is ready
+        window.dispatchEvent(new Event('sidebarLoaded'));
     }
 }
 
-document.addEventListener("DOMContentLoaded", injectNavigation);
+// Intercept Links for Transitions
+window.pageTransitionTo = function(href) {
+    if (window.location.href.includes(href)) return;
+    
+    // Animate out based on current page
+    const content = document.querySelector('.gsap-reveal') || document.querySelector('.content-scroll');
+    if (content && window.gsap) {
+        gsap.to(content, { y: 20, opacity: 0, duration: 0.3, ease: "power2.inOut", onComplete: () => {
+            window.location.href = href;
+        }});
+    } else {
+        window.location.href = href;
+    }
+};
+
+// Global Page Load Animation
+function animatePageIn() {
+    const pageLoader = document.getElementById('page-loader');
+    if (pageLoader) {
+        pageLoader.classList.add('hidden');
+        setTimeout(() => pageLoader.remove(), 500);
+    }
+    
+    const content = document.querySelector('.gsap-reveal') || document.querySelector('.content-scroll');
+    if (content && window.gsap) {
+        // Different animation depending on page context
+        let yOffset = 40;
+        let scale = 1;
+        if (window.location.pathname.includes('catalogo')) {
+            yOffset = 0; scale = 0.95; // Zoom out effect for catalog
+        } else if (window.location.pathname.includes('perfil')) {
+            yOffset = -40; // Drop down effect for profile
+        }
+        
+        gsap.fromTo(content, 
+            { y: yOffset, scale: scale, opacity: 0 }, 
+            { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }
+        );
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    injectNavigation();
+    
+    // Override nav links inside the sidebar to use transition
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            pageTransitionTo(link.getAttribute('href'));
+        });
+    });
+
+    animatePageIn();
+});

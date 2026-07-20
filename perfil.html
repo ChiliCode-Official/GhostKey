@@ -428,6 +428,19 @@
     </style>
 </head>
 <body>
+    <!-- Page Loader -->
+    <div class="page-loader-overlay" id="page-loader">
+        <div class="loader">
+            <svg viewBox="0 0 80 80"><circle r="32" cy="40" cx="40" id="test"></circle></svg>
+        </div>
+        <div class="loader triangle">
+            <svg viewBox="0 0 86 80"><polygon points="43 8 79 72 7 72"></polygon></svg>
+        </div>
+        <div class="loader">
+            <svg viewBox="0 0 80 80"><rect height="64" width="64" y="8" x="8"></rect></svg>
+        </div>
+    </div>
+
     <div class="app-container">
 
         <main class="main-content">
@@ -436,8 +449,11 @@
                     <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer;" title="Amigos">
                         <i class="fas fa-user-friends"></i>
                     </div>
-                    <div class="icon-btn" onclick="window.location.href='index.html'" style="cursor:pointer;">
+                    <div class="icon-btn" onclick="pageTransitionTo('index.html')" style="cursor:pointer;">
                         <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="user-profile" onclick="pageTransitionTo('perfil.html')" style="cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--accent-blue);">
+                        <img src="https://i.imgur.com/S00u4EI.png" id="globalUserAvatar" alt="User" class="user-avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                     </div>
                 </div>
             </header>
@@ -469,7 +485,10 @@
                     <div id="userDashboard" class="dashboard-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap:16px;">
                             <h2 style="font-size: 2rem; font-weight: 800;"><i class="fas fa-user-circle" style="color:var(--accent-blue);"></i> Mi Cuenta</h2>
-                            <button id="logoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="admin-btn-action secondary" onclick="document.getElementById('profileSettingsModal').classList.add('active'); window.openProfileSettings();"><i class="fas fa-cog"></i> Ajustes</button>
+                                <button id="logoutBtn" class="admin-btn-action secondary"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                            </div>
                         </div>
                         
                         <div class="dashboard-grid">
@@ -775,6 +794,22 @@
         </main>
     </div>
 
+    <!-- Profile Settings Modal -->
+    <div class="admin-modal-overlay" id="profileSettingsModal">
+        <div class="admin-modal">
+            <div class="admin-modal-header">Ajustes de Perfil</div>
+            <div class="admin-modal-body">
+                <label class="admin-label">Nombre de Usuario</label>
+                <input type="text" id="settingsUsername" class="admin-input-styled" placeholder="Escribe tu nuevo nombre">
+                <p style="color:var(--text-secondary); font-size:0.8rem; margin-top:10px;">Este nombre será visible para tus amigos y en tu lista de referidos.</p>
+            </div>
+            <div class="admin-modal-footer">
+                <button class="admin-btn-action secondary" onclick="document.getElementById('profileSettingsModal').classList.remove('active')"><i class="fas fa-times"></i> Cancelar</button>
+                <button class="admin-btn-action" onclick="window.saveProfileSettings()"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Apple-style Admin Delivery Modal -->
     <div class="admin-modal-overlay" id="deliveryModal">
         <div class="admin-modal">
@@ -798,7 +833,6 @@
     </div>
 
     <script src="sparks.js"></script>
-    <script src="products.js"></script>
     <script src="navigation.js"></script>
     <script type="module" src="wishlist.js"></script>
     <script type="module" src="friends.js"></script>

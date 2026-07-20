@@ -55,21 +55,7 @@ body::before, body::after {
     grid-template-columns: 80px 1fr 0px;
 }
 
-.app-container.friends-active {
-    grid-template-columns: 240px 1fr 280px;
-}
-
-.app-container.sidebar-collapsed.friends-active {
-    grid-template-columns: 80px 1fr 280px;
-}
-
-.app-container.friends-active .sidebar.right-sidebar {
-    width: auto;
-    opacity: 1;
-    pointer-events: auto;
-    padding: 24px 20px;
-    border-left: 1px solid var(--border-color);
-}
+/* Left Sidebar Mobile Active Grid Setup isn't needed for desktop, it's just standard 2 columns. */
 
 /* --- Sidebar --- */
 .sidebar {
@@ -88,14 +74,7 @@ body::before, body::after {
 .sidebar.left-sidebar {
     border-right: 1px solid var(--border-color);
 }
-.sidebar.right-sidebar {
-    border-left: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
-    padding: 0;
-}
+/* No right sidebar anymore */
 .sidebar::-webkit-scrollbar { width: 0; }
 
 
@@ -1180,9 +1159,8 @@ body::before, body::after {
 
 @media (max-width: 1024px) {
     .app-container {
-        grid-template-columns: 80px 1fr; /* Hide right sidebar on mobile/tablet */
+        grid-template-columns: 80px 1fr;
     }
-    .right-sidebar { display: none; }
 }
 
 @media (max-width: 768px) {
@@ -1192,8 +1170,23 @@ body::before, body::after {
         height: auto;
         min-height: 100vh;
     }
-    .left-sidebar { display: none; } /* Hide left sidebar on mobile */
-    .right-sidebar { display: none; } /* Hide right sidebar on mobile */
+    .left-sidebar { 
+        display: none; 
+    } 
+    /* Overlay for left sidebar on mobile */
+    .app-container.left-sidebar-mobile-active .left-sidebar {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 9999;
+        background: var(--bg-dark);
+        border-right: 1px solid var(--border-color);
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+    }
+    
     .mobile-only { display: block; }
     
     .main-content { border-radius: 0; border: none; padding-bottom: 100px; min-height: 100vh; background: transparent; }

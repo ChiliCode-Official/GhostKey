@@ -13,6 +13,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
+    <!-- Page Loader -->
+    <div class="page-loader-overlay" id="page-loader">
+        <div class="loader">
+            <svg viewBox="0 0 80 80"><circle r="32" cy="40" cx="40" id="test"></circle></svg>
+        </div>
+        <div class="loader triangle">
+            <svg viewBox="0 0 86 80"><polygon points="43 8 79 72 7 72"></polygon></svg>
+        </div>
+        <div class="loader">
+            <svg viewBox="0 0 80 80"><rect height="64" width="64" y="8" x="8"></rect></svg>
+        </div>
+    </div>
+
     <div class="app-container">
 
         <main class="main-content">
@@ -26,11 +39,11 @@
                     <div class="icon-btn" onclick="window.toggleFriendsSidebar()" style="cursor:pointer;" title="Amigos">
                         <i class="fas fa-user-friends"></i>
                     </div>
-                    <div class="icon-btn" onclick="window.location.href='index.html'" style="cursor:pointer;">
+                    <div class="icon-btn" onclick="pageTransitionTo('index.html')" style="cursor:pointer;">
                         <i class="fas fa-arrow-left"></i>
                     </div>
-                    <div class="user-profile" onclick="window.location.href='perfil.html'" style="cursor:pointer;">
-                        <img src="https://i.imgur.com/S00u4EI.png" alt="User" class="user-avatar" style="background:var(--accent-blue);">
+                    <div class="user-profile" onclick="pageTransitionTo('perfil.html')" style="cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--accent-blue);">
+                        <img src="https://i.imgur.com/S00u4EI.png" id="globalUserAvatar" alt="User" class="user-avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                     </div>
                 </div>
             </header>
