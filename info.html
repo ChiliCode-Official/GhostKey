@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Virtual - Información</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="index.html" class="brand-logo">GKey</a>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link"><i class="fa-solid fa-gamepad"></i></a>
+                </li>
+                <li class="nav-item active">
+                    <a href="perfil.html" class="nav-link"><i class="fa-solid fa-user"></i></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" style="grid-column: 2 / span 2;">
+            <header class="top-bar">
+                <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+            </header>
+
+            <section style="margin-top: 1rem; max-width: 800px;">
+                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">Centro de Ayuda</h1>
+                
+                <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-users"></i> Sistema de Referidos</h2>
+                    <p style="margin-bottom: 1rem; line-height: 1.6;">Invita a tus amigos a unirse y gana saldo gratis. Por cada compra que realice un amigo invitado por ti, tú recibirás el <strong>3%</strong> del valor de su compra en créditos directamente a tu saldo.</p>
+                    <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
+                        <strong>Tu Link de Referido:</strong>
+                        <p style="color: var(--warning); margin-top: 5px;">Inicia sesión para ver tu enlace único.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-wallet"></i> Pagos y Recargas</h2>
+                    <p style="margin-bottom: 1rem; line-height: 1.6;">Para comprar en la tienda, primero debes recargar tu Saldo Virtual. Ve a tu Perfil, elige un monto, y el sistema te redirigirá a WhatsApp con las instrucciones de pago (Transferencia, OXXO, etc.). Una vez que el administrador verifique tu pago, tu saldo se reflejará al instante.</p>
+                </div>
+
+                <div class="glass-panel" style="padding: 2rem;">
+                    <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-box-open"></i> Entrega de Productos</h2>
+                    <ul style="line-height: 1.8; margin-left: 20px;">
+                        <li><strong>Disponible:</strong> La entrega del correo, contraseña o código es inmediata tras la compra.</li>
+                        <li><strong>Bajo pedido:</strong> El producto se entregará en un par de horas, el administrador procesará tu pedido y verás la entrega en tu historial de compras.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
