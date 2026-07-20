@@ -20,20 +20,43 @@
 <body>
     <!-- Page Loader -->
     <div class="page-loader-overlay" id="page-loader">
-        <div class="loader">
-            <svg viewBox="0 0 80 80">
-                <circle r="32" cy="40" cx="40" id="test"></circle>
-            </svg>
-        </div>
-        <div class="loader triangle">
-            <svg viewBox="0 0 86 80">
-                <polygon points="43 8 79 72 7 72"></polygon>
-            </svg>
-        </div>
-        <div class="loader">
-            <svg viewBox="0 0 80 80">
-                <rect height="64" width="64" y="8" x="8"></rect>
-            </svg>
+        <div id="ghost">
+          <div id="red">
+            <div id="pupil"></div>
+            <div id="pupil1"></div>
+            <div id="eye"></div>
+            <div id="eye1"></div>
+            <div id="top0"></div>
+            <div id="top1"></div>
+            <div id="top2"></div>
+            <div id="top3"></div>
+            <div id="top4"></div>
+            <div id="st0"></div>
+            <div id="st1"></div>
+            <div id="st2"></div>
+            <div id="st3"></div>
+            <div id="st4"></div>
+            <div id="st5"></div>
+            <div id="an1"></div>
+            <div id="an2"></div>
+            <div id="an3"></div>
+            <div id="an4"></div>
+            <div id="an5"></div>
+            <div id="an6"></div>
+            <div id="an7"></div>
+            <div id="an8"></div>
+            <div id="an9"></div>
+            <div id="an10"></div>
+            <div id="an11"></div>
+            <div id="an12"></div>
+            <div id="an13"></div>
+            <div id="an14"></div>
+            <div id="an15"></div>
+            <div id="an16"></div>
+            <div id="an17"></div>
+            <div id="an18"></div>
+          </div>
+          <div id="shadow"></div>
         </div>
     </div>
 
@@ -677,7 +700,19 @@
 
 
 <!-- INJECTED SPA SCRIPTS -->
+<script>
+window.runWhenReady = function(cb) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', cb);
+    } else {
+        cb();
+    }
+};
+</script>
+
 <script type="module">
+
+
 import { auth, db, app, googleProvider } from "./firebase-config.js";
 import { onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1285,7 +1320,7 @@ window.toggleFriendsSidebar = () => {
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
+runWhenReady(() => {
     // 1. GSAP Animations with container scroller fix
     gsap.registerPlugin(ScrollTrigger);
 
@@ -1719,14 +1754,16 @@ window.switchView = function(viewIdOrHref) {
 
 window.pageTransitionTo = window.switchView;
 
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
     injectNavigation();
     const pageLoader = document.getElementById('page-loader');
     if (pageLoader) {
         pageLoader.classList.add('hidden');
         setTimeout(() => pageLoader.remove(), 500);
     }
-});
+}
+
+runWhenReady(initApp);
 
 // --- perfil.js ---
 
@@ -2545,7 +2582,7 @@ window.rejectRecharge = async (reqId) => {
 ﻿// Vanilla JS implementation of ClickSpark and CursorGrid (adapted from React Bits)
 // Theme colors: Purple #5113fa
 
-document.addEventListener("DOMContentLoaded", () => {
+runWhenReady(() => {
     // ----------------------------------------------------
     // 1. ClickSpark Implementation
     // ----------------------------------------------------
@@ -2874,7 +2911,7 @@ const updateAllWishlistIcons = () => {
 // Make it available globally for inline onclick handlers if needed
 window.toggleWishlist = toggleWishlist;
 
-document.addEventListener("DOMContentLoaded", initWishlist);
+runWhenReady(initWishlist);
 
 
 // --- INLINE SCRIPT FROM producto.html ---
@@ -2887,7 +2924,7 @@ document.addEventListener("DOMContentLoaded", initWishlist);
         let stockStatus = 'disponible'; // Default
         let defaultCredentials = '';
 
-        document.addEventListener("DOMContentLoaded", async () => {
+        runWhenReady(async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
 
@@ -3392,7 +3429,7 @@ gsap.registerPlugin(ScrollTrigger);
 
         
 
-        document.addEventListener("DOMContentLoaded", async () => {
+        runWhenReady(async () => {
             gsap.registerPlugin(ScrollTrigger);
 
             const grid = document.getElementById('methodsGrid');

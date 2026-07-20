@@ -64,9 +64,7 @@ body::before, body::after {
     display: flex;
     flex-direction: column;
     padding: 24px 20px;
-    border: none;
-    z-index: 10;
-    overflow-x: hidden;
+    height: 100%;
     overflow-y: auto;
     position: relative;
     padding-bottom: 60px; /* Space for toggle button */
