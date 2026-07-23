@@ -198,8 +198,32 @@ if (btnBuy) {
                 });
             });
 
-            alert("¡Compra realizada con éxito!");
-            window.location.href = "perfil.html";
+            if (isGift) {
+                const giftModal = document.getElementById('gift-confirmation-modal');
+                const friendNameEl = document.getElementById('gift-friend-name');
+                const giftMsgEl = document.getElementById('gift-modal-message');
+                const shareBtn = document.getElementById('share-whatsapp-btn');
+
+                if (friendNameEl) friendNameEl.textContent = gEmail;
+                if (giftMsgEl) giftMsgEl.textContent = `¡Nos esforzaremos lo necesario para entregar tu regalo (${productData.name}) a ${gEmail} con la mayor rapidez posible!`;
+
+                if (shareBtn) {
+                    shareBtn.onclick = () => {
+                        const message = `¡Hola! 🎁 Te acabo de regalar *${productData.name}* en GhostKey.\n\n¡Nos esforzaremos al máximo para que lo recibas super rápido! 🚀✨\n\nVisita GhostKey para ver tus regalos: ${window.location.origin}`;
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+                    };
+                }
+
+                if (giftModal) {
+                    giftModal.classList.add('active');
+                } else {
+                    alert(`¡Regalo enviado a ${gEmail}! Nos esforzaremos por entregarlo con la mayor rapidez.`);
+                    window.location.href = "perfil.html";
+                }
+            } else {
+                alert("¡Compra realizada con éxito!");
+                window.location.href = "perfil.html";
+            }
             
         } catch (e) {
             console.error(e);

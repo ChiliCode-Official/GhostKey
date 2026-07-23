@@ -25,16 +25,33 @@ function setPanelCollapsed(collapsed) {
 function initFriendsPanel() {
     if (!panel || !dashboard) return;
 
-    const saved = localStorage.getItem(PANEL_KEY) === '1';
-    setPanelCollapsed(saved);
+    // Default to collapsed = true unless explicitly opened
+    const saved = localStorage.getItem(PANEL_KEY);
+    const isCollapsed = saved === null ? true : saved === '1';
+    setPanelCollapsed(isCollapsed);
 
     toggleBtn?.addEventListener('click', () => {
-        setPanelCollapsed(!dashboard.classList.contains('friends-panel-collapsed'));
+        const currentlyCollapsed = panel.classList.contains('is-collapsed');
+        setPanelCollapsed(!currentlyCollapsed);
     });
 
     reopenTab?.addEventListener('click', () => setPanelCollapsed(false));
+
+    // Global listener for any friends icon / button across the UI
+    document.querySelectorAll('.fa-users, [data-action="toggle-friends"]').forEach(icon => {
+        const parentBtn = icon.closest('button, a, .dock-item');
+        if (parentBtn && parentBtn !== toggleBtn) {
+            parentBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const currentlyCollapsed = panel.classList.contains('is-collapsed');
+                setPanelCollapsed(!currentlyCollapsed);
+            });
+        }
+    });
 }
 
-initFriendsPanel();
+document.addEventListener('DOMContentLoaded', () => {
+    initFriendsPanel();
+});
 
 export { setPanelCollapsed };

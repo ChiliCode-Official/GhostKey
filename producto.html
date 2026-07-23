@@ -100,8 +100,14 @@
                         <p style="font-size: 0.9rem; color: var(--text-muted);">Tu saldo disponible: <strong id="user-current-balance" style="color: var(--accent-primary);">$0.00</strong></p>
                         
                         <div>
-                            <button id="btn-toggle-gift" class="btn-gift" style="width: 100%;">
-                                Regalar a un amigo
+                            <button id="btn-toggle-gift" class="gift-btn-custom">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32px" height="32px">
+                                <rect width="36" height="36" x="0" y="0" fill="#fdd835" rx="18"></rect>
+                                <path fill="#e53935" d="M38.67,42H11.52C11.27,40.62,11,38.57,11,36c0-5,0-11,0-11s1.44-7.39,3.22-9.59 c1.67-2.06,2.76-3.48,6.78-4.41c3-0.7,7.13-0.23,9,1c2.15,1.42,3.37,6.67,3.81,11.29c1.49-0.3,5.21,0.2,5.5,1.28 C40.89,30.29,39.48,38.31,38.67,42z"></path>
+                                <path fill="#01579b" d="M17.165,17.283c5.217-0.055,9.391,0.283,9,6.011c-0.391,5.728-8.478,5.533-9.391,5.337 c-0.913-0.196-7.826-0.043-7.696-5.337C9.209,18,13.645,17.32,17.165,17.283z"></path>
+                              </svg>
+                              <span class="now">a un amigo</span>
+                              <span class="play">Regalar</span>
                             </button>
                             
                             <div id="gift-section" style="display:none; margin-top: 1rem; padding: 1rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--glass-border);">
@@ -110,30 +116,8 @@
                             </div>
                         </div>
                             
-                            <button id="buy-btn" class="btn-buy-custom">
-                              <span class="box">
-                              Comprar
-                              <div class="star-1">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              <div class="star-2">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              <div class="star-3">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              <div class="star-4">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              <div class="star-5">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              <div class="star-6">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>bitcoin</title><path d="M14.24 10.56C13.93 11.8 12 11.17 11.4 11L11.95 8.82C12.57 9 14.56 9.26 14.24 10.56M11.13 12.12L10.53 14.53C11.27 14.72 13.56 15.45 13.9 14.09C14.26 12.67 11.87 12.3 11.13 12.12M21.7 14.42C20.36 19.78 14.94 23.04 9.58 21.7C4.22 20.36 .963 14.94 2.3 9.58C3.64 4.22 9.06 .964 14.42 2.3C19.77 3.64 23.03 9.06 21.7 14.42M14.21 8.05L14.66 6.25L13.56 6L13.12 7.73C12.83 7.66 12.54 7.59 12.24 7.53L12.68 5.76L11.59 5.5L11.14 7.29C10.9 7.23 10.66 7.18 10.44 7.12L10.44 7.12L8.93 6.74L8.63 7.91C8.63 7.91 9.45 8.1 9.43 8.11C9.88 8.22 9.96 8.5 9.94 8.75L8.71 13.68C8.66 13.82 8.5 14 8.21 13.95C8.22 13.96 7.41 13.75 7.41 13.75L6.87 15L8.29 15.36C8.56 15.43 8.82 15.5 9.08 15.56L8.62 17.38L9.72 17.66L10.17 15.85C10.47 15.93 10.76 16 11.04 16.08L10.59 17.87L11.69 18.15L12.15 16.33C14 16.68 15.42 16.54 16 14.85C16.5 13.5 16 12.7 15 12.19C15.72 12 16.26 11.55 16.41 10.57C16.61 9.24 15.59 8.53 14.21 8.05Z"></path></svg>
-                              </div>
-                              </span>
-                            </button>
-                        </div>
+                        <button id="buy-btn" class="btn-buy-custom">
+                            <i class="fa-solid fa-cart-shopping"></i> Comprar Ahora
                         </button>
                         <p id="buy-error" style="color: var(--danger); font-size: 0.8rem; display: none;"></p>
                     </div>
@@ -168,8 +152,83 @@
         <a href="perfil.html" class="dock-item"><i class="fa-solid fa-user"></i></a>
     </nav>
 
+    <!-- Gift Confirmation Modal with Astronaut Space Animation -->
+    <div class="modal" id="gift-confirmation-modal">
+        <div class="modal-content" style="max-width: 480px; text-align: center; padding: 1.5rem;">
+            <h3 style="color: var(--accent-primary); font-size: 1.3rem;">¡Regalo Enviado con Éxito! 🎁</h3>
+            <p id="gift-modal-message" style="margin-top: 8px; font-size: 0.95rem; color: var(--text-main);">
+                Nos esforzaremos al máximo para entregar tu regalo a tu amigo con la mayor rapidez posible.
+            </p>
+
+            <!-- Astronaut Space Animation (Uiverse JkHuger) -->
+            <div class="astronaut-space-container">
+                <div class="box-of-star1">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star2">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star3">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star4">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div data-js="astro" class="astronaut">
+                    <div class="head"></div>
+                    <div class="arm arm-left"></div>
+                    <div class="arm arm-right"></div>
+                    <div class="body">
+                        <div class="panel"></div>
+                    </div>
+                    <div class="leg leg-left"></div>
+                    <div class="leg leg-right"></div>
+                    <div class="schoolbag"></div>
+                </div>
+            </div>
+
+            <p id="gift-recipient-info" style="font-weight: 700; color: #10b981; font-size: 1rem; margin-bottom: 1rem;">
+                Para: <span id="gift-friend-name">Amigo</span>
+            </p>
+
+            <div style="display: flex; gap: 10px; flex-direction: column;">
+                <button id="share-whatsapp-btn" class="btn-primary" style="background: #25D366; border: none; font-size: 1rem; padding: 12px; color: white;">
+                    <i class="fa-brands fa-whatsapp"></i> Compartir por WhatsApp
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('gift-confirmation-modal').classList.remove('active')">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/producto.js"></script>
     <script type="module" src="js/mobile-nav.js"></script>
+    <script type="module" src="js/cart.js"></script>
 </body>
 </html>

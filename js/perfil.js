@@ -67,7 +67,12 @@ btnLogout.addEventListener('click', () => {
     });
 });
 
-btnLoginGuard.addEventListener('click', async () => {
+btnLoginGuard?.addEventListener('click', async () => {
+    const termsCheck = document.getElementById('terms-checkbox');
+    if (termsCheck && !termsCheck.checked) {
+        alert("Debes aceptar los términos y condiciones para continuar.");
+        return;
+    }
     try {
         await signInWithPopup(auth, provider);
     } catch(err) {
@@ -83,27 +88,99 @@ async function loadClientData(uid) {
         
         if (userSnap.exists()) {
             const data = userSnap.data();
-            userBalance.textContent = data.balance ? data.balance.toFixed(2) : '0.00';
+            if (userBalance) userBalance.textContent = data.balance ? data.balance.toFixed(2) : '0.00';
             
             // Load Orders
             const qOrders = query(collection(db, "orders"), where("uid", "==", uid));
             const ordersSnap = await getDocs(qOrders);
             const tbody = document.getElementById('client-orders-body');
-            tbody.innerHTML = '';
-            ordersSnap.forEach(d => {
+            const noticeBox = document.getElementById('pending-orders-notice');
+            const deliveredSection = document.getElementById('delivered-section');
+            const deliveredContainer = document.getElementById('delivered-products-container');
+
+            let hasPending = false;
+            let hasDelivered = false;
+
+            if (tbody) tbody.innerHTML = '';
+            if (deliveredContainer) deliveredContainer.innerHTML = '';
+
+            for (const d of ordersSnap.docs) {
                 const o = d.data();
+                if (o.status === 'pendiente') hasPending = true;
+
                 const dDate = o.timestamp ? o.timestamp.toDate().toLocaleDateString() : 'Reciente';
                 const statusClass = o.status === 'pendiente' ? 'status-pending' : 'status-confirmed';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${dDate}</td>
-                        <td>${o.productName}</td>
-                        <td><span class="status-badge ${statusClass}">${o.status.toUpperCase()}</span></td>
-                        <td>${o.textDelivered || 'Procesando...'}</td>
-                    </tr>
-                `;
+
+                // Append to Table
+                if (tbody) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${dDate}</td>
+                            <td>${escapeHtml(o.productName || 'Producto')}</td>
+                            <td><span class="status-badge ${statusClass}">${o.status.toUpperCase()}</span></td>
+                            <td>${escapeHtml(o.textDelivered || 'Procesando...')}</td>
+                        </tr>
+                    `;
+                }
+
+                // If confirmed/delivered, build Delivered Card
+                if (o.status === 'confirmado' && deliveredContainer) {
+                    hasDelivered = true;
+
+                    // Fetch product image if available
+                    let prodImg = 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=300';
+                    if (o.productId) {
+                        try {
+                            const pDoc = await getDoc(doc(db, 'products', o.productId));
+                            if (pDoc.exists() && pDoc.data().image) {
+                                prodImg = pDoc.data().image;
+                            }
+                        } catch(e) { /* use fallback */ }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'delivered-card';
+                    card.innerHTML = `
+                        <p class="delivered-tag">ENTREGADO</p>
+                        <div class="delivered-wrapper">
+                            <div class="delivered-card-image">
+                                <img src="${prodImg}" alt="${escapeHtml(o.productName || 'Producto')}">
+                            </div>
+                            <div class="delivered-content">
+                                <p class="delivered-title">${escapeHtml(o.productName || 'Producto')}</p>
+                                <p class="delivered-title delivered-price">$${o.price || 0}</p>
+                            </div>
+                            <button class="delivered-card-btn" data-credential="${escapeHtml(o.textDelivered || '')}">
+                                <i class="fa-solid fa-key"></i> OBTENER
+                            </button>
+                        </div>
+                    `;
+                    deliveredContainer.appendChild(card);
+                }
+            }
+
+            // Click listener for OBTENER buttons
+            document.querySelectorAll('.delivered-card-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const text = btn.dataset.credential;
+                    if (text) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            alert(`¡Tu producto entregado!\n\nCredencial/Código:\n${text}\n\n(Copiado al portapapeles)`);
+                        }).catch(() => {
+                            alert(`Credencial/Código:\n${text}`);
+                        });
+                    } else {
+                        alert("El administrador está procesando tu entrega.");
+                    }
+                });
             });
-            // Wishlist logic could be added here
+
+            if (noticeBox) {
+                noticeBox.style.display = hasPending ? 'block' : 'none';
+            }
+            if (deliveredSection) {
+                deliveredSection.style.display = hasDelivered ? 'block' : 'none';
+            }
         }
     } catch(err) {
         console.error("Error loading client data:", err);
