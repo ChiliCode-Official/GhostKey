@@ -1,6 +1,19 @@
 import { auth, db, provider } from './firebase-config.js';
 import { onAuthStateChanged, signOut, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    increment,
+    serverTimestamp,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const ADMIN_EMAIL = 'lrodricg30@gmail.com';
 let currentUser = null;
@@ -179,21 +192,90 @@ async function loadAdminData() {
     const stockMap = {};
     stockDocs.forEach(sd => { stockMap[sd.id] = sd.data(); });
 
-    qProducts.forEach(d => {
-        const p = d.data();
-        const s = stockMap[d.id] || { status: 'desconocido' };
-        tbodyStock.innerHTML += `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.category}</td>
-                <td>$${p.price}</td>
-                <td><span class="status-badge ${s.status === 'disponible' ? 'status-confirmed' : 'status-pending'}">${s.status}</span></td>
-            </tr>
-        `;
-    });
+    // 3. Products List
+    const tbodyStock = document.getElementById('admin-stock-body');
+    if (tbodyStock) {
+        tbodyStock.innerHTML = '';
+        try {
+            const qProducts = await getDocs(collection(db, "products"));
+            const stockDocs = await getDocs(collection(db, "products_stock"));
+            const stockMap = {};
+            stockDocs.forEach(sd => { stockMap[sd.id] = sd.data(); });
+
+            if (qProducts.empty) {
+                tbodyStock.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No hay productos registrados en el inventario. Agrega uno arriba.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                qProducts.forEach(d => {
+                    const p = d.data();
+                    const s = stockMap[d.id] || { status: 'desconocido', credentialsPool: '' };
+                    const poolLines = (s.credentialsPool || "").split('\n').filter(l => l.trim() !== "").length;
+                    const stockInfo = s.status === 'disponible' ? `Disponible (${poolLines} en pool)` : s.status;
+                    const statusClass = s.status === 'disponible' ? 'status-confirmed' : (s.status === 'bajo_pedido' ? 'status-pending' : 'status-danger');
+
+                    tbodyStock.innerHTML += `
+                        <tr>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <img src="${p.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=100'}" style="width:36px; height:36px; border-radius:6px; object-fit:cover;">
+                                    <strong>${escapeHtml(p.name || 'Sin nombre')}</strong>
+                                </div>
+                            </td>
+                            <td>${escapeHtml(p.category || 'N/A')}</td>
+                            <td>$${p.price || 0}</td>
+                            <td><small style="color:var(--text-muted); display:block; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.description || 'Sin descripción')}</small></td>
+                            <td><span class="status-badge ${statusClass}">${stockInfo}</span></td>
+                            <td>
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn-secondary" style="padding:4px 8px; font-size:0.8rem;" onclick="openEditModal('${d.id}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-secondary" style="padding:4px 8px; font-size:0.8rem; color:var(--danger);" onclick="deleteProduct('${d.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch(e) {
+            console.error("Error loading admin products stock:", e);
+            tbodyStock.innerHTML = `<tr><td colspan="6" style="color:var(--danger); text-align:center;">Error al cargar inventario: ${e.message}</td></tr>`;
+        }
+    }
+
+    // 4. Users List
+    const tbodyUsers = document.getElementById('admin-users-body');
+    if (tbodyUsers) {
+        tbodyUsers.innerHTML = '';
+        try {
+            const qUsers = await getDocs(collection(db, "users"));
+            qUsers.forEach(uDoc => {
+                const uData = uDoc.data();
+                tbodyUsers.innerHTML += `
+                    <tr>
+                        <td>${escapeHtml(uData.email || 'Sin correo')}</td>
+                        <td><small style="color:var(--text-muted);">${escapeHtml(uDoc.id)}</small></td>
+                        <td>$${(uData.balance || 0).toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        } catch(e) {
+            console.error("Error loading admin users:", e);
+        }
+    }
 }
 
-import { updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 window.approveRecharge = async function(reqId, uid, amount) {
     if(!confirm(`¿Aprobar $${amount} para este usuario?`)) return;
@@ -230,11 +312,11 @@ window.deliverOrder = async function(orderId) {
 };
 
 window.createProduct = async function() {
-    const name = document.getElementById('new-prod-name').value;
+    const name = document.getElementById('new-prod-name').value.trim();
     const price = parseFloat(document.getElementById('new-prod-price').value);
     const category = document.getElementById('new-prod-category').value;
-    const img = document.getElementById('new-prod-img').value;
-    const desc = document.getElementById('new-prod-desc').value;
+    const img = document.getElementById('new-prod-img').value.trim();
+    const desc = document.getElementById('new-prod-desc').value.trim();
     const status = document.getElementById('new-prod-status').value;
     const isFeatured = document.getElementById('new-prod-featured').checked;
     const pool = document.getElementById('new-prod-pool').value;
@@ -245,13 +327,11 @@ window.createProduct = async function() {
     }
 
     try {
-        // Create Product
         const pRef = doc(collection(db, "products"));
         await setDoc(pRef, {
             name, price, category, image: img, description: desc, isFeatured
         });
 
-        // Create Stock
         await setDoc(doc(db, "products_stock", pRef.id), {
             status, credentialsPool: pool
         });
@@ -259,10 +339,92 @@ window.createProduct = async function() {
         alert("Producto creado exitosamente.");
         document.getElementById('new-prod-name').value = '';
         document.getElementById('new-prod-price').value = '';
+        document.getElementById('new-prod-img').value = '';
+        document.getElementById('new-prod-desc').value = '';
         document.getElementById('new-prod-pool').value = '';
+        document.getElementById('new-prod-featured').checked = false;
+
         loadAdminData();
     } catch(e) {
-        console.error(e);
+        console.error("Error creando producto:", e);
         alert("Error creando producto.");
+    }
+};
+
+window.openEditModal = async function(prodId) {
+    try {
+        const pSnap = await getDoc(doc(db, 'products', prodId));
+        if (!pSnap.exists()) return;
+        const p = pSnap.data();
+
+        const sSnap = await getDoc(doc(db, 'products_stock', prodId));
+        const s = sSnap.exists() ? sSnap.data() : { status: 'disponible', credentialsPool: '' };
+
+        document.getElementById('edit-prod-id').value = prodId;
+        document.getElementById('edit-prod-name').value = p.name || '';
+        document.getElementById('edit-prod-price').value = p.price || 0;
+        document.getElementById('edit-prod-category').value = p.category || 'juegos';
+        document.getElementById('edit-prod-img').value = p.image || '';
+        document.getElementById('edit-prod-desc').value = p.description || '';
+        document.getElementById('edit-prod-status').value = s.status || 'disponible';
+        document.getElementById('edit-prod-featured').checked = !!p.isFeatured;
+        document.getElementById('edit-prod-pool').value = s.credentialsPool || '';
+
+        document.getElementById('edit-product-modal').classList.add('active');
+    } catch(err) {
+        console.error("Error opening edit modal:", err);
+    }
+};
+
+window.closeEditModal = function() {
+    const modal = document.getElementById('edit-product-modal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.saveEditedProduct = async function() {
+    const prodId = document.getElementById('edit-prod-id').value;
+    if (!prodId) return;
+
+    const name = document.getElementById('edit-prod-name').value.trim();
+    const price = parseFloat(document.getElementById('edit-prod-price').value);
+    const category = document.getElementById('edit-prod-category').value;
+    const img = document.getElementById('edit-prod-img').value.trim();
+    const desc = document.getElementById('edit-prod-desc').value.trim();
+    const status = document.getElementById('edit-prod-status').value;
+    const isFeatured = document.getElementById('edit-prod-featured').checked;
+    const pool = document.getElementById('edit-prod-pool').value;
+
+    if (!name || isNaN(price)) {
+        alert("Nombre y Precio son obligatorios.");
+        return;
+    }
+
+    try {
+        await updateDoc(doc(db, 'products', prodId), {
+            name, price, category, image: img, description: desc, isFeatured
+        });
+
+        await setDoc(doc(db, 'products_stock', prodId), {
+            status, credentialsPool: pool
+        }, { merge: true });
+
+        closeEditModal();
+        alert("Producto actualizado correctamente.");
+        loadAdminData();
+    } catch(err) {
+        console.error("Error updating product:", err);
+        alert("Error al actualizar producto.");
+    }
+};
+
+window.deleteProduct = async function(prodId) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este producto del inventario?")) return;
+    try {
+        await deleteDoc(doc(db, 'products', prodId));
+        await deleteDoc(doc(db, 'products_stock', prodId));
+        alert("Producto eliminado.");
+        loadAdminData();
+    } catch(err) {
+        console.error("Error deleting product:", err);
     }
 };
