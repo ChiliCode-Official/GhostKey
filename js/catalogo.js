@@ -123,7 +123,8 @@ function handleFilters() {
 }
 
 function applyFilters() {
-    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    const activeFilterBtn = document.querySelector('.filter-btn.active');
+    const activeFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     
     let filtered = allProducts;
@@ -133,7 +134,7 @@ function applyFilters() {
     }
     
     if (searchTerm) {
-        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchTerm));
     }
     
     renderProducts(filtered);

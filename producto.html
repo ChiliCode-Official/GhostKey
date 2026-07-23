@@ -92,6 +92,18 @@
                         <h2 id="p-price" style="font-size: 2rem; color: var(--accent-primary);">$0.00</h2>
                     </div>
 
+                    <!-- Favorite Button -->
+                    <div id="favorite-wrapper" style="display: none;">
+                        <input type="checkbox" id="favorite" name="favorite-checkbox" class="favorite-input" value="favorite-button">
+                        <label for="favorite" class="favorite-container">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                          <div class="action">
+                            <span class="option-1">Add to Favorites</span>
+                            <span class="option-2">Added to Favorites</span>
+                          </div>
+                        </label>
+                    </div>
+
                     <div id="auth-state-message" style="color: var(--warning); font-size: 0.9rem;">
                         <i class="fa-solid fa-circle-exclamation"></i> Necesitas iniciar sesión para comprar.
                     </div>
@@ -110,9 +122,16 @@
                               <span class="play">Regalar</span>
                             </button>
                             
-                            <div id="gift-section" style="display:none; margin-top: 1rem; padding: 1rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--glass-border);">
-                                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Correo del amigo:</label>
-                                <input type="email" id="gift-email" placeholder="amigo@email.com" style="width:100%; border:1px solid var(--glass-border); padding: 8px; border-radius:4px; background:var(--bg-main); color:white;">
+                            <div id="gift-section" style="display:none; margin-top: 1rem;">
+                                <div class="brutalist-container" style="width: 100%;">
+                                  <input
+                                    id="gift-email"
+                                    placeholder="AMIGO@EMAIL.COM"
+                                    class="brutalist-input smooth-type"
+                                    type="email"
+                                  />
+                                  <label class="brutalist-label">CORREO DEL AMIGO</label>
+                                </div>
                             </div>
                         </div>
                             

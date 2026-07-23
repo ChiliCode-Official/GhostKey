@@ -156,7 +156,7 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container no-right-panel">
+    <div class="dashboard-container">
         <!-- Sidebar (PC) -->
         <aside class="sidebar">
             <a href="index.html" class="brand-logo">GKey</a>
@@ -218,6 +218,9 @@
 
             <div id="profile-content" style="display: none;">
                 <div class="profile-header" style="flex-direction: column; align-items: center; gap: 1rem;">
+                    <!-- Profile Picture -->
+                    <img id="main-profile-avatar" class="profile-avatar-lg user-avatar" src="https://ui-avatars.com/api/?name=User&background=A182E8&color=fff" alt="Avatar">
+                    
                     <!-- GhostCard (Uiverse.io by CodeM7710) -->
                     <div class="main-container">
                       <div class="border">
@@ -435,6 +438,72 @@
 
             </div>
         </main>
+        
+        <!-- Right Panel (Friends) -->
+        <aside class="right-panel" id="friends-panel">
+            <button type="button" class="panel-collapse-btn" id="friends-panel-toggle" aria-expanded="true" aria-label="Ocultar panel de amigos">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="right-panel__inner">
+                <div class="panel-section">
+                    <h3 class="panel-title">Amigos en línea · 6 / 45</h3>
+                    <div class="list-item">
+                        <div class="list-icon"><img src="https://ui-avatars.com/api/?name=FA" alt="avatar"></div>
+                        <div class="list-info">
+                            <p class="list-name">Fahim Auditor</p>
+                            <p class="list-desc">Apex</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon"><img src="https://ui-avatars.com/api/?name=KF" alt="avatar"></div>
+                        <div class="list-info">
+                            <p class="list-name">Killer Freake</p>
+                            <p class="list-desc">Dota 2</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3 class="panel-title">Parties</h3>
+                    <div class="list-item glass-panel">
+                        <div class="list-icon" style="background: var(--accent-primary); color: white;"><i class="fa-solid fa-rocket"></i></div>
+                        <div class="list-info">
+                            <p class="list-name">CS2 Match</p>
+                            <p class="list-desc">Buscando +1</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-header" style="margin-top: 1rem;">
+                    <h3>Amigos & Referidos</h3>
+                </div>
+                
+                <div class="brutalist-container" style="margin-bottom: 15px; width: 100%;">
+                  <input
+                    id="search-friend-input"
+                    placeholder="TIPO AQUÍ"
+                    class="brutalist-input smooth-type"
+                    type="text"
+                    style="padding: 10px; font-size: 14px; border-width: 2px;"
+                  />
+                  <label class="brutalist-label" style="top: -20px; font-size: 10px;">BUSCAR / AÑADIR</label>
+                </div>
+
+                <div class="friends-list" id="friends-list">
+                    <!-- Se llena dinámicamente -->
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Cargando amigos...</p>
+                </div>
+
+                <div class="referral-box">
+                    <h4>Tu Enlace de Invitación</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">¡Gana 3% en saldo cuando tus amigos compren usando tu link!</p>
+                    <div style="display:flex; gap: 5px;">
+                        <input type="text" id="ref-link-input" readonly value="..." style="flex: 1; padding: 5px; border-radius: 4px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
+                        <button class="btn-primary" id="copy-ref-btn" style="padding: 5px 10px;"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <!-- Edit Product Modal -->
@@ -563,7 +632,7 @@
             <path class="line" d="M7 16 27 16"></path>
           </svg>
         </label>
-        <a href="#" class="dock-item"><i class="fa-solid fa-users"></i></a>
+        <a href="#" class="dock-item" id="mobile-friends-btn"><i class="fa-solid fa-users"></i></a>
         <a href="perfil.html" class="dock-item active"><i class="fa-solid fa-user"></i></a>
     </nav>
 
@@ -571,6 +640,7 @@
     <script type="module" src="js/perfil.js"></script>
     <script type="module" src="js/mobile-nav.js"></script>
     <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/friends-panel.js"></script>
     
     <script>
         // Modal logic (UI)

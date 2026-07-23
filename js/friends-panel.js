@@ -159,6 +159,25 @@ function initFriendsPanel() {
     onAuthStateChanged(auth, (user) => {
         loadRealFriends(user);
     });
+
+    const searchFriendInput = document.getElementById('search-friend-input');
+    if (searchFriendInput) {
+        searchFriendInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const friendsContainer = document.getElementById('friends-list');
+            if (friendsContainer) {
+                const items = friendsContainer.querySelectorAll('.list-item');
+                items.forEach(item => {
+                    const name = item.querySelector('.list-name').textContent.toLowerCase();
+                    if (name.includes(term)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

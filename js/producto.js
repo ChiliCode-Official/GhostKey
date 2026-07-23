@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, serverTimestamp, runTransaction, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -121,12 +121,30 @@ onAuthStateChanged(auth, async (user) => {
                 }
                 if (buyControls) buyControls.style.display = 'flex';
 
+                const favBtn = document.getElementById('favorite');
+                const favWrapper = document.getElementById('favorite-wrapper');
+                if (favBtn && favWrapper) {
+                    favWrapper.style.display = 'block';
+                    const wishlist = userDocData.wishlist || [];
+                    favBtn.checked = wishlist.includes(productId);
+                    
+                    favBtn.onchange = async () => {
+                        try {
+                            const uRef = doc(db, 'users', currentUser.uid);
+                            if (favBtn.checked) {
+                                await updateDoc(uRef, { wishlist: arrayUnion(productId) });
+                            } else {
+                                await updateDoc(uRef, { wishlist: arrayRemove(productId) });
+                            }
+                        } catch(e) {
+                            console.error("Error updating favorite", e);
+                            favBtn.checked = !favBtn.checked;
+                        }
+                    };
+                }
+
                 if (productData && userDocData.balance < productData.price) {
-                    if (buyError) {
-                        buyError.textContent = "Saldo insuficiente. Recarga en tu perfil.";
-                        buyError.style.display = 'block';
-                    }
-                    if (btnBuy) btnBuy.disabled = true;
+                    // Do not disable, let user click to see animation
                 }
             }
         } catch (e) {
@@ -154,6 +172,18 @@ if (btnBuy) {
                 buyError.textContent = "Ingresa el correo de tu amigo.";
                 buyError.style.display = 'block';
             }
+            return;
+        }
+
+        if (userDocData && userDocData.balance < productData.price) {
+            btnBuy.classList.add('shake-err');
+            if (buyError) {
+                buyError.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> Saldo insuficiente. Recarga en tu perfil.";
+                buyError.style.display = 'block';
+            }
+            setTimeout(() => {
+                btnBuy.classList.remove('shake-err');
+            }, 500);
             return;
         }
 
@@ -218,9 +248,10 @@ if (btnBuy) {
                 if (giftMsgEl) giftMsgEl.textContent = `¡Nos esforzaremos lo necesario para entregar tu regalo (${productData.name}) a ${gEmail} con la mayor rapidez posible!`;
 
                 if (shareBtn) {
-                    shareBtn.onclick = () => {
+                    shareBtn.onclick = (e) => {
+                        e.preventDefault();
                         const message = `¡Hola! 🎁 Te acabo de regalar *${productData.name}* en GhostKey.\n\n¡Nos esforzaremos al máximo para que lo recibas super rápido! 🚀✨\n\nVisita GhostKey para ver tus regalos: ${window.location.origin}`;
-                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
                     };
                 }
 
