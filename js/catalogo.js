@@ -1,6 +1,6 @@
 import { db, auth } from './firebase-config.js';
 import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { initWishlistButtons } from './wishlist.js';
 import { getGhostLoaderHTML } from './main.js';
 
@@ -143,6 +143,8 @@ function applyFilters() {
 document.addEventListener('DOMContentLoaded', () => {
     handleFilters();
 });
+
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {

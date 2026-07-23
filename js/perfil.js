@@ -1,5 +1,5 @@
 import { auth, db, provider } from './firebase-config.js';
-import { onAuthStateChanged, signOut, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, signOut, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
     doc,
     getDoc,
@@ -40,6 +40,8 @@ const cardUid = document.getElementById('card-uid');
 const cardName = document.getElementById('card-name');
 const userBalance = document.getElementById('user-balance');
 const userAvatars = document.querySelectorAll('.user-avatar');
+
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {

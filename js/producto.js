@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, collection, serverTimestamp, runTransaction, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 function escapeHtml(str) {
@@ -105,6 +105,8 @@ async function loadProductDetails() {
         if (pDesc) pDesc.textContent = "Hubo un error al cargar la información del producto.";
     }
 }
+
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
