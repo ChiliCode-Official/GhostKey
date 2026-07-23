@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Virtual - Métodos de Pago</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar (PC) -->
+        <aside class="sidebar">
+            <a href="index.html" class="brand-logo">GKey</a>
+            
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link"><i class="fa-solid fa-gamepad"></i></a>
+                </li>
+                <li class="nav-item active">
+                    <a href="metodos-pago.html" class="nav-link"><i class="fa-solid fa-credit-card"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="perfil.html" class="nav-link"><i class="fa-solid fa-user"></i></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" style="grid-column: 2 / span 2;">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+                <div class="top-actions">
+                    <div class="user-profile user-profile--loading" id="user-profile-btn" title="Cargando sesión…">
+                        <img id="user-avatar" class="user-avatar" alt="">
+                        <span id="user-name"></span>
+                    </div>
+                </div>
+            </header>
+
+            <section style="margin-top: 1rem; max-width: 1000px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px;">
+                            <i class="fa-solid fa-building-columns" style="color: var(--accent-primary);"></i> Métodos de Pago
+                        </h1>
+                        <p style="color: var(--text-muted);">Realiza tus transferencias con los datos oficiales de GhostKey.</p>
+                    </div>
+                    <a href="perfil.html" class="btn-primary"><i class="fa-solid fa-wallet"></i> Ver Mi Saldo</a>
+                </div>
+
+                <!-- Admin Add Payment Method Form (Visible only to Admin) -->
+                <div id="admin-payment-container" class="glass-panel" style="display: none; padding: 1.8rem; margin-bottom: 2rem; border-color: rgba(161, 130, 232, 0.4);">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-shield"></i> Administrar Métodos de Pago (Panel Admin)</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label class="payment-detail-label">Banco / Plataforma</label>
+                            <input type="text" id="pm-bank" placeholder="Ej: STP, BBVA, Nu" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
+                        </div>
+                        <div>
+                            <label class="payment-detail-label">Nombre del Beneficiario</label>
+                            <input type="text" id="pm-beneficiario" placeholder="Nombre completo" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
+                        </div>
+                        <div>
+                            <label class="payment-detail-label">Concepto Recomendado</label>
+                            <input type="text" id="pm-concepto" placeholder="Ej: Tu correo o ID de usuario" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
+                        </div>
+                        <div>
+                            <label class="payment-detail-label">Cuenta CLABE (18 dígitos)</label>
+                            <input type="text" id="pm-clabe" placeholder="18 dígitos" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
+                        </div>
+                    </div>
+                    
+                    <button id="btn-save-payment-method" class="btn-primary" style="padding: 10px 20px;"><i class="fa-solid fa-plus"></i> Guardar Método de Pago</button>
+                </div>
+
+                <!-- Payment Methods Grid -->
+                <div id="payment-methods-list" class="payment-grid">
+                    <p style="color: var(--text-muted);">Cargando métodos de pago...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Dock -->
+    <nav class="mobile-dock" aria-label="Navegación móvil">
+        <a href="index.html" class="dock-item"><i class="fa-solid fa-house"></i></a>
+        <a href="catalogo.html" class="dock-item"><i class="fa-solid fa-gamepad"></i></a>
+        <a href="metodos-pago.html" class="dock-item active"><i class="fa-solid fa-credit-card"></i></a>
+        <a href="perfil.html" class="dock-item"><i class="fa-solid fa-user"></i></a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">¡Cuenta CLABE copiada al portapapeles!</div>
+
+    <script type="module" src="js/metodos-pago.js"></script>
+</body>
+</html>

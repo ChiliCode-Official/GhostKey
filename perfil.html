@@ -211,8 +211,9 @@
                         </div>
                       </div>
                     </div>
-                    <div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
                         <a href="info.html" class="btn-secondary"><i class="fa-solid fa-circle-info"></i> Ayuda y Referidos</a>
+                        <a href="metodos-pago.html" class="btn-secondary"><i class="fa-solid fa-credit-card"></i> Métodos de Pago</a>
                     </div>
                 </div>
 
@@ -223,7 +224,10 @@
                             <p style="opacity: 0.8; margin-bottom: 5px;">Saldo Disponible (MXN)</p>
                             <p class="balance-amount">$<span id="user-balance">0.00</span></p>
                         </div>
-                        <button class="recharge-btn" onclick="openRechargeModal()">Recargar Saldo <i class="fa-brands fa-whatsapp"></i></button>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="metodos-pago.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-credit-card"></i> Ver Cuentas</a>
+                            <button class="recharge-btn" onclick="openRechargeModal()">Recargar Saldo <i class="fa-brands fa-whatsapp"></i></button>
+                        </div>
                     </div>
 
                     <div class="tabs">
