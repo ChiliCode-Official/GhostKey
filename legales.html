@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Virtual - Términos y Privacidad</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="index.html" class="brand-logo">GKey</a>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link"><i class="fa-solid fa-gamepad"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="perfil.html" class="nav-link"><i class="fa-solid fa-user"></i></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" style="grid-column: 2 / span 2;">
+            <header class="top-bar">
+                <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+            </header>
+
+            <section style="margin-top: 1rem; max-width: 800px;">
+                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">Legal</h1>
+                
+                <div id="terms" class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-file-contract"></i> Términos de Servicio</h2>
+                    
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">1. Responsabilidad sobre Depósitos</h3>
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--text-muted);">
+                        No nos hacemos responsables por depósitos o transferencias realizadas a otras cuentas que no estén listadas explícitamente en nuestra página oficial de <a href="metodos-pago.html" style="color: var(--accent-primary); text-decoration: underline;">Métodos de Pago</a>. Es responsabilidad del usuario verificar correctamente los datos antes de realizar cualquier transacción.
+                    </p>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">2. Política de Reembolsos</h3>
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--danger); font-weight: bold;">
+                        NO EMITIMOS REEMBOLSOS EN EFECTIVO.
+                    </p>
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--text-muted);">
+                        Los reembolsos se realizarán únicamente en forma de créditos (Saldo Virtual) en tu cuenta. Este saldo a favor solo procederá en caso de que alguna de nuestras claves, cuentas o productos entregados presente fallas de origen comprobables. No otorgamos reembolsos por mal uso de los productos, bloqueos ajenos a nosotros o cualquier otro inconveniente provocado por el usuario final.
+                    </p>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">3. Entrega de Productos</h3>
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--text-muted);">
+                        La entrega de productos digitales está sujeta a nuestra disponibilidad de stock. Algunos productos son de entrega inmediata, mientras que otros están catalogados bajo pedido y pueden tardar en ser procesados por la administración.
+                    </p>
+                </div>
+
+                <div id="privacy" class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-shield-halved"></i> Políticas de Privacidad</h2>
+                    
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--text-muted);">
+                        En GhostKey, nos tomamos muy en serio tu privacidad. Únicamente recolectamos los datos estrictamente necesarios para identificar tu cuenta (como tu correo electrónico asociado a tu inicio de sesión) y para la gestión de tus créditos y compras dentro de la plataforma.
+                    </p>
+                    <p style="margin-bottom: 1rem; line-height: 1.6; color: var(--text-muted);">
+                        No compartimos, vendemos, ni alquilamos tu información a terceros. No enviamos correos de spam, únicamente notificaciones esenciales sobre el estado de tus pedidos o referidos. Al iniciar sesión y hacer uso de la plataforma, consientes este tratamiento mínimo de datos.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Dock -->
+    <nav class="mobile-dock">
+        <a href="index.html" class="dock-item"><i class="fa-solid fa-house"></i></a>
+        <a href="catalogo.html" class="dock-item"><i class="fa-solid fa-gamepad"></i></a>
+        <a href="perfil.html" class="dock-item active"><i class="fa-solid fa-user"></i></a>
+    </nav>
+
+    <script type="module" src="js/friends-panel.js"></script>
+    <script type="module" src="js/cart.js"></script>
+</body>
+</html>

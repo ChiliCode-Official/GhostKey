@@ -86,9 +86,25 @@ btnLoginGuard?.addEventListener('click', async () => {
         return;
     }
     try {
-        await signInWithPopup(auth, provider);
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: user.email,
+                balance: 0,
+                cart: {},
+                referralCode: user.uid.substring(0, 8).toUpperCase(),
+                referredBy: null
+            });
+        }
     } catch(err) {
-        console.error(err);
+        if (err.code !== 'auth/popup-closed-by-user') {
+            console.error("Login Error:", err);
+            alert("Error al iniciar sesión.");
+        }
     }
 });
 
@@ -199,39 +215,6 @@ async function loadClientData(uid) {
     }
 }
 
-window.processRecharge = async function() {
-    const inputAmount = document.getElementById('custom-recharge').value;
-    const amount = parseFloat(inputAmount);
-    
-    if (isNaN(amount) || amount <= 0) {
-        alert("Ingresa un monto válido.");
-        return;
-    }
-    
-    if (!currentUser) return;
-
-    try {
-        await addDoc(collection(db, 'balance_requests'), {
-            uid: currentUser.uid,
-            userEmail: currentUser.email,
-            amount: amount,
-            status: "pendiente",
-            timestamp: serverTimestamp()
-        });
-        
-        const waMessage = `Hola, quiero recargar $${amount} MXN a mi cuenta (${currentUser.email}).`;
-        const waUrl = `https://wa.me/5211234567890?text=${encodeURIComponent(waMessage)}`;
-        window.open(waUrl, '_blank');
-        
-        closeRechargeModal();
-        alert("Solicitud creada. Tu saldo se reflejará una vez confirmado.");
-        loadClientData(currentUser.uid); // Refresh
-    } catch(err) {
-        console.error(err);
-        alert("Error al procesar la recarga.");
-    }
-};
-
 // --- Admin Logic ---
 async function loadAdminData() {
     console.log("Cargando datos de Admin...");
@@ -272,14 +255,6 @@ async function loadAdminData() {
             </tr>
         `;
     });
-
-    // 3. Products List
-    const qProducts = await getDocs(collection(db, "products"));
-    const tbodyStock = document.getElementById('admin-stock-body');
-    tbodyStock.innerHTML = '';
-    const stockDocs = await getDocs(collection(db, "products_stock"));
-    const stockMap = {};
-    stockDocs.forEach(sd => { stockMap[sd.id] = sd.data(); });
 
     // 3. Products List
     const tbodyStock = document.getElementById('admin-stock-body');
@@ -403,6 +378,8 @@ window.deliverOrder = async function(orderId) {
 window.createProduct = async function() {
     const name = document.getElementById('new-prod-name').value.trim();
     const price = parseFloat(document.getElementById('new-prod-price').value);
+    const minQtyInput = document.getElementById('new-prod-min-quantity');
+    const minQuantity = minQtyInput ? parseInt(minQtyInput.value) || 1 : 1;
     const category = document.getElementById('new-prod-category').value;
     const img = document.getElementById('new-prod-img').value.trim();
     const desc = document.getElementById('new-prod-desc').value.trim();
@@ -418,7 +395,7 @@ window.createProduct = async function() {
     try {
         const pRef = doc(collection(db, "products"));
         await setDoc(pRef, {
-            name, price, category, image: img, description: desc, isFeatured
+            name, price, minQuantity, category, image: img, description: desc, isFeatured
         });
 
         await setDoc(doc(db, "products_stock", pRef.id), {
@@ -452,6 +429,8 @@ window.openEditModal = async function(prodId) {
         document.getElementById('edit-prod-id').value = prodId;
         document.getElementById('edit-prod-name').value = p.name || '';
         document.getElementById('edit-prod-price').value = p.price || 0;
+        const minQ = document.getElementById('edit-prod-min-quantity');
+        if(minQ) minQ.value = p.minQuantity || 1;
         document.getElementById('edit-prod-category').value = p.category || 'juegos';
         document.getElementById('edit-prod-img').value = p.image || '';
         document.getElementById('edit-prod-desc').value = p.description || '';
@@ -476,6 +455,8 @@ window.saveEditedProduct = async function() {
 
     const name = document.getElementById('edit-prod-name').value.trim();
     const price = parseFloat(document.getElementById('edit-prod-price').value);
+    const minQtyInput = document.getElementById('edit-prod-min-quantity');
+    const minQuantity = minQtyInput ? parseInt(minQtyInput.value) || 1 : 1;
     const category = document.getElementById('edit-prod-category').value;
     const img = document.getElementById('edit-prod-img').value.trim();
     const desc = document.getElementById('edit-prod-desc').value.trim();
@@ -489,8 +470,8 @@ window.saveEditedProduct = async function() {
     }
 
     try {
-        await updateDoc(doc(db, 'products', prodId), {
-            name, price, category, image: img, description: desc, isFeatured
+        await updateDoc(doc(db, "products", prodId), {
+            name, price, minQuantity, category, image: img, description: desc, isFeatured
         });
 
         await setDoc(doc(db, 'products_stock', prodId), {

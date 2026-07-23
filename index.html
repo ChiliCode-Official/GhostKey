@@ -40,8 +40,9 @@
                 </div>
                 
                 <div class="top-actions">
-                    <button class="action-btn"><i class="fa-solid fa-bell"></i></button>
-                    <button class="action-btn"><i class="fa-solid fa-bag-shopping"></i></button>
+                    <button class="action-btn" title="Amigos"><i class="fa-solid fa-users"></i></button>
+                    <a href="cart.html" class="action-btn" title="Carrito"><i class="fa-solid fa-bag-shopping"></i></a>
+                    <button class="action-btn" id="logout-btn-header" title="Cerrar sesión" style="display:none; color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
                     <div class="user-profile user-profile--loading" id="user-profile-btn" title="Cargando sesión…">
                         <img id="user-avatar" class="user-avatar" alt="">
                         <span id="user-name"></span>
@@ -162,6 +163,9 @@
                 
                 <div id="review-form-container" style="background: var(--bg-card); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--glass-border); margin-bottom: 2rem; display: none;">
                     <h3 style="margin-bottom: 1rem;">Comparte tu experiencia</h3>
+                    <select id="review-product-select" style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-main);">
+                        <option value="">Cargando tus productos...</option>
+                    </select>
                     <textarea id="review-text" rows="3" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-main); padding: 10px; margin-bottom: 10px; resize: none;" placeholder="Escribe tu opinión aquí..."></textarea>
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">

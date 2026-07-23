@@ -1,6 +1,7 @@
 import { db, auth, provider } from './firebase-config.js';
 import {
     signInWithPopup,
+    signOut,
     onAuthStateChanged,
     setPersistence,
     browserLocalPersistence
@@ -150,6 +151,14 @@ function updateUserProfileUI(user) {
         }
         userProfileBtn.title = 'Iniciar sesión con Google';
     }
+    
+    const logoutBtn = document.getElementById('logout-btn-header');
+    if (logoutBtn) {
+        logoutBtn.style.display = user ? 'inline-block' : 'none';
+        logoutBtn.onclick = () => {
+            signOut(auth).then(() => window.location.reload());
+        };
+    }
 }
 
 async function handleLogin() {
@@ -195,6 +204,9 @@ onAuthStateChanged(auth, async (user) => {
     const reviewFormContainer = document.getElementById('review-form-container');
     if (reviewFormContainer) {
         reviewFormContainer.style.display = user ? 'block' : 'none';
+        if (user) {
+            populateReviewProducts(user);
+        }
     }
 
     if (user) {
@@ -419,9 +431,11 @@ export async function loadReviews() {
 
             const card = document.createElement('div');
             card.className = 'review-card';
+            const productBadge = r.productName ? `<span style="display:inline-block; font-size:0.75rem; background:var(--accent-primary); color:white; padding:2px 8px; border-radius:12px; margin-bottom:8px;">${escapeHtml(r.productName)}</span>` : '';
             card.innerHTML = `
                 <div class="review-stars">${starsHtml}</div>
                 <div class="body">
+                    ${productBadge}
                     <p class="text">${escapeHtml(r.text || '')}</p>
                     <span class="username">from: @${escapeHtml(r.username || 'Usuario')}</span>
                     <div class="footer">
@@ -474,10 +488,72 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
+async function populateReviewProducts(user) {
+    const selector = document.getElementById('review-product-select');
+    if (!selector) return;
+    const submitBtn = document.getElementById('btn-submit-review');
+    const textInput = document.getElementById('review-text');
+
+    try {
+        // Fetch all orders by the user
+        const qOrders = query(collection(db, "orders"), where("uid", "==", user.uid));
+        const ordersSnap = await getDocs(qOrders);
+        const orderedProducts = new Map();
+        ordersSnap.forEach(doc => {
+            const data = doc.data();
+            orderedProducts.set(data.productId, data.productName);
+        });
+
+        // Fetch all reviews by the user
+        const qReviews = query(collection(db, "reviews"), where("uid", "==", user.uid));
+        const reviewsSnap = await getDocs(qReviews);
+        const reviewedProductIds = new Set();
+        reviewsSnap.forEach(doc => {
+            const data = doc.data();
+            if(data.productId) reviewedProductIds.add(data.productId);
+        });
+
+        selector.innerHTML = '';
+        let count = 0;
+
+        orderedProducts.forEach((name, id) => {
+            if (!reviewedProductIds.has(id)) {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = name;
+                selector.appendChild(opt);
+                count++;
+            }
+        });
+
+        if (count === 0) {
+            selector.innerHTML = '<option value="">No tienes productos pendientes de reseñar</option>';
+            selector.disabled = true;
+            if (submitBtn) submitBtn.disabled = true;
+            if (textInput) textInput.disabled = true;
+        } else {
+            selector.disabled = false;
+            if (submitBtn) submitBtn.disabled = false;
+            if (textInput) textInput.disabled = false;
+        }
+
+    } catch(err) {
+        console.error("Error populating review products:", err);
+    }
+}
+
 async function handleReviewSubmit() {
     const textInput = document.getElementById('review-text');
-    if (!textInput) return;
+    const selector = document.getElementById('review-product-select');
+    if (!textInput || !selector) return;
+    
     const text = textInput.value.trim();
+    const productId = selector.value;
+
+    if (!productId) {
+        alert("Selecciona un producto para reseñar.");
+        return;
+    }
 
     if (!text) {
         alert("Por favor escribe tu reseña.");
@@ -491,11 +567,14 @@ async function handleReviewSubmit() {
 
     const selectedRating = document.querySelector('input[name="rate"]:checked');
     const ratingVal = selectedRating ? parseInt(selectedRating.value) : 5;
+    const productName = selector.options[selector.selectedIndex].text;
 
     try {
         await addDoc(collection(db, "reviews"), {
             uid: currentUser.uid,
             username: currentUser.displayName || currentUser.email.split('@')[0],
+            productId: productId,
+            productName: productName,
             text: text,
             rating: ratingVal,
             likes: [],
@@ -504,6 +583,7 @@ async function handleReviewSubmit() {
 
         textInput.value = '';
         alert("¡Gracias por compartir tu opinión!");
+        populateReviewProducts(currentUser);
         loadReviews();
     } catch (err) {
         console.error("Error posting review:", err);

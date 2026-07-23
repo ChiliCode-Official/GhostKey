@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Virtual - Pago</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pago-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 2rem auto;
+            background: var(--bg-panel);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        @media (max-width: 768px) {
+            .pago-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .recharge-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+        .r-opt {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .r-opt:hover, .r-opt.selected {
+            border-color: var(--accent-primary);
+            background: rgba(161, 130, 232, 0.1);
+        }
+        .payment-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .confirm-box {
+            background: rgba(161, 130, 232, 0.05);
+            border: 1px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container no-right-panel">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="index.html" class="brand-logo">GKey</a>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link"><i class="fa-solid fa-gamepad"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="perfil.html" class="nav-link"><i class="fa-solid fa-user"></i></a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" style="grid-column: 2 / span 2;">
+            <header class="top-bar">
+                <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+            </header>
+
+            <div id="auth-state-message" style="display:none; text-align:center; padding:3rem; color:var(--warning);">
+                <h2><i class="fa-solid fa-circle-exclamation"></i> Necesitas iniciar sesión para continuar.</h2>
+            </div>
+
+            <section class="pago-container" id="pago-content" style="display:none;">
+                <!-- Left: Animation -->
+                <div style="display:flex; justify-content:center; align-items:center; background:var(--bg-card); border-radius:12px; padding:2rem;">
+                    <!-- POS Payment Machine Animation (Uiverse Admin12121) -->
+                    <div class="pay-anim-container">
+                     <div class="pay-anim-left">
+                      <div class="pay-anim-card">
+                       <div class="pay-anim-card-line"></div>
+                       <div class="pay-anim-buttons"></div>
+                      </div>
+                      <div class="pay-anim-post">
+                       <div class="pay-anim-post-line"></div>
+                       <div class="pay-anim-screen">
+                        <div class="pay-anim-dollar" id="pos-dollar-sign">$</div>
+                       </div>
+                      </div>
+                     </div>
+                     <div class="pay-anim-right">
+                      <div class="pay-anim-text" id="pos-status-text">Calculando...</div>
+                       <svg viewBox="0 0 451.846 451.847" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path fill="var(--accent-primary)" d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0l194.287 194.284c6.177 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.267 22.373z"></path></svg>
+                     </div>
+                    </div>
+                </div>
+
+                <!-- Right: Logic Form -->
+                <div class="payment-box">
+                    <h2 id="pago-title" style="margin-bottom: 5px;">Procesando...</h2>
+                    <p id="pago-subtitle" style="color:var(--text-muted); margin-bottom: 2rem;">Calculando opciones de pago.</p>
+                    
+                    <!-- Dynamic Content Area -->
+                    <div id="dynamic-payment-area">
+                        <!-- Filled by JS -->
+                    </div>
+                    
+                    <div id="action-area" style="margin-top: 1.5rem;">
+                        <!-- Filled by JS -->
+                    </div>
+                    
+                    <p id="pago-error" style="color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; text-align: center;"></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Astronaut Modal for Gifts -->
+    <div class="modal" id="gift-confirmation-modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">¡Regalo Confirmado!</h3>
+            <div class="astronaut-space-container">
+                <div class="box-of-star1">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star2">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star3">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div class="box-of-star4">
+                    <div class="star star-position1"></div>
+                    <div class="star star-position2"></div>
+                    <div class="star star-position3"></div>
+                    <div class="star star-position4"></div>
+                    <div class="star star-position5"></div>
+                    <div class="star star-position6"></div>
+                    <div class="star star-position7"></div>
+                </div>
+                <div data-js="astro" class="astronaut">
+                    <div class="head"></div>
+                    <div class="arm arm-left"></div>
+                    <div class="arm arm-right"></div>
+                    <div class="body">
+                        <div class="panel"></div>
+                    </div>
+                    <div class="leg leg-left"></div>
+                    <div class="leg leg-right"></div>
+                    <div class="schoolbag"></div>
+                </div>
+            </div>
+            <p id="gift-modal-message" style="margin-top: 1rem; line-height: 1.6; color: var(--text-main);">
+                ¡Nos esforzaremos lo necesario para entregar tu regalo a <strong id="gift-friend-name">amigo</strong> con la mayor rapidez posible!
+            </p>
+            <div style="display: flex; gap: 10px; margin-top: 1.5rem; flex-direction: column;">
+                <button class="btn-primary" id="share-whatsapp-btn" style="background: #25D366; color: #fff;">
+                    <i class="fa-brands fa-whatsapp"></i> Compartir
+                </button>
+                <button class="btn-secondary" onclick="window.location.href='perfil.html'">Ir a mi Perfil</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/pago.js"></script>
+</body>
+</html>

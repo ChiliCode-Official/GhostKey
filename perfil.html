@@ -211,7 +211,7 @@
                     </label>
 
                     <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; max-width: 320px; text-align: center; margin-top: 5px;">
-                        Únicamente utilizamos tus datos para identificar tu cuenta. No enviamos spam. Al continuar o registrarte aceptas nuestras <a href="#" style="color: var(--accent-primary); text-decoration: underline;">Políticas de Privacidad</a> y <a href="#" style="color: var(--accent-primary); text-decoration: underline;">Términos de Servicio</a>.
+                        Únicamente utilizamos tus datos para identificar tu cuenta. No enviamos spam. Al continuar o registrarte aceptas nuestras <a href="legales.html#privacy" style="color: var(--accent-primary); text-decoration: underline;">Políticas de Privacidad</a> y <a href="legales.html#terms" style="color: var(--accent-primary); text-decoration: underline;">Términos de Servicio</a>.
                     </p>
                 </form>
             </div>
@@ -257,7 +257,7 @@
                         </div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <a href="metodos-pago.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-credit-card"></i> Ver Cuentas</a>
-                            <button class="recharge-btn" onclick="openRechargeModal()">Recargar Saldo <i class="fa-brands fa-whatsapp"></i></button>
+                            <a href="pago.html?from=profile" class="recharge-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">Recargar Saldo <i class="fa-brands fa-whatsapp"></i></a>
                         </div>
                     </div>
 
@@ -379,12 +379,13 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <input type="text" id="new-prod-name" placeholder="Nombre">
                                 <input type="number" id="new-prod-price" placeholder="Precio">
+                                <input type="number" id="new-prod-min-quantity" placeholder="Cant. Mínima (Mayoreo)" min="1" value="1">
                                 <select id="new-prod-category">
                                     <option value="juegos">Juegos</option>
                                     <option value="cuentas">Cuentas</option>
                                     <option value="saldo">Saldo</option>
                                 </select>
-                                <input type="text" id="new-prod-img" placeholder="URL de Imagen">
+                                <input type="text" id="new-prod-img" placeholder="URL de Imagen" style="grid-column: span 2;">
                             </div>
                             <textarea id="new-prod-desc" placeholder="Descripción" style="width: 100%; margin-top: 10px;"></textarea>
                             
@@ -520,6 +521,10 @@
                     <label style="font-size: 0.8rem; color: var(--text-muted);">Precio ($ MXN)</label>
                     <input type="number" id="edit-prod-price" placeholder="Precio" style="width:100%;">
                 </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 0.8rem; color: var(--text-muted);">Cantidad Mínima (Mayoreo)</label>
+                    <input type="number" id="edit-prod-min-quantity" placeholder="1" min="1" style="width:100%;">
+                </div>
                 <div>
                     <label style="font-size: 0.8rem; color: var(--text-muted);">Categoría</label>
                     <select id="edit-prod-category" style="width:100%;">
@@ -563,49 +568,6 @@
             <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
                 <button class="btn-primary" onclick="saveEditedProduct()" style="flex: 1;">Guardar Cambios</button>
                 <button class="btn-secondary" onclick="closeEditModal()" style="flex: 1;">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recharge Modal -->
-    <!-- Recharge Modal -->
-    <div class="modal" id="recharge-modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <h3>Recargar Saldo</h3>
-            <p class="text-muted" style="margin-top: 10px; font-size: 0.9rem;">Selecciona el monto. Serás redirigido a WhatsApp para confirmar el pago. Una vez verificado por un admin, tu saldo se actualizará.</p>
-            
-            <!-- POS Payment Machine Animation (Uiverse Admin12121) -->
-            <div class="pay-anim-container">
-             <div class="pay-anim-left">
-              <div class="pay-anim-card">
-               <div class="pay-anim-card-line"></div>
-               <div class="pay-anim-buttons"></div>
-              </div>
-              <div class="pay-anim-post">
-               <div class="pay-anim-post-line"></div>
-               <div class="pay-anim-screen">
-                <div class="pay-anim-dollar">$</div>
-               </div>
-              </div>
-             </div>
-             <div class="pay-anim-right">
-              <div class="pay-anim-text">Esperando tu Pago</div>
-               <svg viewBox="0 0 451.846 451.847" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path fill="var(--accent-primary)" d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0l194.287 194.284c6.177 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.267 22.373z"></path></svg>
-             </div>
-            </div>
-
-            <div class="recharge-options">
-                <div class="r-opt" onclick="selectMonto(100)">$100</div>
-                <div class="r-opt" onclick="selectMonto(200)">$200</div>
-                <div class="r-opt" onclick="selectMonto(500)">$500</div>
-                <div class="r-opt" onclick="selectMonto(1000)">$1000</div>
-            </div>
-            
-            <input type="number" id="custom-recharge" placeholder="Otro monto..." style="width: 100%; margin-bottom: 1rem;">
-            
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button class="btn-secondary" onclick="closeRechargeModal()">Cancelar</button>
-                <button class="btn-primary" onclick="processRecharge()"><i class="fa-brands fa-whatsapp"></i> Continuar</button>
             </div>
         </div>
     </div>

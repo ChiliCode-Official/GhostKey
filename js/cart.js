@@ -27,7 +27,9 @@ function createCartModalHTML() {
                     <span>Total Estimado:</span>
                     <span id="cart-total-price" style="color: var(--accent-primary);">$0.00</span>
                 </div>
-                <a href="catalogo.html" id="cart-checkout-btn" class="btn-primary" style="display:block; text-align:center; padding:12px;">Explorar Productos</a>
+                <button id="cart-checkout-btn" class="btn-primary" style="width:100%; display:block; text-align:center; padding:12px;">
+                    <i class="fa-solid fa-credit-card"></i> Pagar / Recargar
+                </button>
             </div>
         </div>
     `;
@@ -71,13 +73,14 @@ async function loadCartContent() {
 
     try {
         const uSnap = await getDoc(doc(db, 'users', currentUser.uid));
-        const wishlistIds = (uSnap.exists() && uSnap.data().wishlist) ? uSnap.data().wishlist : [];
+        const cartObj = (uSnap.exists() && uSnap.data().cart) ? uSnap.data().cart : {};
+        const cartItems = Object.keys(cartObj);
 
-        if (wishlistIds.length === 0) {
+        if (cartItems.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                     <i class="fa-solid fa-basket-shopping" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
-                    <p>Tu carrito/wishlist está vacío.</p>
+                    <p>Tu carrito está vacío.</p>
                 </div>
             `;
             if (totalPriceEl) totalPriceEl.textContent = '$0.00';
@@ -87,11 +90,13 @@ async function loadCartContent() {
         container.innerHTML = '';
         let totalSum = 0;
 
-        for (const pid of wishlistIds) {
+        for (const pid of cartItems) {
+            const qty = cartObj[pid];
             const pSnap = await getDoc(doc(db, 'products', pid));
             if (pSnap.exists()) {
                 const p = pSnap.data();
-                totalSum += (p.price || 0);
+                const itemTotal = (p.price || 0) * qty;
+                totalSum += itemTotal;
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'cart-item';
@@ -99,7 +104,7 @@ async function loadCartContent() {
                     <img src="${p.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=100'}" class="cart-item-img">
                     <div class="cart-item-info">
                         <div class="cart-item-title">${escapeHtml(p.name)}</div>
-                        <div class="cart-item-price">$${p.price}</div>
+                        <div class="cart-item-price">$${p.price} x ${qty} = $${itemTotal.toFixed(2)}</div>
                     </div>
                     <a href="producto.html?id=${pid}" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">Ver</a>
                 `;
@@ -108,6 +113,13 @@ async function loadCartContent() {
         }
 
         if (totalPriceEl) totalPriceEl.textContent = `$${totalSum.toFixed(2)}`;
+
+        const checkoutBtn = document.getElementById('cart-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.onclick = () => {
+                window.location.href = `pago.html?from=cart&amount=${totalSum}`;
+            };
+        }
 
     } catch (err) {
         console.error("Error loading cart:", err);

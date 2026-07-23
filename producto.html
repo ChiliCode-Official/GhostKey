@@ -121,25 +121,34 @@
                               <span class="now">a un amigo</span>
                               <span class="play">Regalar</span>
                             </button>
-                            
-                            <div id="gift-section" style="display:none; margin-top: 1rem;">
-                                <div class="brutalist-container" style="width: 100%;">
-                                  <input
-                                    id="gift-email"
-                                    placeholder="AMIGO@EMAIL.COM"
-                                    class="brutalist-input smooth-type"
-                                    type="email"
-                                  />
-                                  <label class="brutalist-label">CORREO DEL AMIGO</label>
-                                </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">Cantidad</span>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <button id="btn-qty-minus" style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--glass-border); border-radius: 5px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
+                                <span id="qty-display" style="font-weight: 700; font-size: 1.1rem; width: 20px; text-align: center;">1</span>
+                                <button id="btn-qty-plus" style="background: var(--accent-primary); color: white; border: none; border-radius: 5px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
                             </div>
                         </div>
-                            
+
                         <button id="buy-btn" class="btn-buy-custom">
-                            <i class="fa-solid fa-cart-shopping"></i> Comprar Ahora
+                            <i class="fa-solid fa-credit-card"></i> Comprar Ahora
+                        </button>
+                        
+                        <button id="add-cart-btn" class="btn-secondary" style="margin-top: 5px; padding: 12px; border-radius: 8px; border: 1px solid var(--accent-primary); color: var(--accent-primary); display: flex; justify-content: center; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
                         </button>
                         <p id="buy-error" style="color: var(--danger); font-size: 0.8rem; display: none;"></p>
                     </div>
+                </div>
+            </section>
+            
+            <!-- Product Reviews Section -->
+            <section class="reviews-section" style="margin-top: 3rem; margin-bottom: 3rem; width: 100%;">
+                <h2 class="section-title">Opiniones de los Usuarios</h2>
+                <div id="product-reviews-container" style="display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 1rem; margin-top: 1.5rem;">
+                    <!-- Reviews will be injected here by JS -->
+                    <p style="color: var(--text-muted);">Cargando reseñas...</p>
                 </div>
             </section>
         </main>
@@ -171,77 +180,75 @@
         <a href="perfil.html" class="dock-item"><i class="fa-solid fa-user"></i></a>
     </nav>
 
-    <!-- Gift Confirmation Modal with Astronaut Space Animation -->
-    <div class="modal" id="gift-confirmation-modal">
-        <div class="modal-content" style="max-width: 480px; text-align: center; padding: 1.5rem;">
-            <h3 style="color: var(--accent-primary); font-size: 1.3rem;">¡Regalo Enviado con Éxito! 🎁</h3>
-            <p id="gift-modal-message" style="margin-top: 8px; font-size: 0.95rem; color: var(--text-main);">
-                Nos esforzaremos al máximo para entregar tu regalo a tu amigo con la mayor rapidez posible.
-            </p>
+    <!-- Multi-Step Gift Modal -->
+    <div class="modal" id="gift-multi-modal">
+        <div class="modal-content" style="max-width: 480px; text-align: center; padding: 1.5rem; position: relative;">
+            
+            <!-- Step 1: Input Email -->
+            <div id="gift-step-1">
+                <h3 style="color: var(--accent-primary); font-size: 1.3rem;">Regalar a un Amigo</h3>
+                <p style="margin-top: 8px; font-size: 0.95rem; color: var(--text-muted);">Ingresa el correo electrónico de tu amigo.</p>
+                <div class="brutalist-container" style="width: 100%; margin-top: 1.5rem;">
+                  <input
+                    id="gift-email-input-modal"
+                    placeholder="AMIGO@EMAIL.COM"
+                    class="brutalist-input smooth-type"
+                    type="email"
+                  />
+                  <label class="brutalist-label">CORREO DEL AMIGO</label>
+                </div>
+                <p id="gift-modal-error" style="color: var(--danger); font-size: 0.85rem; margin-top: 10px; display: none;"></p>
+                <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                    <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('gift-multi-modal').classList.remove('active')">Cancelar</button>
+                    <button class="btn-primary" style="flex:1;" id="btn-gift-next-1">Continuar</button>
+                </div>
+            </div>
 
-            <!-- Astronaut Space Animation (Uiverse JkHuger) -->
-            <div class="astronaut-space-container">
-                <div class="box-of-star1">
-                    <div class="star star-position1"></div>
-                    <div class="star star-position2"></div>
-                    <div class="star star-position3"></div>
-                    <div class="star star-position4"></div>
-                    <div class="star star-position5"></div>
-                    <div class="star star-position6"></div>
-                    <div class="star star-position7"></div>
+            <!-- Step 2: Confirmation -->
+            <div id="gift-step-2" style="display: none;">
+                <h3 style="color: var(--warning); font-size: 1.3rem;">¿Estás Seguro?</h3>
+                <p style="margin-top: 8px; font-size: 0.95rem; color: var(--text-main);">
+                    Estás a punto de regalar <strong id="gift-confirm-product-name" style="color:var(--accent-primary);">Producto</strong> 
+                    a <strong id="gift-confirm-email">correo@amigo.com</strong> por <strong id="gift-confirm-price" style="color:var(--danger);">$0.00 MXN</strong>.
+                </p>
+                <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                    <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('gift-step-2').style.display='none'; document.getElementById('gift-step-1').style.display='block';">Atrás</button>
+                    <button class="btn-primary" style="flex:1;" id="btn-gift-confirm-buy">Confirmar Regalo</button>
                 </div>
-                <div class="box-of-star2">
-                    <div class="star star-position1"></div>
-                    <div class="star star-position2"></div>
-                    <div class="star star-position3"></div>
-                    <div class="star star-position4"></div>
-                    <div class="star star-position5"></div>
-                    <div class="star star-position6"></div>
-                    <div class="star star-position7"></div>
-                </div>
-                <div class="box-of-star3">
-                    <div class="star star-position1"></div>
-                    <div class="star star-position2"></div>
-                    <div class="star star-position3"></div>
-                    <div class="star star-position4"></div>
-                    <div class="star star-position5"></div>
-                    <div class="star star-position6"></div>
-                    <div class="star star-position7"></div>
-                </div>
-                <div class="box-of-star4">
-                    <div class="star star-position1"></div>
-                    <div class="star star-position2"></div>
-                    <div class="star star-position3"></div>
-                    <div class="star star-position4"></div>
-                    <div class="star star-position5"></div>
-                    <div class="star star-position6"></div>
-                    <div class="star star-position7"></div>
-                </div>
-                <div data-js="astro" class="astronaut">
-                    <div class="head"></div>
-                    <div class="arm arm-left"></div>
-                    <div class="arm arm-right"></div>
-                    <div class="body">
-                        <div class="panel"></div>
+            </div>
+
+            <!-- Step 3: Success Astronaut -->
+            <div id="gift-step-3" style="display: none;">
+                <h3 style="color: var(--accent-primary); font-size: 1.3rem;">¡Regalo Enviado con Éxito! 🎁</h3>
+                <p id="gift-modal-message" style="margin-top: 8px; font-size: 0.95rem; color: var(--text-main);">
+                    Nos esforzaremos al máximo para entregar tu regalo a tu amigo con la mayor rapidez posible.
+                </p>
+
+                <div class="astronaut-space-container">
+                    <!-- Astronaut CSS Animation -->
+                    <div class="box-of-star1"><div class="star star-position1"></div><div class="star star-position2"></div><div class="star star-position3"></div><div class="star star-position4"></div><div class="star star-position5"></div><div class="star star-position6"></div><div class="star star-position7"></div></div>
+                    <div class="box-of-star2"><div class="star star-position1"></div><div class="star star-position2"></div><div class="star star-position3"></div><div class="star star-position4"></div><div class="star star-position5"></div><div class="star star-position6"></div><div class="star star-position7"></div></div>
+                    <div class="box-of-star3"><div class="star star-position1"></div><div class="star star-position2"></div><div class="star star-position3"></div><div class="star star-position4"></div><div class="star star-position5"></div><div class="star star-position6"></div><div class="star star-position7"></div></div>
+                    <div class="box-of-star4"><div class="star star-position1"></div><div class="star star-position2"></div><div class="star star-position3"></div><div class="star star-position4"></div><div class="star star-position5"></div><div class="star star-position6"></div><div class="star star-position7"></div></div>
+                    <div data-js="astro" class="astronaut">
+                        <div class="head"></div>
+                        <div class="arm arm-left"></div>
+                        <div class="arm arm-right"></div>
+                        <div class="body"><div class="panel"></div></div>
+                        <div class="leg leg-left"></div>
+                        <div class="leg leg-right"></div>
+                        <div class="schoolbag"></div>
                     </div>
-                    <div class="leg leg-left"></div>
-                    <div class="leg leg-right"></div>
-                    <div class="schoolbag"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 1.5rem; flex-direction: column;">
+                    <button class="btn-primary" id="share-whatsapp-btn" style="background: #25D366; color: #fff;">
+                        <i class="fa-brands fa-whatsapp"></i> Compartir
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='perfil.html'">Ir a mi Perfil</button>
                 </div>
             </div>
 
-            <p id="gift-recipient-info" style="font-weight: 700; color: #10b981; font-size: 1rem; margin-bottom: 1rem;">
-                Para: <span id="gift-friend-name">Amigo</span>
-            </p>
-
-            <div style="display: flex; gap: 10px; flex-direction: column;">
-                <button id="share-whatsapp-btn" class="btn-primary" style="background: #25D366; border: none; font-size: 1rem; padding: 12px; color: white;">
-                    <i class="fa-brands fa-whatsapp"></i> Compartir por WhatsApp
-                </button>
-                <button class="btn-secondary" onclick="document.getElementById('gift-confirmation-modal').classList.remove('active')">
-                    Cerrar
-                </button>
-            </div>
         </div>
     </div>
 

@@ -1,0 +1,71 @@
+[debug] [2026-07-23T02:04:01.177Z] ----------------------------------------------------------------------
+[debug] [2026-07-23T02:04:01.179Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\lrodr\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2026-07-23T02:04:01.179Z] CLI Version:   15.24.0
+[debug] [2026-07-23T02:04:01.179Z] Platform:      win32
+[debug] [2026-07-23T02:04:01.179Z] Node Version:  v24.18.0
+[debug] [2026-07-23T02:04:01.179Z] Detected Agent: unknown
+[debug] [2026-07-23T02:04:01.180Z] Time:          Wed Jul 22 2026 20:04:01 GMT-0600 (hora estándar central)
+[debug] [2026-07-23T02:04:01.180Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\lrodr\Documents\GitHub\Digital-Footprint
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-07-23T02:05:18.867Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-23T02:05:18.867Z] > authorizing via signed-in user (lrodri30gc@gmail.com)
+[debug] [2026-07-23T02:05:18.880Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:18.880Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:18.881Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2026-07-23T02:05:19.392Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2026-07-23T02:05:19.392Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] 
+=== Firestore Setup
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-07-23T02:05:22.552Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:22.552Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:22.552Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/digital-ecom-f1579/services/firestore.googleapis.com [none]
+[debug] [2026-07-23T02:05:22.553Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/digital-ecom-f1579/services/firestore.googleapis.com  x-goog-user-project=digital-ecom-f1579
+[debug] [2026-07-23T02:05:23.284Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/digital-ecom-f1579/services/firestore.googleapis.com 200
+[debug] [2026-07-23T02:05:23.284Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/digital-ecom-f1579/services/firestore.googleapis.com [omitted]
+[info] +  firestore: required API firestore.googleapis.com is enabled 
+[debug] [2026-07-23T02:05:23.287Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:23.288Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:05:23.288Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/digital-ecom-f1579/databases [none]
+[debug] [2026-07-23T02:05:23.865Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/digital-ecom-f1579/databases 200
+[debug] [2026-07-23T02:05:23.865Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/digital-ecom-f1579/databases {"databases":[{"name":"projects/digital-ecom-f1579/databases/(default)","uid":"9a0d341c-cd48-4157-ba4f-e919b0d55c26","createTime":"2026-07-18T04:54:12.636840Z","updateTime":"2026-07-18T04:54:12.636840Z","locationId":"nam5","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-07-23T01:05:25.175034Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"s","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"ILD4u4Pb55UDMOaCsL2325UD"}]}
+[info] 
+[info] Firestore Security Rules allow you to define how and when to allow
+[info] requests. You can keep these rules in your project directory
+[info] and publish them with firebase deploy.
+[info] 
+[debug] [2026-07-23T02:07:28.722Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:07:28.722Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:07:28.722Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/releases pageSize=10&pageToken=
+[debug] [2026-07-23T02:07:28.926Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/releases 200
+[debug] [2026-07-23T02:07:28.926Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/releases {"releases":[{"name":"projects/digital-ecom-f1579/releases/cloud.firestore","rulesetName":"projects/digital-ecom-f1579/rulesets/0a693ca9-022d-4710-bddb-ed39b3332d31","createTime":"2026-07-18T04:54:13.312524Z","updateTime":"2026-07-19T03:45:43.449822Z"}]}
+[debug] [2026-07-23T02:07:28.927Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:07:28.927Z] Checked if tokens are valid: true, expires at: 1784775831251
+[debug] [2026-07-23T02:07:28.927Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/rulesets/0a693ca9-022d-4710-bddb-ed39b3332d31 [none]
+[debug] [2026-07-23T02:07:29.032Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/rulesets/0a693ca9-022d-4710-bddb-ed39b3332d31 200
+[debug] [2026-07-23T02:07:29.032Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/digital-ecom-f1579/rulesets/0a693ca9-022d-4710-bddb-ed39b3332d31 [omitted]
+[info] i  Downloaded the existing Firestore Security Rules from the Firebase console 
+[info] i  Skipping write of firestore.rules 
+[info] 
+[info] Firestore indexes allow you to perform complex queries while
+[info] maintaining performance that scales with the size of the result
+[info] set. You can keep index definitions in your project directory
+[info] and publish them with firebase deploy.
+[info] 
