@@ -37,9 +37,10 @@
                 <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
                     <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-users"></i> Sistema de Referidos</h2>
                     <p style="margin-bottom: 1rem; line-height: 1.6;">Invita a tus amigos a unirse y gana saldo gratis. Por cada compra que realice un amigo invitado por ti, tú recibirás el <strong>3%</strong> del valor de su compra en créditos directamente a tu saldo.</p>
-                    <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
+                    <div class="referral-box" style="background: var(--bg-main); padding: 1.2rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
                         <strong>Tu Link de Referido:</strong>
-                        <p style="color: var(--warning); margin-top: 5px;">Inicia sesión para ver tu enlace único.</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0 10px 0;">¡Gana 3% en saldo cuando tus amigos compren usando tu link!</p>
+                        <input type="text" id="ref-link-input" readonly value="Inicia sesión para ver tu enlace" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem; margin-bottom: 10px;">
                     </div>
                 </div>
 
@@ -59,5 +60,8 @@
             </section>
         </main>
     </div>
+
+    <script type="module" src="js/friends-panel.js"></script>
+    <script type="module" src="js/cart.js"></script>
 </body>
 </html>

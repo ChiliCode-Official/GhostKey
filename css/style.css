@@ -2443,6 +2443,48 @@ input:focus, select:focus, textarea:focus {
   box-shadow: none;
 }
 
+/* --- Global Modal System --- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.active {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
 /* --- Shopping Cart Drawer --- */
 .cart-modal {
   position: fixed;
@@ -3302,6 +3344,127 @@ input:focus, select:focus, textarea:focus {
   border-radius: 28px 28px 67px 0 / 28px 28px 62px 0;
   right: 0;
   background-color: #fbfdfa;
+}
+
+/* --- Referral Button (Uiverse marcelodolza adapted) --- */
+.button-referral {
+  --primary: #A182E8;
+  --neutral-1: #1e1b2e;
+  --neutral-2: #12101d;
+  --radius: 12px;
+
+  cursor: pointer;
+  border-radius: var(--radius);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  border: none;
+  box-shadow: 0 0.5px 0.5px 1px rgba(161, 130, 232, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+  width: 100%;
+  padding: 14px;
+  height: 52px;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  margin-top: 8px;
+}
+.button-referral:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 1px 2px rgba(161, 130, 232, 0.5),
+    0 15px 30px rgba(161, 130, 232, 0.2);
+}
+.button-referral:active {
+  transform: scale(0.98);
+}
+.button-referral:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  border: 1.5px solid transparent;
+  background: linear-gradient(var(--neutral-1), var(--neutral-2)) padding-box,
+    linear-gradient(to bottom, rgba(161, 130, 232, 0.3), rgba(161, 130, 232, 0.8)) border-box;
+  z-index: 0;
+  transition: all 0.4s ease;
+}
+.button-referral::before {
+  content: "";
+  inset: 4px;
+  position: absolute;
+  background: linear-gradient(to top, var(--neutral-1), var(--neutral-2));
+  border-radius: 10px;
+  z-index: 2;
+}
+
+.button-referral .outline {
+  position: absolute;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  inset: -2px;
+}
+.button-referral .outline::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(from 180deg, transparent 60%, #A182E8 80%, transparent 100%);
+  animation: spin 2s linear infinite;
+  animation-play-state: paused;
+}
+.button-referral:hover .outline {
+  opacity: 1;
+}
+.button-referral:hover .outline::before {
+  animation-play-state: running;
+}
+
+.button-referral .state {
+  padding-left: 26px;
+  z-index: 3;
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+.button-referral .state p {
+  display: flex;
+  margin: 0;
+}
+.button-referral .state .icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  transform: scale(1.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+.button-referral .state p span {
+  display: inline-block;
+  opacity: 1;
+}
+.button-referral:hover p span {
+  animation: wave 0.5s ease forwards calc(var(--i) * 0.02s);
+}
+
+.button-referral .state--sent {
+  display: none;
+}
+.button-referral.copied .state--default {
+  display: none;
+}
+.button-referral.copied .state--sent {
+  display: flex;
+  color: #10b981;
 }
 
 .arm-left:after,

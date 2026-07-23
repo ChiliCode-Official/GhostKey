@@ -18,6 +18,16 @@ import {
 const ADMIN_EMAIL = 'lrodricg30@gmail.com';
 let currentUser = null;
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // UI Elements
 const authGuard = document.getElementById('auth-guard');
 const profileContent = document.getElementById('profile-content');
