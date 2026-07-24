@@ -105,10 +105,12 @@ btnLoginGuard?.addEventListener('click', async () => {
         }
         if (authGuard) authGuard.style.display = 'none';
         if (profileContent) profileContent.style.display = 'block';
+        if (btnLogout) btnLogout.style.display = 'inline-block';
+        loadClientData(user.uid);
     } catch(err) {
         if (err.code !== 'auth/popup-closed-by-user') {
             console.error("Login Error:", err);
-            alert("Error al iniciar sesión.");
+            alert("Error al iniciar sesión: " + (err.message || err.code || err));
         }
     }
 });
