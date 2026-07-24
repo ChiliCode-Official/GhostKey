@@ -183,7 +183,7 @@
                 </div>
             </header>
 
-            <div id="auth-guard" style="display: block; padding: 2rem 1rem; text-align: center;">
+            <div id="auth-guard" style="display: none; padding: 2rem 1rem; text-align: center;">
                 <form action="" class="form-login" onsubmit="event.preventDefault();">
                     <p class="form-title">
                         Bienvenido<span>Inicia sesión para continuar en GhostKey</span>
@@ -601,50 +601,6 @@
     </nav>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-    <!-- Early auth check: hide login form instantly if Firebase has a persisted user -->
-    <script>
-        (function() {
-            function showProfile() {
-                var guard = document.getElementById('auth-guard');
-                var profile = document.getElementById('profile-content');
-                var logout = document.getElementById('logout-btn');
-                if (guard) guard.style.display = 'none';
-                if (profile) profile.style.display = 'block';
-                if (logout) logout.style.display = 'inline-block';
-            }
-
-            // Check 1: localStorage (Firebase compat SDK)
-            try {
-                for (var i = 0; i < localStorage.length; i++) {
-                    var key = localStorage.key(i);
-                    if (key && key.indexOf('firebase:authUser:') !== -1) {
-                        showProfile();
-                        return;
-                    }
-                }
-            } catch(e) {}
-
-            // Check 2: IndexedDB (Firebase 10.x modular SDK with browserLocalPersistence)
-            try {
-                var request = indexedDB.open('firebaseLocalStorageDb', 1);
-                request.onsuccess = function(event) {
-                    try {
-                        var db = event.target.result;
-                        var tx = db.transaction('firebaseLocalStorage', 'readonly');
-                        var store = tx.objectStore('firebaseLocalStorage');
-                        var getAll = store.getAll();
-                        getAll.onsuccess = function() {
-                            if (getAll.result && getAll.result.length > 0) {
-                                showProfile();
-                            }
-                        };
-                    } catch(e) {}
-                };
-            } catch(e) {}
-        })();
-    </script>
-
     <script type="module" src="js/perfil.js"></script>
     <script type="module" src="js/mobile-nav.js"></script>
     <script type="module" src="js/cart.js"></script>
