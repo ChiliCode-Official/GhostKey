@@ -40,7 +40,7 @@ const userAvatars   = document.querySelectorAll('.user-avatar');
 
 // ─── Show / Hide helpers ──────────────────────────────────────────────────────
 function showGuard() {
-    if (authGuard)      authGuard.style.display      = 'flex';
+    if (authGuard)      authGuard.style.display      = 'block';
     if (profileContent) profileContent.style.display = 'none';
     if (btnLogout)      btnLogout.style.display       = 'none';
 }
@@ -91,10 +91,15 @@ getRedirectResult(auth).then(async result => {
 });
 
 // ─── Logout ───────────────────────────────────────────────────────────────────
+window.__perfil_logout = function() {
+    signOut(auth)
+        .then(() => { window.location.href = 'index.html'; })
+        .catch(e => { console.error('Logout error:', e); alert('Error al cerrar sesión: ' + e.message); });
+};
+
+// Also attach via addEventListener as belt & suspenders
 if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
-        signOut(auth).then(() => { window.location.href = 'index.html'; }).catch(console.error);
-    });
+    btnLogout.addEventListener('click', window.__perfil_logout);
 }
 
 // ─── Google Login ─────────────────────────────────────────────────────────────
