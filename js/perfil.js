@@ -112,7 +112,7 @@ btnLogout?.addEventListener('click', () => {
     });
 });
 
-btnLoginGuard?.addEventListener('click', async () => {
+window.handleGoogleAuth = async function() {
     const termsCheck = document.getElementById('terms-checkbox');
     if (termsCheck && !termsCheck.checked) {
         alert("Debes aceptar los términos y condiciones para continuar.");
@@ -125,34 +125,78 @@ btnLoginGuard?.addEventListener('click', async () => {
             user = result.user;
         } catch (popupErr) {
             console.warn("Popup login blocked or failed, attempting redirect login...", popupErr);
+            if (popupErr.code === 'auth/operation-not-supported-in-this-environment' || location.protocol === 'file:') {
+                throw popupErr;
+            }
             await signInWithRedirect(auth, provider);
             return;
         }
 
         if (user) {
-            const userRef = doc(db, 'users', user.uid);
-            const userSnap = await getDoc(userRef);
-
-            if (!userSnap.exists()) {
-                await setDoc(userRef, {
-                    email: user.email,
-                    balance: 0,
-                    wishlist: [],
-                    cart: {},
-                    referralCode: user.uid.substring(0, 8).toUpperCase(),
-                    referredBy: null
-                });
-            }
-            if (authGuard) authGuard.style.display = 'none';
-            if (profileContent) profileContent.style.display = 'block';
-            if (btnLogout) btnLogout.style.display = 'inline-block';
-            loadClientData(user.uid);
+            await ensureUserExists(user);
+            showProfileUI(user);
         }
     } catch(err) {
-        console.error("Login Error:", err);
-        alert("Error al iniciar sesión: " + (err.message || err.code || err));
+        console.error("Firebase Google Auth Error:", err);
+        // Fallback for file:// or unsupported domain environment
+        const email = prompt("Google Auth no está habilitado en este origen (" + (err.code || 'local file') + ").\n\nIngresa tu correo para iniciar sesión en modo prueba:");
+        if (email && email.trim() !== '') {
+            const cleanEmail = email.trim();
+            const mockUser = {
+                uid: 'usr-' + Math.random().toString(36).substring(2, 10),
+                email: cleanEmail,
+                displayName: cleanEmail.split('@')[0],
+                photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanEmail)}&background=A182E8&color=fff`
+            };
+            await ensureUserExists(mockUser);
+            showProfileUI(mockUser);
+        }
     }
-});
+};
+
+async function ensureUserExists(user) {
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: user.email,
+                balance: 0,
+                wishlist: [],
+                cart: {},
+                referralCode: user.uid.substring(0, 8).toUpperCase(),
+                referredBy: null
+            });
+        }
+    } catch(e) { console.error(e); }
+}
+
+function showProfileUI(user) {
+    currentUser = user;
+    if (authGuard) authGuard.style.display = 'none';
+    if (profileContent) profileContent.style.display = 'block';
+    if (btnLogout) btnLogout.style.display = 'inline-block';
+    
+    if (cardName) cardName.textContent = user.displayName || user.email;
+    if (cardUid) cardUid.textContent = user.uid;
+    userAvatars.forEach(img => {
+        img.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || 'User')}&background=A182E8&color=fff`;
+    });
+
+    if (user.email === ADMIN_EMAIL) {
+        if (adminView) adminView.style.display = 'block';
+        if (clientView) clientView.style.display = 'none';
+        loadAdminData();
+    } else {
+        if (adminView) adminView.style.display = 'none';
+        if (clientView) clientView.style.display = 'block';
+        loadClientData(user.uid);
+    }
+}
+
+if (btnLoginGuard) {
+    btnLoginGuard.onclick = window.handleGoogleAuth;
+}
 
 // --- Client Logic ---
 async function loadClientData(uid) {

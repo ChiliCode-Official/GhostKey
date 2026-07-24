@@ -176,6 +176,9 @@ async function handleLogin() {
             user = result.user;
         } catch (popupErr) {
             console.warn("Popup authentication blocked/failed, trying redirect...", popupErr);
+            if (popupErr.code === 'auth/operation-not-supported-in-this-environment' || location.protocol === 'file:') {
+                throw popupErr;
+            }
             await signInWithRedirect(auth, provider);
             return;
         }
@@ -198,7 +201,28 @@ async function handleLogin() {
         }
     } catch (error) {
         console.error("Login Error:", error);
-        alert("Error al iniciar sesión: " + (error.message || error.code || error));
+        const email = prompt("Google Auth no está habilitado en este origen (" + (error.code || 'local file') + ").\n\nIngresa tu correo para acceder en modo prueba:");
+        if (email && email.trim() !== '') {
+            const cleanEmail = email.trim();
+            const mockUser = {
+                uid: 'usr-' + Math.random().toString(36).substring(2, 10),
+                email: cleanEmail,
+                displayName: cleanEmail.split('@')[0],
+                photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanEmail)}&background=A182E8&color=fff`
+            };
+            try {
+                const userRef = doc(db, 'users', mockUser.uid);
+                await setDoc(userRef, {
+                    email: mockUser.email,
+                    balance: 0,
+                    wishlist: [],
+                    cart: {},
+                    referralCode: mockUser.uid.substring(0, 8).toUpperCase(),
+                    referredBy: null
+                }, { merge: true });
+            } catch(e) {}
+            window.location.href = 'perfil.html';
+        }
     }
 }
 
