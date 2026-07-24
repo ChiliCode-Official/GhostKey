@@ -46,34 +46,36 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        authGuard.style.display = 'none';
-        profileContent.style.display = 'block';
+        if (authGuard) authGuard.style.display = 'none';
+        if (profileContent) profileContent.style.display = 'block';
+        if (btnLogout) btnLogout.style.display = 'inline-block';
         
         // Render basic info on GhostCard
         if (cardName) cardName.textContent = user.displayName || user.email;
         if (cardUid) cardUid.textContent = user.uid;
         userAvatars.forEach(img => {
-            img.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=A182E8&color=fff`;
+            img.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || 'User')}&background=A182E8&color=fff`;
         });
 
         // Check Admin Role
         if (user.email === ADMIN_EMAIL) {
-            adminView.style.display = 'block';
-            clientView.style.display = 'none';
+            if (adminView) adminView.style.display = 'block';
+            if (clientView) clientView.style.display = 'none';
             loadAdminData();
         } else {
-            adminView.style.display = 'none';
-            clientView.style.display = 'block';
+            if (adminView) adminView.style.display = 'none';
+            if (clientView) clientView.style.display = 'block';
             loadClientData(user.uid);
         }
     } else {
         currentUser = null;
-        authGuard.style.display = 'block';
-        profileContent.style.display = 'none';
+        if (authGuard) authGuard.style.display = 'block';
+        if (profileContent) profileContent.style.display = 'none';
+        if (btnLogout) btnLogout.style.display = 'none';
     }
 });
 
-btnLogout.addEventListener('click', () => {
+btnLogout?.addEventListener('click', () => {
     signOut(auth).then(() => {
         window.location.href = 'index.html';
     });
@@ -95,11 +97,14 @@ btnLoginGuard?.addEventListener('click', async () => {
             await setDoc(userRef, {
                 email: user.email,
                 balance: 0,
+                wishlist: [],
                 cart: {},
                 referralCode: user.uid.substring(0, 8).toUpperCase(),
                 referredBy: null
             });
         }
+        if (authGuard) authGuard.style.display = 'none';
+        if (profileContent) profileContent.style.display = 'block';
     } catch(err) {
         if (err.code !== 'auth/popup-closed-by-user') {
             console.error("Login Error:", err);
@@ -112,11 +117,23 @@ btnLoginGuard?.addEventListener('click', async () => {
 async function loadClientData(uid) {
     try {
         const userRef = doc(db, 'users', uid);
-        const userSnap = await getDoc(userRef);
+        let userSnap = await getDoc(userRef);
         
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: (currentUser && currentUser.email) || '',
+                balance: 0,
+                wishlist: [],
+                cart: {},
+                referralCode: uid.substring(0, 8).toUpperCase(),
+                referredBy: null
+            });
+            userSnap = await getDoc(userRef);
+        }
+
         if (userSnap.exists()) {
             const data = userSnap.data();
-            if (userBalance) userBalance.textContent = data.balance ? data.balance.toFixed(2) : '0.00';
+            if (userBalance) userBalance.textContent = (data.balance !== undefined && data.balance !== null) ? Number(data.balance).toFixed(2) : '0.00';
             
             // Load Orders
             const qOrders = query(collection(db, "orders"), where("uid", "==", uid));
@@ -136,7 +153,20 @@ async function loadClientData(uid) {
                 const o = d.data();
                 if (o.status === 'pendiente') hasPending = true;
 
-                const dDate = o.timestamp ? o.timestamp.toDate().toLocaleDateString() : 'Reciente';
+                let dDate = 'Reciente';
+                if (o.timestamp) {
+                    try {
+                        if (typeof o.timestamp.toDate === 'function') {
+                            dDate = o.timestamp.toDate().toLocaleDateString();
+                        } else if (o.timestamp.seconds) {
+                            dDate = new Date(o.timestamp.seconds * 1000).toLocaleDateString();
+                        } else {
+                            dDate = new Date(o.timestamp).toLocaleDateString();
+                        }
+                    } catch(e) {
+                        dDate = 'Reciente';
+                    }
+                }
                 const statusClass = o.status === 'pendiente' ? 'status-pending' : 'status-confirmed';
 
                 // Append to Table
@@ -145,7 +175,7 @@ async function loadClientData(uid) {
                         <tr>
                             <td>${dDate}</td>
                             <td>${escapeHtml(o.productName || 'Producto')}</td>
-                            <td><span class="status-badge ${statusClass}">${o.status.toUpperCase()}</span></td>
+                            <td><span class="status-badge ${statusClass}">${(o.status || 'PENDIENTE').toUpperCase()}</span></td>
                             <td>${escapeHtml(o.textDelivered || 'Procesando...')}</td>
                         </tr>
                     `;
@@ -208,6 +238,43 @@ async function loadClientData(uid) {
             }
             if (deliveredSection) {
                 deliveredSection.style.display = hasDelivered ? 'block' : 'none';
+            }
+
+            // Load Wishlist tab
+            const wishlistContainer = document.getElementById('wishlist-container');
+            if (wishlistContainer) {
+                const wishlistIds = data.wishlist || [];
+                wishlistContainer.innerHTML = '';
+                if (wishlistIds.length === 0) {
+                    wishlistContainer.innerHTML = `<p style="color:var(--text-muted); padding:1rem;">No tienes productos en tu wishlist.</p>`;
+                } else {
+                    for (const pid of wishlistIds) {
+                        try {
+                            const pSnap = await getDoc(doc(db, 'products', pid));
+                            if (pSnap.exists()) {
+                                const p = pSnap.data();
+                                const card = document.createElement('a');
+                                card.href = `producto.html?id=${pid}`;
+                                card.className = 'card';
+                                card.style.minWidth = '220px';
+                                card.innerHTML = `
+                                    <div class="card__shine"></div>
+                                    <div class="card__glow"></div>
+                                    <div class="card__content">
+                                        <div class="card__image" style="background-image: url('${p.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}');"></div>
+                                        <div class="card__text">
+                                            <p class="card__title">${escapeHtml(p.name)}</p>
+                                        </div>
+                                        <div class="card__footer">
+                                            <div class="card__price">$${p.price}</div>
+                                        </div>
+                                    </div>
+                                `;
+                                wishlistContainer.appendChild(card);
+                            }
+                        } catch(e) { console.error("Error loading wishlist item:", e); }
+                    }
+                }
             }
         }
     } catch(err) {

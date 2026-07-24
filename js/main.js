@@ -179,10 +179,12 @@ async function handleLogin() {
                 email: user.email,
                 balance: 0,
                 wishlist: [],
+                cart: {},
                 referralCode: user.uid.substring(0, 8).toUpperCase(),
                 referredBy: null
             });
         }
+        window.location.href = 'perfil.html';
     } catch (error) {
         if (error.code !== 'auth/popup-closed-by-user') {
             console.error("Login Error:", error);
