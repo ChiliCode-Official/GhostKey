@@ -1,5 +1,13 @@
 import { auth, db, provider } from './firebase-config.js';
-import { onAuthStateChanged, signOut, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import {
+    onAuthStateChanged,
+    signOut,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    setPersistence,
+    browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
     doc,
     getDoc,
@@ -42,6 +50,29 @@ const userBalance = document.getElementById('user-balance');
 const userAvatars = document.querySelectorAll('.user-avatar');
 
 setPersistence(auth, browserLocalPersistence).catch(console.error);
+
+// Check redirect login results
+getRedirectResult(auth).then(async (result) => {
+    if (result && result.user) {
+        const user = result.user;
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            await setDoc(userRef, {
+                email: user.email,
+                balance: 0,
+                wishlist: [],
+                cart: {},
+                referralCode: user.uid.substring(0, 8).toUpperCase(),
+                referredBy: null
+            });
+        }
+        if (authGuard) authGuard.style.display = 'none';
+        if (profileContent) profileContent.style.display = 'block';
+        if (btnLogout) btnLogout.style.display = 'inline-block';
+        loadClientData(user.uid);
+    }
+}).catch(console.error);
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -88,30 +119,38 @@ btnLoginGuard?.addEventListener('click', async () => {
         return;
     }
     try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
+        let user = null;
+        try {
+            const result = await signInWithPopup(auth, provider);
+            user = result.user;
+        } catch (popupErr) {
+            console.warn("Popup login blocked or failed, attempting redirect login...", popupErr);
+            await signInWithRedirect(auth, provider);
+            return;
+        }
 
-        if (!userSnap.exists()) {
-            await setDoc(userRef, {
-                email: user.email,
-                balance: 0,
-                wishlist: [],
-                cart: {},
-                referralCode: user.uid.substring(0, 8).toUpperCase(),
-                referredBy: null
-            });
+        if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    email: user.email,
+                    balance: 0,
+                    wishlist: [],
+                    cart: {},
+                    referralCode: user.uid.substring(0, 8).toUpperCase(),
+                    referredBy: null
+                });
+            }
+            if (authGuard) authGuard.style.display = 'none';
+            if (profileContent) profileContent.style.display = 'block';
+            if (btnLogout) btnLogout.style.display = 'inline-block';
+            loadClientData(user.uid);
         }
-        if (authGuard) authGuard.style.display = 'none';
-        if (profileContent) profileContent.style.display = 'block';
-        if (btnLogout) btnLogout.style.display = 'inline-block';
-        loadClientData(user.uid);
     } catch(err) {
-        if (err.code !== 'auth/popup-closed-by-user') {
-            console.error("Login Error:", err);
-            alert("Error al iniciar sesión: " + (err.message || err.code || err));
-        }
+        console.error("Login Error:", err);
+        alert("Error al iniciar sesión: " + (err.message || err.code || err));
     }
 });
 

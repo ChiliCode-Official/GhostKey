@@ -1,6 +1,8 @@
 import { db, auth, provider } from './firebase-config.js';
 import {
     signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
     signOut,
     onAuthStateChanged,
     setPersistence,
@@ -168,27 +170,35 @@ async function handleLogin() {
     }
 
     try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-            await setDoc(userRef, {
-                email: user.email,
-                balance: 0,
-                wishlist: [],
-                cart: {},
-                referralCode: user.uid.substring(0, 8).toUpperCase(),
-                referredBy: null
-            });
+        let user = null;
+        try {
+            const result = await signInWithPopup(auth, provider);
+            user = result.user;
+        } catch (popupErr) {
+            console.warn("Popup authentication blocked/failed, trying redirect...", popupErr);
+            await signInWithRedirect(auth, provider);
+            return;
         }
-        window.location.href = 'perfil.html';
+
+        if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    email: user.email,
+                    balance: 0,
+                    wishlist: [],
+                    cart: {},
+                    referralCode: user.uid.substring(0, 8).toUpperCase(),
+                    referredBy: null
+                });
+            }
+            window.location.href = 'perfil.html';
+        }
     } catch (error) {
-        if (error.code !== 'auth/popup-closed-by-user') {
-            console.error("Login Error:", error);
-        }
+        console.error("Login Error:", error);
+        alert("Error al iniciar sesión: " + (error.message || error.code || error));
     }
 }
 
