@@ -250,14 +250,14 @@
 
                 <!-- Dual View Container -->
                 <div id="client-view">
-                    <div class="balance-card">
+                    <div class="balance-card" style="background: linear-gradient(135deg, var(--accent-primary) 0%, #7C3AED 100%); padding: 2rem; border-radius: var(--border-radius-lg); color: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35); border: 1px solid rgba(255,255,255,0.15);">
                         <div>
-                            <p style="opacity: 0.8; margin-bottom: 5px;">Saldo Disponible (MXN)</p>
-                            <p class="balance-amount">$<span id="user-balance">0.00</span></p>
+                            <p style="opacity: 0.85; margin-bottom: 5px; font-size: 0.95rem; font-weight: 500;"><i class="fa-solid fa-wallet"></i> Saldo Disponible (MXN)</p>
+                            <p class="balance-amount" style="font-size: 3.2rem; font-weight: 900; letter-spacing: -1px;">$<span id="user-balance">0.00</span></p>
                         </div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <a href="metodos-pago.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-credit-card"></i> Ver Cuentas</a>
-                            <a href="pago.html?from=profile" class="recharge-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">Recargar Saldo <i class="fa-brands fa-whatsapp"></i></a>
+                            <a href="metodos-pago.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); color: white;"><i class="fa-solid fa-building-columns"></i> Métodos</a>
+                            <a href="pago.html?from=profile" class="recharge-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; background: white; color: #6D28D9; font-weight: 800; padding: 12px 24px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;"><i class="fa-solid fa-plus-circle"></i> Depositar Saldo</a>
                         </div>
                     </div>
 
@@ -362,12 +362,14 @@
                             <thead>
                                 <tr>
                                     <th>Usuario</th>
-                                    <th>Monto Solicitado</th>
+                                    <th>Método</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
                                     <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="admin-recharge-body">
-                                <!-- JS -->
+                                <!-- JS Injected -->
                             </tbody>
                         </table>
                     </div>

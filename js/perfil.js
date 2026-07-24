@@ -311,19 +311,36 @@ async function loadAdminData() {
     const qRecharges = query(collection(db, "balance_requests"), where("status", "==", "pendiente"));
     const rechargesSnap = await getDocs(qRecharges);
     const tbodyRecharges = document.getElementById('admin-recharge-body');
-    tbodyRecharges.innerHTML = '';
-    rechargesSnap.forEach(d => {
-        const r = d.data();
-        tbodyRecharges.innerHTML += `
-            <tr>
-                <td>${r.userEmail}</td>
-                <td>$${r.amount}</td>
-                <td>
-                    <button class="btn-primary" style="padding: 5px 10px; background: var(--success);" onclick="approveRecharge('${d.id}', '${r.uid}', ${r.amount})">Aprobar</button>
-                </td>
-            </tr>
-        `;
-    });
+    if (tbodyRecharges) {
+        tbodyRecharges.innerHTML = '';
+        if (rechargesSnap.empty) {
+            tbodyRecharges.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:1.5rem;">No hay solicitudes de recarga pendientes.</td></tr>`;
+        } else {
+            rechargesSnap.forEach(d => {
+                const r = d.data();
+                const rDate = r.timestamp ? (r.timestamp.toDate ? r.timestamp.toDate().toLocaleDateString() : 'Reciente') : 'Reciente';
+                const methodLabel = r.method || 'Transferencia';
+                tbodyRecharges.innerHTML += `
+                    <tr>
+                        <td>${escapeHtml(r.userEmail || 'Usuario')}</td>
+                        <td><span class="status-badge" style="background:rgba(161,130,232,0.15); color:var(--accent-primary); border:1px solid var(--glass-border);">${escapeHtml(methodLabel)}</span></td>
+                        <td><strong style="color:var(--success);">$${(r.amount || 0).toFixed(2)}</strong></td>
+                        <td><small style="color:var(--text-muted);">${rDate}</small></td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-primary" style="padding: 6px 12px; background: var(--success); font-size:0.82rem;" onclick="approveRecharge('${d.id}', '${r.uid}', ${r.amount})" title="Sí recibí el pago">
+                                    <i class="fa-solid fa-check"></i> Sí recibí el pago
+                                </button>
+                                <button class="btn-secondary" style="padding: 6px 12px; color: var(--danger); border-color:var(--danger); font-size:0.82rem;" onclick="rejectRecharge('${d.id}')" title="Negar pago">
+                                    <i class="fa-solid fa-xmark"></i> Negar pago
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    }
 
     // 3. Products List
     const tbodyStock = document.getElementById('admin-stock-body');
@@ -419,11 +436,25 @@ window.approveRecharge = async function(reqId, uid, amount) {
         await updateDoc(doc(db, 'balance_requests', reqId), {
             status: "aprobado"
         });
-        alert("Recarga aprobada");
+        alert("Recarga aprobada exitosamente.");
         loadAdminData();
     } catch(e) {
         console.error(e);
-        alert("Error al aprobar");
+        alert("Error al aprobar recarga.");
+    }
+};
+
+window.rejectRecharge = async function(reqId) {
+    if(!confirm("¿Deseas negar/rechazar este pago de recarga?")) return;
+    try {
+        await updateDoc(doc(db, 'balance_requests', reqId), {
+            status: "rechazado"
+        });
+        alert("Solicitud rechazada.");
+        loadAdminData();
+    } catch(e) {
+        console.error(e);
+        alert("Error al rechazar solicitud.");
     }
 };
 
