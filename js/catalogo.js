@@ -119,13 +119,12 @@ function createCard(product) {
     card.className = 'card';
     card.innerHTML = `
         <div class="card__content">
-            <span class="card__badge"></span>
             <button class="wishlist-btn" type="button"><i class="fa-solid fa-heart" aria-hidden="true"></i></button>
             <img class="card__image" alt="" loading="lazy" decoding="async">
             <div class="card__details">
-                <h2 class="card__title"></h2>
+                <h2 class="card__title"><a class="catalog-product-link"></a></h2>
+                <span class="card__badge"></span>
                 <p class="card__price-large"></p>
-                <a class="card__add-btn"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver producto</a>
             </div>
             <a class="card__quick-buy-btn" title="Comprar directamente"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i></a>
         </div>`;
@@ -136,14 +135,14 @@ function createCard(product) {
     const [stockLabel, statusColor] = getStockBadge(product.id);
     badge.textContent = stockLabel;
     badge.style.background = statusColor;
-    card.querySelector('.card__title').textContent = name;
+    const detailsLink = card.querySelector('.catalog-product-link');
+    detailsLink.textContent = name;
     card.querySelector('.card__price-large').textContent = product.displayPrice;
 
     const image = card.querySelector('img');
     image.src = product.image ? resolveImage(product.image) : fallbackImage;
     image.addEventListener('error', () => { image.src = fallbackImage; }, { once: true });
 
-    const detailsLink = card.querySelector('.card__add-btn');
     detailsLink.href = href;
     detailsLink.setAttribute('aria-label', `Ver producto: ${name}`);
     const quickBuy = card.querySelector('.card__quick-buy-btn');

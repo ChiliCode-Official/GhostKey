@@ -1,9 +1,10 @@
 const CACHE_PREFIX = 'ghostkey-pwa-cache-';
-const CACHE_NAME = CACHE_PREFIX + 'v11';
+const CACHE_NAME = CACHE_PREFIX + 'v12';
 const urlsToCache = [
   './index.html',
   './css/style.css',
   './css/store.css',
+  './css/catalogo.css',
   './css/mobile-dock.css',
   './css/help-bubble.css',
   './js/dock.js',

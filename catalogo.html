@@ -69,6 +69,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/store.css">
+    <link rel="stylesheet" href="css/catalogo.css">
 </head>
 <body class="ghost-store">
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
@@ -150,232 +151,15 @@
         })();
     </script>
     
-    <style>
-        .catalog-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 235px) minmax(0, 1fr);
-            align-items: start;
-            gap: clamp(1rem, 3vw, 2rem);
-        }
-        .catalog-sidebar {
-            position: sticky;
-            top: 80px;
-            padding: 1rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            background: var(--bg-card);
-        }
-        .catalog-sidebar-title {
-            margin: 0 0 .75rem;
-            font-size: 1rem;
-        }
-        #catalog-filters {
-            display: grid;
-            align-items: end;
-            gap: .75rem;
-        }
-        #catalog-filters label {
-            display: grid;
-            gap: .35rem;
-            min-width: 0;
-            color: var(--text-muted);
-            font-size: .85rem;
-            font-weight: 600;
-        }
-        #catalog-filters select {
-            min-width: 0;
-            width: 100%;
-            min-height: 42px;
-            padding: .4rem .55rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            background: var(--bg-main);
-            color: var(--text-main);
-            font: inherit;
-        }
-        #catalog-filters button {
-            min-height: 42px;
-            justify-self: start;
-        }
-        .catalog-heading {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: .5rem 1rem;
-        }
-        .catalog-heading h1 {
-            margin: 0;
-            font-size: clamp(1.75rem, 5vw, 2.45rem);
-        }
-        #results-count {
-            color: var(--text-muted);
-            font-size: .9rem;
-        }
-        .catalog-message {
-            grid-column: 1 / -1;
-            padding: 1.25rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-muted);
-        }
-        @media (prefers-reduced-motion: reduce) {
-            #catalog-grid .card {
-                transition: none;
-            }
-        }
-        #catalog-grid img.card__image {
-            object-fit: cover;
-        }
-        #catalog-grid .card__add-btn {
-            position: static;
-            z-index: auto;
-            display: block;
-            text-align: center;
-        }
-        #catalog-grid .card__add-btn::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: 3;
-        }
-        #catalog-grid .wishlist-btn {
-            position: absolute;
-            inset: 12px auto auto 12px;
-            z-index: 5;
-            display: grid;
-            place-items: center;
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--glass-border);
-            border-radius: 50%;
-            background: var(--bg-panel);
-            color: var(--text-main);
-            cursor: pointer;
-        }
-        #catalog-grid .wishlist-btn.active {
-            color: var(--danger) !important;
-        }
-        #catalog-grid .card:focus-within {
-            outline: 2px solid var(--accent-primary);
-            outline-offset: 3px;
-        }
-        @media (max-width: 768px) {
-            .catalog-layout {
-                grid-template-columns: minmax(0, 1fr);
-            }
-            #catalog-filters {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            #catalog-grid .card .card__add-btn {
-                display: inline-flex !important;
-                width: fit-content;
-                text-align: left;
-                margin: .35rem 0 0;
-                padding: 0;
-                border: 0;
-                background: transparent;
-                color: var(--text-main);
-                font-size: .75rem;
-            }
-            #catalog-grid .card .wishlist-btn,
-            #catalog-grid .card .card__quick-buy-btn {
-                width: 40px !important;
-                height: 40px !important;
-            }
-        }
-
-        .catalog-page { padding-top: clamp(20px, 4vw, 44px); }
-        .catalog-heading { margin-bottom: 20px; }
-        .catalog-heading h1 {
-            font-size: clamp(2rem, 5vw, 3.4rem);
-            letter-spacing: -.035em;
-            line-height: 1.08;
-        }
-        #results-count, #catalog-filters label { font-size: .95rem; }
-        #catalog-filters select, #catalog-filters button { min-height: 44px; }
-        #catalog-grid { margin-top: 0; }
-        #catalog-grid .card {
-            height: auto;
-            min-height: 0;
-            background: var(--bg-card) !important;
-            border: 1px solid rgba(255,255,255,.1);
-            box-shadow: none !important;
-            transform: none !important;
-        }
-        #catalog-grid .card:hover { border-color: var(--accent-primary); }
-        #catalog-grid .card .card__image {
-            height: auto;
-            aspect-ratio: 16 / 10;
-            background: var(--bg-main);
-            transform: none;
-        }
-        #catalog-grid .card .card__content { padding: 12px; }
-        #catalog-grid .card .card__title {
-            color: var(--text-main);
-            line-height: 1.35;
-            overflow-wrap: anywhere;
-        }
-        #catalog-grid .card .card__price-large { color: var(--accent-hover); }
-        #catalog-grid .card .card__add-btn {
-            text-decoration: none;
-            min-height: 44px;
-            background: var(--bg-panel);
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 8px;
-            color: var(--text-main);
-        }
-        #catalog-grid .card .wishlist-btn,
-        #catalog-grid .card .card__quick-buy-btn {
-            min-width: 44px;
-            min-height: 44px;
-        }
-        @media (max-width: 768px) {
-            .catalog-page .catalog-sidebar-title { display: block !important; }
-            #catalog-grid .card .card__title {
-                display: block !important;
-                font-size: 1rem !important;
-                line-height: 1.35 !important;
-            }
-            #catalog-grid .card .card__content {
-                height: auto !important;
-                padding: 0;
-                gap: 0;
-            }
-            #catalog-grid .card .card__image {
-                align-self: stretch;
-                height: auto !important;
-                aspect-ratio: auto;
-            }
-            #catalog-grid .card .card__badge {
-                transform: none;
-                letter-spacing: 0;
-                text-transform: none !important;
-            }
-            #catalog-grid .card .card__add-btn {
-                min-height: 44px;
-                margin: 0;
-                padding: 0;
-                align-items: center;
-                gap: .4rem;
-                background: transparent;
-                border: 0;
-                font-size: .87rem;
-            }
-        }
-        @media (max-width: 355px) {
-            #catalog-filters { grid-template-columns: 1fr; }
-        }
-    </style>
     <main class="gk-page-body catalog-page" id="main-content" tabindex="-1">
-        <div class="catalog-heading">
-            <h1>Catálogo</h1>
-            <span id="results-count" role="status">Cargando…</span>
-        </div>
-
+        <h1>Juegos, tarjetas regalo y recargas</h1>
         <div class="catalog-layout">
-            <aside class="catalog-sidebar" aria-label="Filtros del catálogo">
-                <h2 class="catalog-sidebar-title">Filtros</h2>
+            <p id="results-count" role="status">Cargando…</p>
+            <button class="catalog-filter-toggle" id="catalog-filter-toggle" type="button" aria-expanded="false" aria-controls="catalog-filter-panel catalog-sort">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i> Ordenar y filtrar
+            </button>
+            <aside id="catalog-filter-panel" class="catalog-sidebar" aria-label="Filtros del catálogo">
+                <h2>Filtros</h2>
                 <form id="catalog-filters">
                     <label>
                         Colección
@@ -392,26 +176,31 @@
                             <option value="over-500">Más de $500</option>
                         </select>
                     </label>
-                    <label>
+                    <button class="btn-secondary" type="reset">Limpiar filtros</button>
+                </form>
+            </aside>
+            <label class="catalog-sort" id="catalog-sort">
                         Ordenar
-                        <select id="sort-select">
+                        <select id="sort-select" form="catalog-filters">
                             <option value="default">Relevancia</option>
                             <option value="price-asc">Precio: menor a mayor</option>
                             <option value="price-desc">Precio: mayor a menor</option>
                             <option value="newest">Lo más nuevo</option>
                         </select>
                     </label>
-                    <button class="btn-secondary" type="reset">Limpiar filtros</button>
-                </form>
-            </aside>
-
-            <div class="catalog-main">
-                <div class="catalog-grid" id="catalog-grid" aria-busy="true"></div>
-            </div>
+            <div class="catalog-grid" id="catalog-grid" aria-busy="true"></div>
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const filterToggle = document.getElementById('catalog-filter-toggle');
+        const catalogPage = document.getElementById('main-content');
+        catalogPage.classList.add('catalog-ready');
+        filterToggle.addEventListener('click', () => {
+            const expanded = catalogPage.classList.toggle('filters-open');
+            filterToggle.setAttribute('aria-expanded', String(expanded));
+        });
+    </script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/catalogo.js"></script>
     <script type="module" src="js/mobile-nav.js"></script>
