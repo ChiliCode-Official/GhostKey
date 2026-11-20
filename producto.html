@@ -141,8 +141,9 @@
             });
         }
     </script>
+    <link rel="stylesheet" href="css/store.css">
 </head>
-<body>
+<body class="ghost-store">
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <!-- ===== GLOBAL NAVBAR (GhostKey) ===== -->
     <style>
@@ -176,7 +177,15 @@
         .gk-dock-item i { font-size: 1.2rem; }
         .gk-dock-item.active { color: var(--accent-primary); }
     </style>
-    <nav class="gk-navbar">
+    <nav class="store-rail" aria-label="Secciones de GhostKey">
+        <a class="store-brand" href="index.html"><img src="img/ghost-logo.png" alt="">GhostKey</a>
+        <a href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i>Inicio</a>
+        <a href="catalogo.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>Catálogo</a>
+        <a href="perfil.html"><i class="fa-solid fa-user" aria-hidden="true"></i>Mi cuenta</a>
+        <a href="info.html"><i class="fa-solid fa-circle-question" aria-hidden="true"></i>Cómo funciona</a>
+        <a href="metodos-pago.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i>Métodos de pago</a>
+    </nav>
+    <nav class="gk-navbar" aria-label="Búsqueda y cuenta">
         <a href="index.html" class="gk-nav-logo"><img src="img/ghost-logo.png" alt="GhostKey"></a>
         <div class="gk-search-wrap">
             <input id="gk-nav-search" type="search" aria-label="Buscar productos" placeholder="Buscar productos..." autocomplete="off">

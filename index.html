@@ -1315,11 +1315,20 @@
             });
         }
     </script>
+    <link rel="stylesheet" href="css/store.css">
 </head>
-<body>
+<body class="ghost-store">
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <!-- ===== TOP NAVBAR ===== -->
-    <nav class="gk-navbar">
+    <nav class="store-rail" aria-label="Secciones de GhostKey">
+        <a class="store-brand" href="index.html"><img src="img/ghost-logo.png" alt="">GhostKey</a>
+        <a href="index.html" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i>Inicio</a>
+        <a href="catalogo.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>Catálogo</a>
+        <a href="perfil.html"><i class="fa-solid fa-user" aria-hidden="true"></i>Mi cuenta</a>
+        <a href="info.html"><i class="fa-solid fa-circle-question" aria-hidden="true"></i>Cómo funciona</a>
+        <a href="metodos-pago.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i>Métodos de pago</a>
+    </nav>
+    <nav class="gk-navbar" aria-label="Búsqueda y cuenta">
         <a href="index.html" class="gk-nav-logo">
             <img src="img/ghost-logo.png" alt="GhostKey">
             <span>GhostKey</span>
@@ -1338,7 +1347,7 @@
         <!-- Search Bar -->
         <div class="gk-search-wrap">
             <input
-                id="main-search-input"
+                id="main-search-input" aria-label="Buscar productos"
                 autocomplete="off"
                 placeholder="Buscar productos, juegos, cuentas..."
                 type="text"
@@ -1388,7 +1397,7 @@
                         <i class="fa-solid fa-bolt"></i> Comprar ahora
                     </a>
                     <a href="catalogo.html" class="btn-ghost">
-                        <i class="fa-solid fa-grid-2"></i> Ver catálogo
+                        <i class="fa-solid fa-layer-group"></i> Ver catálogo
                     </a>
                 </div>
                 <div class="gk-hero-dots" id="hero-dots" role="group" aria-label="Seleccionar producto destacado"></div>
@@ -1407,7 +1416,7 @@
             <div class="gk-section-header">
                 <div class="gk-section-title-wrap">
                     <div class="gk-section-accent"></div>
-                    <h2>Productos de la tienda</h2>
+                    <h2>Productos</h2>
                 </div>
                 <a href="catalogo.html" class="gk-see-all">
                     Ver todos <i class="fa-solid fa-arrow-right"></i>
@@ -1495,7 +1504,7 @@
             <div class="gk-section-header">
                 <div class="gk-section-title-wrap">
                     <div class="gk-section-accent"></div>
-                    <h2>Explorar <span>Categorías</span></h2>
+                    <h2>Categorías</h2>
                 </div>
                 <a href="catalogo.html" class="gk-see-all">
                     Ver todas <i class="fa-solid fa-arrow-right"></i>
