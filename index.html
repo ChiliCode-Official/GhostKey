@@ -1274,7 +1274,7 @@
         </section>
 
         <!-- Productos de la tienda -->
-        <section class="gk-section">
+        <section class="gk-section market-shelf">
             <div class="gk-section-header">
                 <div class="gk-section-title-wrap">
                     <div class="gk-section-accent"></div>
@@ -1426,18 +1426,38 @@
             </div>
         </section>
 
-        <section class="gk-section" id="como-comprar">
-            <h2>Cómo comprar o regalar</h2>
-            <div class="store-guides">
-                <div class="gk-how-card">
-                    <h3>Comprar para ti</h3>
-                    <p>Elige un producto, agrégalo al carrito y paga. Ve a <strong>Mi cuenta</strong> para consultar tu pedido.</p>
-                </div>
-                <div class="gk-how-card" id="como-regalar">
-                    <h3>Regalar a un amigo</h3>
-                    <p>Abre un producto y pulsa <strong>Regalar a un amigo</strong>. Elige a alguien de tu lista o escribe su correo. Revisa el total y confirma.</p>
-                    <a href="catalogo.html" class="gk-see-all">Elegir un regalo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                </div>
+        <section class="gk-section market-guide" id="como-comprar" aria-labelledby="market-guide-title">
+            <h2 id="market-guide-title">De la tienda a tu biblioteca</h2>
+            <ol class="market-guide-route">
+                <li>
+                    <div class="market-scene market-scene-catalog" aria-hidden="true">
+                        <span class="market-cover"><i class="fa-solid fa-gamepad"></i></span>
+                        <span class="market-cover"><i class="fa-solid fa-ticket"></i></span>
+                        <span class="market-cover"><i class="fa-solid fa-film"></i></span>
+                    </div>
+                    <h3>Elige un producto</h3>
+                    <p>Abre su ficha para consultar el precio y la disponibilidad.</p>
+                </li>
+                <li id="como-regalar">
+                    <div class="market-scene market-scene-choice" aria-hidden="true">
+                        <span><i class="fa-solid fa-bag-shopping"></i> Para mí</span>
+                        <span><i class="fa-solid fa-gift"></i> Para un amigo</span>
+                    </div>
+                    <h3>Compra o regala</h3>
+                    <p>Añádelo al carrito para comprarlo. Si es un regalo, pulsa <strong>Regalar a un amigo</strong> en la ficha y elige al destinatario o escribe su correo.</p>
+                </li>
+                <li>
+                    <div class="market-scene market-scene-library" aria-hidden="true">
+                        <span><i class="fa-solid fa-book-open"></i></span>
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3>Consulta tu pedido</h3>
+                    <p>Revisa el total y confirma. En <strong>Mi biblioteca</strong> puedes ver el estado de tu compra o regalo.</p>
+                </li>
+            </ol>
+            <div class="market-guide-actions">
+                <a class="btn-primary" href="catalogo.html">Explorar catálogo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                <a class="btn-ghost" href="perfil.html#tab-pedidos">Abrir mi biblioteca</a>
             </div>
         </section>
 
