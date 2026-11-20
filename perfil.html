@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Virtual - Perfil</title>
+    <title>Mi perfil | GhostKey</title>
 
     <meta name="description" content="Compra cuentas premium, claves de juegos y saldo virtual en GhostKey. Entrega rápida, transacciones seguras y soporte dedicado.">
     <meta name="keywords" content="cuentas premium, claves juegos, saldo virtual, GhostKey, tienda digital, videojuegos">
@@ -68,13 +68,14 @@
         /* Dashboard Tabs */
         .tabs {
             display: flex;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 2rem;
             border-bottom: 1px solid var(--glass-border);
             padding-bottom: 10px;
-            overflow-x: auto;
         }
         .tab-btn {
+            min-height: 44px;
             background: none;
             border: none;
             color: var(--text-muted);
@@ -89,6 +90,19 @@
             background: var(--bg-card);
             color: var(--accent-primary);
             font-weight: bold;
+        }
+        .tab-btn:focus-visible,
+        .tab-content:focus-visible,
+        #copy-profile-uid:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 3px;
+        }
+        #copy-uid-hint:empty { margin: 0; }
+        @media (prefers-reduced-motion: reduce) {
+            #profile-content .tab-content.active,
+            #pending-orders-notice * {
+                animation: none;
+            }
         }
         .tab-content {
             display: none;
@@ -331,7 +345,7 @@
             <header class="top-bar">
                 <h2>Mi Perfil</h2>
                 <div class="top-actions">
-                    <button id="logout-btn" class="btn-secondary" style="display: none;" onclick="if(window.__perfil_logout) window.__perfil_logout();">Cerrar Sesión</button>
+                    <button id="logout-btn" class="btn-secondary" style="display: none;" type="button">Cerrar Sesión</button>
                 </div>
             </header>
 
@@ -344,8 +358,8 @@
                         Bienvenido<span>Debes iniciar sesión para ver tu perfil</span>
                     </p>
 
-                    <button class="btn-primary" type="button" style="width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 8px;" onclick="document.getElementById('auth-modal').style.display='flex'">
-                        Abrir Inicio de Sesión
+                    <button class="btn-primary" type="button" style="width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 8px;" id="open-profile-login">
+                        Iniciar sesión
                     </button>
                 </form>
             </div>
@@ -376,9 +390,8 @@
                         </div>
                       </div>
                     </div>
-                    <p id="copy-uid-hint" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: color 0.2s;">
-                        <i class="fa-regular fa-copy"></i> Haz clic en la tarjeta para copiar tu UID de amigo
-                    </p>
+                    <button id="copy-profile-uid" type="button" class="btn-secondary">Copiar UID de amigo</button>
+                    <p id="copy-uid-hint" role="status"></p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px;">
                         <a href="info.html" class="btn-secondary"><i class="fa-solid fa-circle-info"></i> Ayuda y Referidos</a>
                         <a href="metodos-pago.html" class="btn-secondary"><i class="fa-solid fa-credit-card"></i> Métodos de Pago</a>
@@ -398,14 +411,14 @@
                         </div>
                     </div>
 
-                    <div class="tabs">
-                        <button class="tab-btn active" data-target="tab-pedidos">Mis Pedidos</button>
-                        <button class="tab-btn" data-target="tab-recargas">Mis Recargas</button>
-                        <button class="tab-btn" data-target="tab-referidos"><i class="fa-solid fa-users"></i> Referidos & Amigos</button>
-                        <button class="tab-btn" data-target="tab-wishlist">Mi Wishlist</button>
+                    <div class="tabs" role="tablist" aria-label="Secciones de mi cuenta">
+                        <button class="tab-btn active" type="button" id="tab-pedidos-control" role="tab" aria-controls="tab-pedidos" aria-selected="true">Mis Pedidos</button>
+                        <button class="tab-btn" type="button" id="tab-recargas-control" role="tab" aria-controls="tab-recargas" aria-selected="false" tabindex="-1">Mis Recargas</button>
+                        <button class="tab-btn" type="button" id="tab-referidos-control" role="tab" aria-controls="tab-referidos" aria-selected="false" tabindex="-1"><i class="fa-solid fa-users"></i> Referidos & Amigos</button>
+                        <button class="tab-btn" type="button" id="tab-wishlist-control" role="tab" aria-controls="tab-wishlist" aria-selected="false" tabindex="-1">Mi Wishlist</button>
                     </div>
 
-                    <div id="tab-referidos" class="tab-content">
+                    <div id="tab-referidos" class="tab-content" role="tabpanel" aria-labelledby="tab-referidos-control" tabindex="0">
                         <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;">
                             <h3 style="color: var(--accent-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa-solid fa-user-plus"></i> Tu Programa de Referidos (3% de comisión por compra)
@@ -416,7 +429,7 @@
                             
                             <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--glass-border);">
                                 <div style="flex: 1; min-width: 220px;">
-                                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tu Enlace Único de Referido</label>
+                                    <label for="profile-referral-link" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tu Enlace Único de Referido</label>
                                     <input type="text" id="profile-referral-link" readonly style="width: 100%; background: var(--bg-main); border: 1px solid var(--glass-border); color: var(--text-main); padding: 10px 12px; border-radius: 8px; font-size: 0.85rem;" value="Cargando enlace...">
                                 </div>
                                 <button class="share-button" id="btn-share-referral-profile" style="width: auto; padding: 0 20px; margin-top: 0; min-height: 42px;">
@@ -447,7 +460,7 @@
                         </div>
                     </div>
 
-                    <div id="tab-recargas" class="tab-content">
+                    <div id="tab-recargas" class="tab-content" role="tabpanel" aria-labelledby="tab-recargas-control" tabindex="0">
                         <div class="glass-panel" style="padding: 1.5rem;">
                             <h3 style="color: var(--accent-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa-solid fa-clock-rotate-left"></i> Historial de Solicitudes de Recarga
@@ -470,7 +483,7 @@
                         </div>
                     </div>
 
-                    <div id="tab-pedidos" class="tab-content active">
+                    <div id="tab-pedidos" class="tab-content active" role="tabpanel" aria-labelledby="tab-pedidos-control" tabindex="0">
                         <!-- Delivered Products Cards Section (Uiverse vinodjangid07 adapted) -->
                         <div id="delivered-section" style="display:none; margin-bottom: 2rem;">
                             <h4 style="color: var(--accent-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
@@ -485,11 +498,11 @@
                         <div id="pending-orders-notice" style="display:none; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem; text-align: center;">
                             <div style="display:flex; flex-direction:column; align-items:center; gap: 10px;">
                                 <p style="font-weight: 700; font-size: 1.05rem; color: var(--accent-primary);">
-                                    ¡Estamos haciendo lo posible por entregar tu producto en el menor tiempo posible!
+                                    Estamos preparando tu pedido.
                                 </p>
                                 
                                 <!-- Hamster Wheel Animation (Uiverse Nawsome) -->
-                                <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
+                                <div aria-hidden="true" class="wheel-and-hamster">
                                     <div class="wheel"></div>
                                     <div class="hamster">
                                         <div class="hamster__body">
@@ -510,7 +523,7 @@
                             </div>
                         </div>
 
-                        <div class="table-responsive">
+                        <div class="table-responsive-wrap" tabindex="0" role="region" aria-label="Historial de pedidos">
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -521,13 +534,13 @@
                                     </tr>
                                 </thead>
                                 <tbody id="client-orders-body">
-                                    <!-- JS Injected -->
+                                    <tr><td colspan="4">Cargando…</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div id="tab-wishlist" class="tab-content">
+                    <div id="tab-wishlist" class="tab-content" role="tabpanel" aria-labelledby="tab-wishlist-control" tabindex="0">
                         <div class="horizontal-scroll" id="wishlist-container">
                              <!-- JS Injected -->
                         </div>
@@ -538,16 +551,16 @@
                 <div id="admin-view" style="display: none;">
                     <h3 style="margin-bottom: 1rem; color: var(--danger);"><i class="fa-solid fa-shield"></i> Panel de Administrador</h3>
                     
-                    <div class="tabs">
-                        <button class="tab-btn active" data-target="tab-admin-pedidos">Pedidos Pendientes</button>
-                        <button class="tab-btn" data-target="tab-admin-recargas">Aprobar Recargas</button>
-                        <button class="tab-btn" data-target="tab-admin-stock">Inventario / Stock</button>
-                        <button class="tab-btn" data-target="tab-admin-users">Usuarios</button>
-                        <button class="tab-btn" data-target="tab-admin-collections">Colecciones</button>
-                        <button class="tab-btn" data-target="tab-admin-metodos"><i class="fa-solid fa-credit-card"></i> Métodos de Pago</button>
+                    <div class="tabs" role="tablist" aria-label="Secciones de administración">
+                        <button class="tab-btn active" type="button" id="tab-admin-pedidos-control" role="tab" aria-controls="tab-admin-pedidos" aria-selected="true">Pedidos Pendientes</button>
+                        <button class="tab-btn" type="button" id="tab-admin-recargas-control" role="tab" aria-controls="tab-admin-recargas" aria-selected="false" tabindex="-1">Aprobar Recargas</button>
+                        <button class="tab-btn" type="button" id="tab-admin-stock-control" role="tab" aria-controls="tab-admin-stock" aria-selected="false" tabindex="-1">Inventario / Stock</button>
+                        <button class="tab-btn" type="button" id="tab-admin-users-control" role="tab" aria-controls="tab-admin-users" aria-selected="false" tabindex="-1">Usuarios</button>
+                        <button class="tab-btn" type="button" id="tab-admin-collections-control" role="tab" aria-controls="tab-admin-collections" aria-selected="false" tabindex="-1">Colecciones</button>
+                        <button class="tab-btn" type="button" id="tab-admin-metodos-control" role="tab" aria-controls="tab-admin-metodos" aria-selected="false" tabindex="-1"><i class="fa-solid fa-credit-card"></i> Métodos de Pago</button>
                     </div>
 
-                    <div id="tab-admin-pedidos" class="tab-content active">
+                    <div id="tab-admin-pedidos" class="tab-content active" role="tabpanel" aria-labelledby="tab-admin-pedidos-control" tabindex="0">
                         <!-- Pedidos bajo pedido -->
                         <div class="table-responsive-wrap">
                         <table class="data-table">
@@ -559,13 +572,13 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-orders-body">
-                                <!-- JS -->
+                                <tr><td colspan="3">Cargando…</td></tr>
                             </tbody>
                         </table>
                         </div>
                     </div>
 
-                    <div id="tab-admin-recargas" class="tab-content">
+                    <div id="tab-admin-recargas" class="tab-content" role="tabpanel" aria-labelledby="tab-admin-recargas-control" tabindex="0">
                         <div class="table-responsive-wrap">
                         <table class="data-table">
                             <thead>
@@ -578,33 +591,33 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-recharge-body">
-                                <!-- JS Injected -->
+                                <tr><td colspan="5">Cargando…</td></tr>
                             </tbody>
                         </table>
                         </div>
                     </div>
                     
-                    <div id="tab-admin-stock" class="tab-content">
+                    <div id="tab-admin-stock" class="tab-content" role="tabpanel" aria-labelledby="tab-admin-stock-control" tabindex="0">
                         <!-- Add product form -->
                         <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
                             <h4 style="margin-bottom: 1rem;">Agregar Nuevo Producto</h4>
                             <div class="admin-form-grid">
-                                <input type="text" id="new-prod-name" placeholder="Nombre">
-                                <input type="number" id="new-prod-price" placeholder="Precio">
-                                <input type="number" id="new-prod-min-quantity" placeholder="Cant. Mínima (Mayoreo)" min="1" value="1">
-                                <select id="new-prod-category">
+                                <input type="text" id="new-prod-name" aria-label="Nombre" placeholder="Nombre">
+                                <input type="number" id="new-prod-price" aria-label="Precio" placeholder="Precio">
+                                <input type="number" id="new-prod-min-quantity" aria-label="Cant. Mínima (Mayoreo)" placeholder="Cant. Mínima (Mayoreo)" min="1" value="1">
+                                <select id="new-prod-category" aria-label="Categoría">
                                     <option value="juegos">Juegos</option>
                                     <option value="cuentas">Cuentas</option>
                                     <option value="saldo">Saldo</option>
                                     <option value="metodos">Métodos</option>
                                 </select>
-                                <input type="text" id="new-prod-img" placeholder="URL de Imagen" style="grid-column: span 2;">
+                                <input type="text" id="new-prod-img" aria-label="URL de Imagen" placeholder="URL de Imagen" style="grid-column: span 2;">
                             </div>
-                            <textarea id="new-prod-desc" placeholder="Descripción" style="width: 100%; margin-top: 10px;"></textarea>
+                            <textarea id="new-prod-desc" aria-label="Descripción" placeholder="Descripción" style="width: 100%; margin-top: 10px;"></textarea>
                             
                             <h4 style="margin: 1rem 0;">Configuración de Stock</h4>
                             <div class="admin-form-grid">
-                                <select id="new-prod-status">
+                                <select id="new-prod-status" aria-label="Estado del producto">
                                     <option value="disponible">Disponible (Usa pool de abajo)</option>
                                     <option value="bajo_pedido">Bajo pedido</option>
                                     <option value="agotado">Agotado / No disponible</option>
@@ -617,9 +630,9 @@
                                 <label style="display:flex; align-items:center; gap:5px;">
                                     <input type="checkbox" id="new-prod-streaming" onchange="document.getElementById('new-prod-streaming-opts').style.display = this.checked ? 'block' : 'none'"> Es cuenta de Streaming
                                 </label>
-                                <input type="text" id="new-prod-streaming-opts" placeholder="Opciones y Precio (ej. 1 Mes: 50, 2 Meses: 90)" style="display:none; width:100%;">
+                                <input type="text" id="new-prod-streaming-opts" aria-label="Opciones y Precio (ej. 1 Mes: 50, 2 Meses: 90)" placeholder="Opciones y Precio (ej. 1 Mes: 50, 2 Meses: 90)" style="display:none; width:100%;">
                             </div>
-                            <textarea id="new-prod-pool" placeholder="Pool de Credenciales (Una por línea, si es Disponible)" style="width: 100%; height: 80px; margin-top: 10px;"></textarea>
+                            <textarea id="new-prod-pool" aria-label="Pool de Credenciales (Una por línea, si es Disponible)" placeholder="Pool de Credenciales (Una por línea, si es Disponible)" style="width: 100%; height: 80px; margin-top: 10px;"></textarea>
                             <button class="btn-primary" onclick="createProduct()" style="margin-top: 1rem; width: 100%;">Guardar Producto</button>
                         </div>
 
@@ -636,13 +649,13 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-stock-body">
-                                <!-- JS -->
+                                <tr><td colspan="6">Cargando…</td></tr>
                             </tbody>
                         </table>
                         </div>
                     </div>
                     
-                    <div id="tab-admin-users" class="tab-content">
+                    <div id="tab-admin-users" class="tab-content" role="tabpanel" aria-labelledby="tab-admin-users-control" tabindex="0">
                         <div class="table-responsive-wrap">
                         <table class="data-table">
                             <thead>
@@ -653,18 +666,18 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-users-body">
-                                <!-- JS Injected -->
+                                <tr><td colspan="3">Cargando…</td></tr>
                             </tbody>
                         </table>
                         </div>
                     </div>
 
-                    <div id="tab-admin-collections" class="tab-content">
+                    <div id="tab-admin-collections" class="tab-content" role="tabpanel" aria-labelledby="tab-admin-collections-control" tabindex="0">
                         <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
                             <h4 style="margin-bottom: 1rem;">Crear Colección</h4>
                             <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
                                 <div>
-                                    <label class="gk-label">Nombre de Colección</label>
+                                    <label for="new-collection-name" class="gk-label">Nombre de Colección</label>
                                     <input type="text" id="new-collection-name" class="gk-input" placeholder="Ej. PlayStation, Steam, Xbox...">
                                 </div>
                                 <button type="button" class="btn btn-primary" id="btn-create-collection" onclick="createCollection()" style="margin-top: 10px;">Crear Colección</button>
@@ -677,31 +690,31 @@
                         </div>
                     </div>
 
-                    <div id="tab-admin-metodos" class="tab-content">
+                    <div id="tab-admin-metodos" class="tab-content" role="tabpanel" aria-labelledby="tab-admin-metodos-control" tabindex="0">
                         <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
                             <h4 style="margin-bottom: 1rem;"><i class="fa-solid fa-plus-circle"></i> Agregar Método de Pago Oficial</h4>
                             <div class="admin-form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                                 <div>
-                                    <label class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Banco / Plataforma</label>
+                                    <label for="admin-pm-bank" class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Banco / Plataforma</label>
                                     <input type="text" id="admin-pm-bank" placeholder="Ej: STP, BBVA, Nu, Banorte" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
                                 </div>
                                 <div>
-                                    <label class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Beneficiario</label>
+                                    <label for="admin-pm-beneficiario" class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Beneficiario</label>
                                     <input type="text" id="admin-pm-beneficiario" placeholder="Nombre completo" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
                                 </div>
                                 <div>
-                                    <label class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Concepto Recomendado</label>
+                                    <label for="admin-pm-concepto" class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Concepto Recomendado</label>
                                     <input type="text" id="admin-pm-concepto" placeholder="Ej: Donación, Recarga" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
                                 </div>
                                 <div>
-                                    <label class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tipo de Método</label>
+                                    <label for="admin-pm-tipo" class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tipo de Método</label>
                                     <select id="admin-pm-tipo" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
                                         <option value="transferencia">Transferencia (SPEI)</option>
                                         <option value="efectivo">Efectivo / OXXO</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Cuenta CLABE / Tarjeta</label>
+                                    <label for="admin-pm-clabe" class="gk-label" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Cuenta CLABE / Tarjeta</label>
                                     <input type="text" id="admin-pm-clabe" placeholder="18 dígitos" style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff;">
                                 </div>
                             </div>
@@ -724,7 +737,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="admin-payment-methods-body">
-                                    <!-- JS Injected -->
+                                    <tr><td colspan="6">Cargando…</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -772,19 +785,19 @@
             <input type="hidden" id="edit-prod-id">
             <div class="admin-form-grid" style="margin-top: 1rem;">
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Nombre</label>
+                    <label for="edit-prod-name" style="font-size: 0.8rem; color: var(--text-muted);">Nombre</label>
                     <input type="text" id="edit-prod-name" placeholder="Nombre" style="width:100%;">
                 </div>
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Precio ($ MXN)</label>
+                    <label for="edit-prod-price" style="font-size: 0.8rem; color: var(--text-muted);">Precio ($ MXN)</label>
                     <input type="number" id="edit-prod-price" placeholder="Precio" style="width:100%;">
                 </div>
                 <div style="grid-column: span 2;">
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Cantidad Mínima (Mayoreo)</label>
+                    <label for="edit-prod-min-quantity" style="font-size: 0.8rem; color: var(--text-muted);">Cantidad Mínima (Mayoreo)</label>
                     <input type="number" id="edit-prod-min-quantity" placeholder="1" min="1" style="width:100%;">
                 </div>
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Categoría</label>
+                    <label for="edit-prod-category" style="font-size: 0.8rem; color: var(--text-muted);">Categoría</label>
                     <select id="edit-prod-category" style="width:100%;">
                         <option value="juegos">Juegos</option>
                         <option value="cuentas">Cuentas</option>
@@ -792,20 +805,20 @@
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">URL de Imagen</label>
+                    <label for="edit-prod-img" style="font-size: 0.8rem; color: var(--text-muted);">URL de Imagen</label>
                     <input type="text" id="edit-prod-img" placeholder="URL de Imagen" style="width:100%;">
                 </div>
             </div>
             
             <div style="margin-top: 10px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted);">Descripción del Producto</label>
+                <label for="edit-prod-desc" style="font-size: 0.8rem; color: var(--text-muted);">Descripción del Producto</label>
                 <textarea id="edit-prod-desc" placeholder="Descripción del producto..." style="width: 100%; height: 70px; margin-top: 5px;"></textarea>
             </div>
             
             <h4 style="margin: 1rem 0 5px 0;">Configuración de Stock</h4>
             <div class="admin-form-grid">
                 <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted);">Estado</label>
+                    <label for="edit-prod-status" style="font-size: 0.8rem; color: var(--text-muted);">Estado</label>
                     <select id="edit-prod-status" style="width:100%;">
                         <option value="disponible">Disponible (Usa pool de abajo)</option>
                         <option value="bajo_pedido">Bajo pedido</option>
@@ -825,7 +838,7 @@
                 <input type="text" id="edit-prod-streaming-opts" placeholder="Opciones y Precio (ej. 1 Mes: 50, 2 Meses: 90)" style="display:none; width:100%;">
             </div>
             <div style="margin-top: 10px;">
-                <label style="font-size: 0.8rem; color: var(--text-muted);">Pool de Credenciales (Una por línea)</label>
+                <label for="edit-prod-pool" style="font-size: 0.8rem; color: var(--text-muted);">Pool de Credenciales (Una por línea)</label>
                 <textarea id="edit-prod-pool" placeholder="Credencial/Código por línea..." style="width: 100%; height: 80px; margin-top: 5px;"></textarea>
             </div>
 
@@ -845,23 +858,6 @@
     <script type="module" src="js/cart.js"></script>
     <script type="module" src="js/friends-panel.js"></script>
     
-    <script>
-        // â”€â”€ Tab System (event delegation â€“ works for both client & admin tabs) â”€â”€
-        document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.tab-btn');
-            if (!btn) return;
-            const tabsContainer = btn.closest('.tabs');
-            if (!tabsContainer) return;
-            const parent = tabsContainer.parentElement;
-            // Deactivate all in same tab group
-            tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            parent.querySelectorAll(':scope > .tab-content').forEach(c => c.classList.remove('active'));
-            // Activate clicked
-            btn.classList.add('active');
-            const target = document.getElementById(btn.dataset.target);
-            if (target) target.classList.add('active');
-        });
-    </script>
     
     <!-- Gift Animation Modal -->
     <div id="gift-animation-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; align-items:center; justify-content:center;">

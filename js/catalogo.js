@@ -1,305 +1,279 @@
-﻿import { db, auth } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { initWishlistButtons } from './wishlist.js';
+import { db, auth } from './firebase-config.js';
+import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { toggleWishlist } from './wishlist.js';
 import { getGhostLoaderHTML } from './main.js';
 
 const catalogGrid = document.getElementById('catalog-grid');
+const resultsCount = document.getElementById('results-count');
 const searchInput = document.getElementById('gk-nav-search');
+const collectionSelect = document.getElementById('collection-select');
+const priceSelect = document.getElementById('price-select');
+const sortSelect = document.getElementById('sort-select');
+const fallbackImage = 'img/ghost-logo.png';
+
 let allProducts = [];
-let stockData = {};
-let currentUserWishlist = [];
+let stockByProduct = new Map();
+let wishlist = new Set();
+let cards = new Map();
+let catalogReady = false;
+let stockAvailable = true;
+let loadVersion = 0;
 
-async function fetchUserWishlist(uid) {
+async function fetchWishlist(user) {
+    if (!user) return new Set();
     try {
-        const userSnap = await getDoc(doc(db, 'users', uid));
-        if (userSnap.exists()) {
-            currentUserWishlist = userSnap.data().wishlist || [];
-        }
-    } catch(e) {
-        console.error(e);
+        const snapshot = await getDoc(doc(db, 'users', user.uid));
+        const entries = snapshot.data()?.wishlist;
+        return new Set(Array.isArray(entries) ? entries : []);
+    } catch (error) {
+        console.warn('Error al consultar favoritos', error);
+        return new Set();
     }
 }
 
-async function loadProducts() {
-    if (catalogGrid) catalogGrid.innerHTML = getGhostLoaderHTML('Cargando cat\u00E1logo...');
+async function loadProducts(user) {
+    const version = ++loadVersion;
+    catalogReady = false;
+    resultsCount.textContent = 'Cargando…';
+    catalogGrid.setAttribute('aria-busy', 'true');
+    catalogGrid.innerHTML = getGhostLoaderHTML('Cargando catálogo…');
+
     try {
-        let querySnapshot = { forEach: () => {} };
-        let stockSnapshot = { forEach: () => {} };
+        const [products, stock, saved] = await Promise.allSettled([
+            getDocs(collection(db, 'products')),
+            getDocs(collection(db, 'products_stock')),
+            fetchWishlist(user)
+        ]);
+        if (version !== loadVersion) return;
+        if (products.status === 'rejected') throw products.reason;
 
-        try { querySnapshot = await getDocs(collection(db, "products")); } catch(e) { console.error("Error fetching products:", e); }
-        try { stockSnapshot = await getDocs(collection(db, "products_stock")); } catch(e) { console.warn("Error fetching stock:", e); }
-
-        allProducts = [];
-        querySnapshot.forEach((doc) => {
-            allProducts.push({ id: doc.id, ...doc.data() });
+        stockAvailable = stock.status === 'fulfilled';
+        stockByProduct = stockAvailable
+            ? new Map(stock.value.docs.map(item => [item.id, item.data()]))
+            : new Map();
+        wishlist = saved.status === 'fulfilled' ? saved.value : new Set();
+        allProducts = products.value.docs.map(item => {
+            const product = { ...item.data(), id: item.id };
+            return { ...product, ...getDisplayPrice(product) };
         });
-        
-        stockData = {};
-        stockSnapshot.forEach((doc) => {
-            stockData[doc.id] = doc.data();
-        });
 
-        applyFilters(); 
-    } catch (e) {
-        console.error("Error loading products: ", e);
-        if (catalogGrid) catalogGrid.innerHTML = `<p style="color:var(--danger)">Error al cargar el cat\u00E1logo.</p>`;
+        cards = new Map();
+        catalogReady = true;
+        applyFilters();
+    } catch (error) {
+        console.error('Error al cargar el catálogo', error);
+        resultsCount.textContent = 'Catálogo no disponible';
+        renderMessage('No se pudo cargar el catálogo.');
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'btn-secondary';
+        retry.textContent = 'Volver a intentar';
+        retry.addEventListener('click', () => loadProducts(auth.currentUser));
+        catalogGrid.firstElementChild.append(' ', retry);
+    } finally {
+        if (version === loadVersion) catalogGrid.setAttribute('aria-busy', 'false');
     }
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+function getDisplayPrice(product) {
+    const basePrice = Number(product.price) || 0;
+    if (product.isStreaming && typeof product.streamingOptions === 'string') {
+        const options = product.streamingOptions.split(',').map(option => option.trim()).filter(Boolean);
+        if (options.some(option => option.includes(':'))) {
+            const price = Math.min(...options.map(option => Number.parseFloat(option.split(':')[1]) || basePrice));
+            return { displayPrice: `Desde $${price.toFixed(2)}`, effectivePrice: price };
+        }
+        if (basePrice === 0) return { displayPrice: '¡Gratis!', effectivePrice: 0 };
+    }
+    return { displayPrice: `$${basePrice.toFixed(2)}`, effectivePrice: basePrice };
 }
 
-function normalizeImageUrl(url) {
-    if (!url) return '';
+function resolveImage(url) {
     try {
-        let clean = url.trim();
-        if (clean.includes('imgur.com') && !clean.includes('i.imgur.com')) {
-            const parts = clean.split('/');
-            const id = parts[parts.length - 1].split('.')[0];
-            if (id) return `https://i.imgur.com/${id}.png`;
+        const image = new URL(url, window.location.href);
+        if (image.protocol !== 'https:' && image.protocol !== 'http:') return fallbackImage;
+        if (image.hostname === 'imgur.com' || image.hostname === 'www.imgur.com') {
+            const id = image.pathname.split('/').filter(Boolean).pop()?.split('.')[0];
+            return id ? `https://i.imgur.com/${encodeURIComponent(id)}.png` : fallbackImage;
         }
-        return clean;
-    } catch(e) {
-        return url || '';
+        return image.href;
+    } catch {
+        return fallbackImage;
     }
 }
 
-function renderProducts(products) {
-    if (!catalogGrid) return;
-    catalogGrid.innerHTML = '';
-    
-    if (products.length === 0) {
-        catalogGrid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No hay productos que coincidan con la b\u00FAsqueda.</p>`;
-        return;
+function getStockBadge(productId) {
+    if (!stockAvailable) return ['Stock sin confirmar', 'var(--warning)'];
+    const stock = stockByProduct.get(productId);
+    if (!stock || stock.status === 'bajo_pedido') return ['Bajo pedido', 'var(--warning)'];
+    if (stock.status === 'disponible' && typeof stock.credentialsPool === 'string') {
+        const count = stock.credentialsPool.split('\n').filter(line => line.trim()).length;
+        if (count > 0) return [`En stock (${count})`, 'var(--success)'];
     }
+    return ['Agotado', 'var(--danger)'];
+}
 
-    products.forEach((prod) => {
-        let status = 'Agotado';
-        let stockLabel = 'Agotado';
-        let statusColor = 'var(--danger)';
-        
-        if (stockData && stockData[prod.id]) {
-            const sd = stockData[prod.id];
-            status = sd.status;
-            if (status === 'disponible') {
-                let pool = sd.credentialsPool || "";
-                let count = pool.split('\n').filter(line => line.trim() !== "").length;
-                stockLabel = count > 0 ? `En stock (${count})` : 'Agotado';
-                statusColor = count > 0 ? 'var(--success)' : 'var(--danger)';
-            } else if (status === 'bajo_pedido') {
-                stockLabel = 'Bajo pedido';
-                statusColor = 'var(--warning)';
-            }
-        }
-
-        const prodImg = normalizeImageUrl(prod.image) || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400';
-
-        let displayPrice = `$${Number(prod.price || 0).toFixed(2)}`;
-        if (prod.isStreaming && prod.streamingOptions) {
-            let minPrice = Infinity;
-            const opts = prod.streamingOptions.split(',').filter(o => o.trim() !== '');
-            opts.forEach(o => {
-                if (o.includes(':')) {
-                    const optPrice = parseFloat(o.split(':')[1].trim());
-                    if (!isNaN(optPrice) && optPrice < minPrice) minPrice = optPrice;
-                }
-            });
-            if (minPrice !== Infinity) {
-                displayPrice = `Desde $${minPrice.toFixed(2)}`;
-            } else if (prod.price == 0) {
-                displayPrice = `¡Gratis!`;
-            }
-        }
-
-        const card = document.createElement('a');
-        card.href = `producto.html?id=${prod.id}`;
-        card.className = 'card';
-        card.style.opacity = 0;
-        card.innerHTML = `
-            <div class="card__shine"></div>
-            <div class="card__glow"></div>
-            <div class="card__content">
-            <div class="card__badge" style="background:${statusColor}">${stockLabel}</div>
-            <button class="wishlist-btn" data-id="${prod.id}" style="position:absolute; top:12px; left:12px; z-index:4; background:var(--bg-panel); border:1px solid var(--glass-border); color:var(--text-muted); border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-heart"></i></button>
-            <div class="card__image" style="background-image: url('${normalizeImageUrl(prod.image) || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}');"></div>
+function createCard(product) {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+        <div class="card__content">
+            <span class="card__badge"></span>
+            <button class="wishlist-btn" type="button"><i class="fa-solid fa-heart" aria-hidden="true"></i></button>
+            <img class="card__image" alt="" loading="lazy" decoding="async">
             <div class="card__details">
-                <p class="card__title">${escapeHtml(prod.name)}</p>
-                <div class="card__reviews">
-                    <span class="stars">★★★★★</span>
-                    <span class="rating">4.8 (1.3k)</span>
-                </div>
-                <div class="card__price-large">${displayPrice}</div>
-                <button class="card__add-btn" type="button">
-                    <i class="fa-solid fa-eye"></i> Ver producto
-                </button>
+                <h2 class="card__title"></h2>
+                <p class="card__price-large"></p>
+                <a class="card__add-btn"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver producto</a>
             </div>
-            <button class="card__quick-buy-btn" data-buy-id="${prod.id}" type="button" aria-label="Comprar directamente" title="Comprar directamente">
-                <i class="fa-solid fa-cart-plus"></i>
-            </button>
-            </div>
-        `;
-        catalogGrid.appendChild(card);
-    });
+            <a class="card__quick-buy-btn" title="Comprar directamente"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i></a>
+        </div>`;
 
-    try {
-        initWishlistButtons(currentUserWishlist);
-    // Compra rapida directa estilo Eneba
-    document.querySelectorAll(".card__quick-buy-btn").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const pid = btn.getAttribute("data-buy-id");
-            if (pid) window.location.href = `producto.html?id=${pid}&action=buy`;
-        });
-    });
-    } catch(e) { console.error('Wishlist init error:', e); }
+    const name = product.name || 'Producto';
+    const href = `producto.html?id=${encodeURIComponent(product.id)}`;
+    const badge = card.querySelector('.card__badge');
+    const [stockLabel, statusColor] = getStockBadge(product.id);
+    badge.textContent = stockLabel;
+    badge.style.background = statusColor;
+    card.querySelector('.card__title').textContent = name;
+    card.querySelector('.card__price-large').textContent = product.displayPrice;
 
-    try {
-        if (typeof gsap !== 'undefined') {
-            gsap.to('.card', {
-                opacity: 1,
-                y: -10,
-                duration: 0.5,
-                stagger: 0.05,
-                ease: "power2.out"
-            });
-        } else {
-            document.querySelectorAll('.card').forEach(c => c.style.opacity = 1);
+    const image = card.querySelector('img');
+    image.src = product.image ? resolveImage(product.image) : fallbackImage;
+    image.addEventListener('error', () => { image.src = fallbackImage; }, { once: true });
+
+    const detailsLink = card.querySelector('.card__add-btn');
+    detailsLink.href = href;
+    detailsLink.setAttribute('aria-label', `Ver producto: ${name}`);
+    const quickBuy = card.querySelector('.card__quick-buy-btn');
+    quickBuy.href = `${href}&action=buy`;
+    quickBuy.setAttribute('aria-label', `Comprar directamente: ${name}`);
+
+    const favorite = card.querySelector('.wishlist-btn');
+    const selected = wishlist.has(product.id);
+    favorite.classList.toggle('active', selected);
+    favorite.setAttribute('aria-label', `Guardar en favoritos: ${name}`);
+    favorite.setAttribute('aria-pressed', String(selected));
+    favorite.addEventListener('click', async () => {
+        favorite.disabled = true;
+        try {
+            await toggleWishlist(product.id, favorite);
+            favorite.setAttribute('aria-pressed', String(favorite.classList.contains('active')));
+        } finally {
+            favorite.disabled = false;
         }
-    } catch(e) {
-        document.querySelectorAll('.card').forEach(c => c.style.opacity = 1);
+    });
+    return card;
+}
+
+function renderMessage(message) {
+    const element = document.createElement('p');
+    element.className = 'catalog-message';
+    element.textContent = message;
+    catalogGrid.replaceChildren(element);
+}
+
+async function loadCollections() {
+    try {
+        const snapshot = await getDocs(collection(db, 'collections'));
+        const options = snapshot.docs.map(item => new Option(item.data().name || item.id, item.id));
+        collectionSelect.replaceChildren(new Option('Todas las colecciones', 'all'), ...options);
+        syncCollection();
+    } catch (error) {
+        console.warn('Error al cargar las colecciones', error);
     }
 }
 
-async function loadCollectionsForFilter() {
-    const colSelect = document.getElementById('collection-select');
-    if (!colSelect) return;
-    try {
-        const snap = await getDocs(collection(db, 'collections'));
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const option = document.createElement('option');
-            option.value = docSnap.id;
-            option.textContent = data.name;
-            colSelect.appendChild(option);
-        });
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeCategory = urlParams.get('cat');
-        if (activeCategory) {
-            colSelect.value = activeCategory;
-        }
-    } catch(e) {
-        console.error("Error loading collections filter:", e);
+function syncCollection() {
+    const category = new URLSearchParams(window.location.search).get('cat');
+    if (category && !Array.from(collectionSelect.options).some(option => option.value === category)) {
+        collectionSelect.add(new Option('Colección seleccionada', category));
     }
+    collectionSelect.value = category || 'all';
 }
 
-function handleFilters() {
-    loadCollectionsForFilter();
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlSearch = urlParams.get('search');
-    
-    if (searchInput) {
-        if (urlSearch) {
-            searchInput.value = urlSearch;
-        }
-        searchInput.addEventListener('input', applyFilters);
-    }
-    
-    const priceSelect = document.getElementById('price-select');
-    if (priceSelect) {
-        priceSelect.addEventListener('change', applyFilters);
-    }
+function syncSearch() {
+    if (searchInput) searchInput.value = new URLSearchParams(window.location.search).get('search') || '';
+}
 
-    const priceRadios = document.querySelectorAll('input[name="price-filter"]');
-    priceRadios.forEach(r => r.addEventListener('change', applyFilters));
-    
-    const sortSelect = document.getElementById('sort-select');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', applyFilters);
-    }
-    
-    const collectionSelect = document.getElementById('collection-select');
-    if (collectionSelect) {
-        collectionSelect.addEventListener('change', (e) => {
-            // Update URL without reloading to keep state
-            const url = new URL(window.location);
-            if(e.target.value === 'all') url.searchParams.delete('cat');
-            else url.searchParams.set('cat', e.target.value);
-            window.history.pushState({}, '', url);
-            applyFilters();
-        });
-    }
+function updateUrl(parameter, value, method) {
+    const url = new URL(window.location.href);
+    if (value) url.searchParams.set(parameter, value);
+    else url.searchParams.delete(parameter);
+    if (url.href !== window.location.href) window.history[method]({}, '', url);
+}
+
+function normalizeSearch(value) {
+    return String(value || '').trim().toLocaleLowerCase('es').normalize('NFD').replace(/\p{Diacritic}/gu, '');
 }
 
 function applyFilters() {
-    const colSelect = document.getElementById('collection-select');
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeCategory = (colSelect && colSelect.value !== 'all') ? colSelect.value : (urlParams.get('cat') || 'all');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : (urlParams.get('search') || '').toLowerCase();
-    
-    let filtered = allProducts;
-    
-    if (activeCategory !== 'all') {
-        filtered = filtered.filter(p => p.category === activeCategory);
+    if (!catalogReady) return;
+    const category = collectionSelect.value;
+    const searchTerm = normalizeSearch(searchInput?.value);
+    const priceRange = priceSelect.value;
+    const filtered = allProducts.filter(product => {
+        if (category !== 'all' && product.category !== category) return false;
+        if (searchTerm && !normalizeSearch(product.name).includes(searchTerm)) return false;
+        const price = product.effectivePrice;
+        if (priceRange === 'under-100') return price < 100;
+        if (priceRange === '100-500') return price >= 100 && price <= 500;
+        if (priceRange === 'over-500') return price > 500;
+        return true;
+    });
+
+    if (sortSelect.value === 'price-asc') filtered.sort((a, b) => a.effectivePrice - b.effectivePrice);
+    if (sortSelect.value === 'price-desc') filtered.sort((a, b) => b.effectivePrice - a.effectivePrice);
+    if (sortSelect.value === 'newest') {
+        filtered.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
     }
-    
-    if (searchTerm) {
-        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchTerm));
+
+    resultsCount.textContent = filtered.length === 1 ? '1 resultado' : `${filtered.length} resultados`;
+    if (!filtered.length) {
+        renderMessage(allProducts.length ? 'No hay coincidencias. Prueba otra búsqueda o limpia los filtros.' : 'Todavía no hay productos en el catálogo.');
+        return;
     }
-    
-    // Apply Price Filter
-    const priceSelect = document.getElementById('price-select');
-    const checkedPrice = document.querySelector('input[name="price-filter"]:checked');
-    const val = priceSelect ? priceSelect.value : (checkedPrice ? checkedPrice.value : 'all');
-    
-    if (val === 'under-100') filtered = filtered.filter(p => p.price < 100);
-    else if (val === '100-500') filtered = filtered.filter(p => p.price >= 100 && p.price <= 500);
-    else if (val === 'over-500') filtered = filtered.filter(p => p.price > 500);
-    
-    // Apply Sort
-    const sortSelect = document.getElementById('sort-select');
-    if (sortSelect) {
-        const sortVal = sortSelect.value;
-        if (sortVal === 'price-asc') filtered.sort((a,b) => a.price - b.price);
-        else if (sortVal === 'price-desc') filtered.sort((a,b) => b.price - a.price);
-        else if (sortVal === 'newest') {
-            filtered.sort((a,b) => {
-                const ta = a.createdAt ? (typeof a.createdAt.toMillis === 'function' ? a.createdAt.toMillis() : 0) : 0;
-                const tb = b.createdAt ? (typeof b.createdAt.toMillis === 'function' ? b.createdAt.toMillis() : 0) : 0;
-                return tb - ta;
-            });
-        }
+
+    const fragment = document.createDocumentFragment();
+    for (const product of filtered) {
+        if (!cards.has(product.id)) cards.set(product.id, createCard(product));
+        fragment.append(cards.get(product.id));
     }
-    
-    const resultsCount = document.getElementById('results-count');
-    if (resultsCount) {
-        resultsCount.textContent = filtered.length + ' resultado' + (filtered.length === 1 ? '' : 's');
-    }
-    
-    renderProducts(filtered);
+    catalogGrid.replaceChildren(fragment);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    handleFilters();
+syncCollection();
+syncSearch();
+loadCollections();
+
+searchInput?.addEventListener('input', () => {
+    updateUrl('search', searchInput.value.trim(), 'replaceState');
+    applyFilters();
+});
+collectionSelect.addEventListener('change', () => {
+    updateUrl('cat', collectionSelect.value === 'all' ? '' : collectionSelect.value, 'pushState');
+    applyFilters();
+});
+priceSelect.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', applyFilters);
+document.getElementById('catalog-filters').addEventListener('reset', event => {
+    event.preventDefault();
+    collectionSelect.value = 'all';
+    priceSelect.value = 'all';
+    sortSelect.value = 'default';
+    if (searchInput) searchInput.value = '';
+    const url = new URL(window.location.href);
+    url.searchParams.delete('cat');
+    url.searchParams.delete('search');
+    if (url.href !== window.location.href) window.history.pushState({}, '', url);
+    applyFilters();
+});
+window.addEventListener('popstate', () => {
+    syncCollection();
+    syncSearch();
+    applyFilters();
 });
 
 setPersistence(auth, browserLocalPersistence).catch(console.error);
-
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        await fetchUserWishlist(user.uid);
-    } else {
-        currentUserWishlist = [];
-    }
-    loadProducts();
-});
+onAuthStateChanged(auth, loadProducts);

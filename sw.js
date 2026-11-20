@@ -1,4 +1,5 @@
-const CACHE_NAME = 'ghostkey-pwa-cache-v6';
+const CACHE_PREFIX = 'ghostkey-pwa-cache-';
+const CACHE_NAME = CACHE_PREFIX + 'v7';
 const urlsToCache = [
   './index.html',
   './css/style.css',
@@ -27,7 +28,7 @@ self.addEventListener('install', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
 
   const isPageOrAppAsset = event.request.mode === 'navigate' || ['document', 'script', 'style'].includes(event.request.destination);
   if (isPageOrAppAsset) {
@@ -41,7 +42,8 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(async () => {
-          const cached = await caches.match(event.request);
+          const cache = await caches.open(CACHE_NAME);
+          const cached = await cache.match(event.request);
           if (cached) return cached;
           if (event.request.mode === 'navigate') {
             return new Response('<!doctype html><html lang="es"><meta name="viewport" content="width=device-width"><body style="margin:0;background:#0B0E14;color:white;font-family:system-ui;padding:32px"><h1>GhostKey</h1><p>No se pudo cargar la tienda. Revisa tu conexión y vuelve a intentar.</p><button onclick="location.reload()">Reintentar</button></body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
@@ -53,23 +55,16 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.open(CACHE_NAME).then((cache) => cache.match(event.request))
+      .then((cached) => cached || fetch(event.request))
   );
 });
 
-// Activate Event
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+  event.waitUntil((async () => {
+    const cacheNames = await caches.keys();
+    const oldCaches = cacheNames.filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME);
+    await Promise.all(oldCaches.map((name) => caches.delete(name)));
+    await self.clients.claim();
+  })());
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Virtual - Términos y Privacidad</title>
+    <title>Términos y privacidad | GhostKey</title>
 
     <meta name="description" content="Compra cuentas premium, claves de juegos y saldo virtual en GhostKey. Entrega r�pida, transacciones seguras y soporte dedicado.">
     <meta name="keywords" content="cuentas premium, claves juegos, saldo virtual, GhostKey, tienda digital, videojuegos">
@@ -35,6 +35,7 @@
     </script>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <!-- ===== GLOBAL NAVBAR (GhostKey) ===== -->
     <style>
         html, body { height: auto !important; overflow: visible !important; overflow-x: hidden !important; }
@@ -93,13 +94,17 @@
             }
         })();
     </script>
-    <div class="gk-page-body">
+    <main class="gk-page-body" id="main-content" tabindex="-1">
             <header class="top-bar">
                 <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
             </header>
 
             <section style="margin-top: 1rem; max-width: 800px;">
-                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">Legal</h1>
+                <h1 class="guide-title">Términos y privacidad</h1>
+                <nav class="guide-links" aria-label="Secciones legales">
+                    <a href="#terms">Términos de servicio</a>
+                    <a href="#privacy">Privacidad</a>
+                </nav>
                 
                 <div id="terms" class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
                     <h2 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fa-solid fa-file-contract"></i> Términos de Servicio</h2>
@@ -140,7 +145,7 @@
                 </div>
             </section>
         
-    </div>
+    </main>
 
     <script type="module" src="js/cart.js"></script>
 

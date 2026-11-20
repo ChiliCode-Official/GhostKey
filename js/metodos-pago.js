@@ -11,6 +11,8 @@ import {
 
 const ADMIN_EMAIL = 'lrodricg30@gmail.com';
 let currentUser = null;
+let loadId = 0;
+let toastTimer;
 
 const adminContainer = document.getElementById('admin-payment-container');
 const paymentList = document.getElementById('payment-methods-list');
@@ -28,9 +30,11 @@ onAuthStateChanged(auth, async (user) => {
 export async function loadPaymentMethods() {
     if (!paymentList) return;
 
+    const requestId = ++loadId;
     try {
         const snap = await getDocs(collection(db, "payment_methods"));
 
+        if (requestId !== loadId) return;
         if (snap.empty) {
             paymentList.innerHTML = `
                 <div class="payment-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
@@ -49,7 +53,8 @@ export async function loadPaymentMethods() {
             const bankName = data.banco || data.bank || 'Transferencia Interbancaria';
             const beneficiario = data.beneficiario || 'GhostKey Oficial';
             const concepto = data.concepto || 'Recarga de Saldo';
-            const clabe = data.clabe || '000000000000000000';
+            const clabe = String(data.clabe || '').trim();
+            const accountLabel = data.tipo === 'efectivo' ? 'Número para depósito' : 'Cuenta CLABE';
 
             const card = document.createElement('div');
             card.className = 'payment-card';
@@ -59,7 +64,7 @@ export async function loadPaymentMethods() {
                         <i class="fa-solid fa-building-columns"></i> ${escapeHtml(bankName)}
                     </div>
                     ${currentUser && currentUser.email === ADMIN_EMAIL ? `
-                        <button class="delete-pm-btn" data-id="${docId}" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1rem;" title="Eliminar Método">
+                        <button class="delete-pm-btn" type="button" aria-label="Eliminar método" data-id="${escapeHtml(docId)}" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 1rem;" title="Eliminar Método">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     ` : ''}
@@ -76,10 +81,10 @@ export async function loadPaymentMethods() {
                 </div>
 
                 <div class="payment-detail-group" style="margin-bottom: 0;">
-                    <div class="payment-detail-label">Cuenta CLABE</div>
+                    <div class="payment-detail-label">${accountLabel}</div>
                     <div class="clabe-box" data-clabe="${escapeHtml(clabe)}">
-                        <span class="clabe-number">${escapeHtml(clabe)}</span>
-                        <button class="clabe-copy-btn">
+                        <span class="clabe-number">${clabe ? escapeHtml(clabe) : "Sin número registrado"}</span>
+                        <button type="button" class="clabe-copy-btn" ${clabe ? "" : "disabled"}>
                             <i class="fa-solid fa-copy"></i> Copiar
                         </button>
                     </div>
@@ -90,11 +95,8 @@ export async function loadPaymentMethods() {
         });
 
         // Add Click to Copy listeners with animation
-        document.querySelectorAll('.clabe-box').forEach(box => {
-            box.addEventListener('click', () => {
-                const clabeText = box.dataset.clabe;
-                copyCLABE(clabeText, box);
-            });
+        paymentList.querySelectorAll('.clabe-box').forEach(box => {
+            box.querySelector('.clabe-copy-btn').addEventListener('click', () => copyCLABE(box.dataset.clabe, box));
         });
 
         // Add Delete listeners for Admin
@@ -103,23 +105,29 @@ export async function loadPaymentMethods() {
                 e.stopPropagation();
                 if (!confirm("¿Deseas eliminar este método de pago?")) return;
                 const id = btn.dataset.id;
+                btn.disabled = true;
                 try {
                     await deleteDoc(doc(db, "payment_methods", id));
                     showToast("Método de pago eliminado");
-                    loadPaymentMethods();
+                    await loadPaymentMethods();
                 } catch (err) {
                     console.error("Error deleting payment method:", err);
+                    showToast("No se pudo eliminar el método de pago.");
+                } finally {
+                    btn.disabled = false;
                 }
             });
         });
 
     } catch (err) {
         console.error("Error loading payment methods:", err);
+        if (requestId === loadId) paymentList.textContent = "No se pudieron cargar los métodos de pago. Recarga la página para reintentar.";
     }
 }
 
-function copyCLABE(clabeText, boxElement) {
-    navigator.clipboard.writeText(clabeText).then(() => {
+async function copyCLABE(clabeText, boxElement) {
+    try {
+        await navigator.clipboard.writeText(clabeText);
         boxElement.classList.add('copied');
         const copyBtn = boxElement.querySelector('.clabe-copy-btn');
         if (copyBtn) {
@@ -127,7 +135,7 @@ function copyCLABE(clabeText, boxElement) {
             copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> Copiado`;
         }
 
-        showToast("¡Cuenta CLABE copiada al portapapeles!");
+        showToast("Número copiado al portapapeles.");
 
         setTimeout(() => {
             boxElement.classList.remove('copied');
@@ -136,21 +144,25 @@ function copyCLABE(clabeText, boxElement) {
                 copyBtn.innerHTML = `<i class="fa-solid fa-copy"></i> Copiar`;
             }
         }, 2000);
-    }).catch(err => {
+    } catch (err) {
         console.error("Copy failed:", err);
-    });
+        showToast("No se pudo copiar. Selecciona y copia el número manualmente.");
+    }
 }
 
 function showToast(message) {
     if (!toast) return;
     toast.textContent = message;
     toast.classList.add('show');
-    setTimeout(() => {
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
         toast.classList.remove('show');
     }, 2500);
 }
 
-async function savePaymentMethod() {
+async function savePaymentMethod(event) {
+    event.preventDefault();
+    if (currentUser?.email !== ADMIN_EMAIL || btnSave.disabled) return;
     const bank = document.getElementById('pm-bank').value.trim();
     const beneficiario = document.getElementById('pm-beneficiario').value.trim();
     const concepto = document.getElementById('pm-concepto').value.trim();
@@ -158,10 +170,11 @@ async function savePaymentMethod() {
     const tipo = document.getElementById('pm-tipo') ? document.getElementById('pm-tipo').value : 'transferencia';
 
     if (!bank || !beneficiario || !clabe) {
-        alert("Banco, Beneficiario y Cuenta CLABE son obligatorios.");
+        alert("Ingresa el banco, el beneficiario y el número para depósito.");
         return;
     }
 
+    btnSave.disabled = true;
     try {
         await addDoc(collection(db, "payment_methods"), {
             banco: bank,
@@ -178,10 +191,12 @@ async function savePaymentMethod() {
         document.getElementById('pm-clabe').value = '';
 
         showToast("Método de pago guardado exitosamente");
-        loadPaymentMethods();
+        await loadPaymentMethods();
     } catch (err) {
         console.error("Error saving payment method:", err);
-        alert("Error al guardar el método de pago.");
+        showToast("No se pudo guardar el método de pago.");
+    } finally {
+        btnSave.disabled = false;
     }
 }
 
@@ -194,6 +209,4 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-if (btnSave) {
-    btnSave.addEventListener('click', savePaymentMethod);
-}
+adminContainer?.addEventListener('submit', savePaymentMethod);

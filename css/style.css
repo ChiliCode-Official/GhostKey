@@ -6047,3 +6047,59 @@ button, .btn-primary, .btn-secondary {
         filter: brightness(1.2) !important;
     }
 }
+
+/* Keyboard navigation */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #c8b4ff;
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  padding: 12px 16px;
+  transform: translateY(calc(-100% - 24px));
+  border-radius: 10px;
+  background: #f1eaff;
+  color: #171222;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.guide-title {
+  font-size: clamp(1.6rem, 5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.guide-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.guide-links a:hover {
+  border-color: var(--accent-primary);
+}
+
+.gk-page-body [id] {
+  scroll-margin-top: 96px;
+}

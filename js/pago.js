@@ -1,6 +1,6 @@
 import { db, auth } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, getDocs, setDoc, collection, addDoc, updateDoc, serverTimestamp, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, getDocs, setDoc, collection, serverTimestamp, runTransaction, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { sendNotification } from './notifications.js';
 
 let currentUser = null;
@@ -19,9 +19,10 @@ function getProductTotalPrice(product, quantity, fallbackUnitPrice) {
 // URL Params
 const urlParams = new URLSearchParams(window.location.search);
 const from = urlParams.get('from'); // 'cart', 'profile', 'product'
-const targetAmount = parseFloat(urlParams.get('amount')) || 0;
+const suggestedAmount = Number(urlParams.get('amount'));
+let reviewedTotal = null;
 const productId = urlParams.get('productId');
-const qty = parseInt(urlParams.get('qty')) || 1;
+const qty = Number(urlParams.get('qty') || 1);
 const isGift = urlParams.get('isGift') === 'true';
 const giftEmail = urlParams.get('giftEmail');
 const customerNotesParam = urlParams.get('notes') || '';
@@ -42,23 +43,34 @@ const subEl = document.getElementById('pago-subtitle');
 const errorEl = document.getElementById('pago-error');
 
 onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    userData = null;
+    errorEl.style.display = 'none';
+    actionArea.replaceChildren();
+    dynamicArea.replaceChildren();
+    titleEl.textContent = 'Cargando pago…';
+    subEl.textContent = 'Consultando tus opciones de pago.';
     if (user) {
-        currentUser = user;
         authMsg.style.display = 'none';
         pagoContent.style.display = 'grid';
         
         try {
             const userRef = doc(db, 'users', user.uid);
             const uSnap = await getDoc(userRef);
+            if (user !== currentUser) return;
             if (uSnap.exists()) {
                 userData = uSnap.data();
-                initializePaymentLogic();
+                await initializePaymentLogic(user);
             } else {
-                showError("No se encontró la información del usuario.");
+                throw new Error("No se encontró la información de tu cuenta.");
             }
         } catch(e) {
             console.error(e);
-            showError("Error al cargar datos del usuario.");
+            if (user === currentUser) {
+                titleEl.textContent = "No se pudo cargar el pago";
+                subEl.textContent = "";
+                showError(e.message || "Vuelve a cargar la página para reintentar.");
+            }
         }
     } else {
         authMsg.style.display = 'block';
@@ -73,18 +85,45 @@ function showError(msg) {
     }
 }
 
-function initializePaymentLogic() {
-    const currentBalance = userData.balance || 0;
-    const isPurchase = (from === 'cart' || from === 'product');
-    
-    // DECISION TREE
-    if (isPurchase && currentBalance >= targetAmount && targetAmount > 0) {
-        // MODE: CONFIRM PURCHASE WITH BALANCE
-        setupPurchaseMode(currentBalance, targetAmount);
-    } else {
-        // MODE: RECHARGE BALANCE
-        setupRechargeMode(currentBalance, targetAmount);
+function getUnitPrice(product, duration) {
+    const option = duration && product.streamingOptions?.split(",").find(value => value.split(":")[0].trim() === duration);
+    const optionPrice = option ? parseFloat(option.split(":")[1]) : NaN;
+    const price = Number.isNaN(optionPrice) ? parseFloat(product.price) : optionPrice;
+    if (!Number.isFinite(price) || price < 0) throw new Error("El producto no tiene un precio válido.");
+    return price;
+}
+
+function calculateLineTotal(product, quantity, unitPrice) {
+    if (!Number.isSafeInteger(quantity) || quantity < 1) throw new Error("Cantidad inválida.");
+    return getProductTotalPrice(product, quantity, unitPrice);
+}
+
+async function initializePaymentLogic(user) {
+    const balance = Number(userData.balance) || 0;
+    reviewedTotal = null;
+    if (from === "cart" || from === "product") {
+        const products = from === "cart"
+            ? Object.entries(userData.cart || {})
+            : [[productId, { qty, duration: singleDurationParam }]];
+        if (!products.length) throw new Error("Tu carrito está vacío.");
+        const totals = await Promise.all(products.map(async ([id, item]) => {
+            if (!id) throw new Error("Producto inválido.");
+            const snap = await getDoc(doc(db, "products", id));
+            if (!snap.exists()) throw new Error("Un artículo ya no está disponible. Revisa tu carrito o vuelve al catálogo.");
+            const product = snap.data();
+            const quantity = typeof item === "number" ? item : Number(item?.qty);
+            return calculateLineTotal(product, quantity, getUnitPrice(product, item?.duration));
+        }));
+        if (user !== currentUser) return;
+        reviewedTotal = totals.reduce((sum, line) => sum + line, 0);
+        if (!(reviewedTotal > 0) || !Number.isFinite(reviewedTotal)) throw new Error("No se pudo calcular un total de compra válido.");
+        if (balance >= reviewedTotal) {
+            setupPurchaseMode(balance, reviewedTotal);
+            return;
+        }
     }
+    const deficit = reviewedTotal !== null ? Math.max(15, (reviewedTotal - balance)) : suggestedAmount;
+    setupRechargeMode(balance, Number.isFinite(deficit) && deficit > 0 ? Number(deficit.toFixed(2)) : 0);
 }
 
 function setupPurchaseMode(balance, amount) {
@@ -113,28 +152,28 @@ function setupPurchaseMode(balance, amount) {
     `;
     
     actionArea.innerHTML = `
-        <div class="pos-anim-container-btn" id="btn-confirm-purchase" style="margin: 0 auto; width: 100%;">
-          <div class="pos-left-side-btn">
-            <div class="pos-card-btn">
-              <div class="pos-card-line-btn"></div>
-              <div class="pos-buttons-btn"></div>
-            </div>
-            <div class="pos-post-btn">
-              <div class="pos-post-line-btn"></div>
-              <div class="pos-screen-btn">
-                <div class="pos-icon-btn" style="font-size: 14px; font-weight: bold; color: var(--accent-primary);">✓</div>
-              </div>
-              <div class="pos-numbers-btn"></div>
-              <div class="pos-numbers-line2-btn"></div>
-            </div>
-          </div>
-          <div class="pos-right-side-btn">
-            <div class="pos-new-btn" id="btn-process-text" style="font-size: 1rem; color: #fff;">Confirmar Compra</div>
+        <button type="button" class="pos-anim-container-btn" aria-labelledby="btn-process-text" id="btn-confirm-purchase" style="margin: 0 auto; width: 100%;">
+          <span class="pos-left-side-btn">
+            <span class="pos-card-btn">
+              <span class="pos-card-line-btn"></span>
+              <span class="pos-buttons-btn"></span>
+            </span>
+            <span class="pos-post-btn">
+              <span class="pos-post-line-btn"></span>
+              <span class="pos-screen-btn">
+                <span class="pos-icon-btn" style="font-size: 14px; font-weight: bold; color: var(--accent-primary);">✓</span>
+              </span>
+              <span class="pos-numbers-btn"></span>
+              <span class="pos-numbers-line2-btn"></span>
+            </span>
+          </span>
+          <span class="pos-right-side-btn">
+            <span class="pos-new-btn" id="btn-process-text" style="font-size: 1rem; color: #fff;">Confirmar Compra</span>
             <svg class="pos-arrow-btn" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 451.846 451.847">
               <path d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0l194.287 194.284c6.177 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.267 22.373z" class="active-path" fill="#fff"></path>
             </svg>
-          </div>
-        </div>
+          </span>
+        </button>
         <button id="btn-cancel" class="btn-secondary" style="width:100%; padding: 14px; margin-top: 15px;">
             Cancelar
         </button>
@@ -143,20 +182,18 @@ function setupPurchaseMode(balance, amount) {
     document.getElementById('btn-cancel').onclick = () => window.history.back();
     const confirmBtn = document.getElementById('btn-confirm-purchase');
     confirmBtn.onclick = () => {
-        if(confirmBtn.classList.contains('is-animating')) return;
-        if(navigator.vibrate) navigator.vibrate(200);
+        if (!currentUser || confirmBtn.classList.contains('is-animating')) return;
+        const user = currentUser;
         confirmBtn.classList.add('is-animating');
         
         // Wait for the slide animation to finish (~1.2s)
         setTimeout(() => {
-            processPurchase();
+            if (currentUser === user && confirmBtn.isConnected) processPurchase();
         }, 1300);
     };
 }
 
-let selectedAccount = null;
-
-async function setupRechargeMode(balance, suggestedAmount) {
+function setupRechargeMode(balance, suggestedAmount) {
     titleEl.innerHTML = '<i class="fa-solid fa-wallet"></i> Depositar Saldo';
     if (from === 'cart' || from === 'product') {
         subEl.innerHTML = `<span style="color:var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Saldo insuficiente.</span> Selecciona tu método y monto para abonar.`;
@@ -180,14 +217,14 @@ async function setupRechargeMode(balance, suggestedAmount) {
         </div>
 
         <div style="margin-bottom: 1.2rem;">
-            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">2. Monto a Depositar ($ MXN)</label>
+            <label for="custom-recharge-amount" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 8px;">2. Monto a Depositar ($ MXN)</label>
             <div class="recharge-options" id="recharge-btns" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                <div class="r-opt" data-val="100" style="flex: 1; min-width: 60px; text-align: center;">$100</div>
-                <div class="r-opt" data-val="200" style="flex: 1; min-width: 60px; text-align: center;">$200</div>
-                <div class="r-opt" data-val="500" style="flex: 1; min-width: 60px; text-align: center;">$500</div>
-                <div class="r-opt" data-val="1200" style="flex: 1; min-width: 60px; text-align: center;">$1200</div>
+                <button type="button" class="r-opt" data-val="100" style="flex: 1; min-width: 60px; text-align: center;">$100</button>
+                <button type="button" class="r-opt" data-val="200" style="flex: 1; min-width: 60px; text-align: center;">$200</button>
+                <button type="button" class="r-opt" data-val="500" style="flex: 1; min-width: 60px; text-align: center;">$500</button>
+                <button type="button" class="r-opt" data-val="1200" style="flex: 1; min-width: 60px; text-align: center;">$1200</button>
             </div>
-            <input type="number" id="custom-recharge-amount" class="brutalist-input" placeholder="Monto personalizado (Min. $15)" style="width: 100%; margin-top: 10px; font-size: 1.05rem; padding: 12px; border-radius: 10px;" min="15" value="${defaultVal}">
+            <input type="number" id="custom-recharge-amount" class="brutalist-input" placeholder="Monto personalizado (Min. $15)" style="width: 100%; margin-top: 10px; font-size: 1.05rem; padding: 12px; border-radius: 10px;" min="15" step="0.01" inputmode="decimal" value="${defaultVal}">
         </div>
 
         <div id="bank-info-box" style="background: rgba(161, 130, 232, 0.08); border: 1px solid var(--accent-primary); padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
@@ -199,68 +236,72 @@ async function setupRechargeMode(balance, suggestedAmount) {
                 <button type="button" id="btn-copy-clabe-pago" class="btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fa-solid fa-copy"></i> Copiar</button>
             </div>
             <div id="pm-extra-details" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; display: none;"></div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;" id="pm-guide-text">Realiza la transferencia y haz clic en Confirmar para notificar al Administrador.</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;" id="pm-guide-text">Realiza la transferencia y registra tu depósito para que se pueda verificar.</p>
         </div>
     `;
     
     actionArea.innerHTML = `
-        <div class="pos-anim-container-btn theme-recharge" id="btn-process-recharge" style="margin: 0 auto; width: 100%;">
-          <div class="pos-left-side-btn">
-            <div class="pos-card-btn">
-              <div class="pos-card-line-btn"></div>
-              <div class="pos-buttons-btn"></div>
-            </div>
-            <div class="pos-post-btn">
-              <div class="pos-post-line-btn"></div>
-              <div class="pos-screen-btn">
-                <div class="pos-icon-btn" style="font-size: 16px; font-weight: bold;">$</div>
-              </div>
-              <div class="pos-numbers-btn"></div>
-              <div class="pos-numbers-line2-btn"></div>
-            </div>
-          </div>
-          <div class="pos-right-side-btn">
-            <div class="pos-new-btn" id="btn-process-text" style="font-size: 1rem;">Confirmar Pago</div>
+        <button type="button" class="pos-anim-container-btn theme-recharge" aria-labelledby="btn-process-text" id="btn-process-recharge" style="margin: 0 auto; width: 100%;">
+          <span class="pos-left-side-btn">
+            <span class="pos-card-btn">
+              <span class="pos-card-line-btn"></span>
+              <span class="pos-buttons-btn"></span>
+            </span>
+            <span class="pos-post-btn">
+              <span class="pos-post-line-btn"></span>
+              <span class="pos-screen-btn">
+                <span class="pos-icon-btn" style="font-size: 16px; font-weight: bold;">$</span>
+              </span>
+              <span class="pos-numbers-btn"></span>
+              <span class="pos-numbers-line2-btn"></span>
+            </span>
+          </span>
+          <span class="pos-right-side-btn">
+            <span class="pos-new-btn" id="btn-process-text" style="font-size: 1rem;">Registrar depósito</span>
             <svg class="pos-arrow-btn" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 451.846 451.847">
               <path d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0l194.287 194.284c6.177 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.267 22.373z" class="active-path" fill="#cfcfcf"></path>
             </svg>
-          </div>
-        </div>
+          </span>
+        </button>
     `;
+
+    let accountLoadId = 0;
+    let selectedAccount = null;
 
     // Load account logic from Firestore filtered by tipo
     async function loadAccountForTipo(tipo) {
+        const loadId = ++accountLoadId;
+        selectedAccount = null;
         const clabeDisplay = document.getElementById('pm-clabe-display');
         const bankTitle = document.getElementById('pm-bank-title');
         const extraDetails = document.getElementById('pm-extra-details');
         
+        if (extraDetails) extraDetails.style.display = "none";
         if (clabeDisplay) clabeDisplay.textContent = 'Cargando...';
         if (bankTitle) bankTitle.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Obteniendo cuenta oficial...`;
 
         try {
             const snap = await getDocs(collection(db, "payment_methods"));
+            if (loadId !== accountLoadId || !clabeDisplay?.isConnected) return;
             let foundDoc = null;
-            let fallbackDoc = null;
             
             snap.forEach(dSnap => {
                 const dData = dSnap.data();
-                if (!fallbackDoc) fallbackDoc = { id: dSnap.id, ...dData };
-                const docTipo = (dData.tipo || 'transferencia').toLowerCase().trim();
+                if (!String(dData.clabe || '').trim()) return;
+                const docTipo = String(dData.tipo || 'transferencia').toLowerCase().trim();
                 if (!foundDoc && (docTipo === tipo.toLowerCase().trim())) {
                     foundDoc = { id: dSnap.id, ...dData };
                 }
             });
 
-            // Use matching type or the first available method registered in Firestore
-            const activeDoc = foundDoc || fallbackDoc;
+            const activeDoc = foundDoc;
 
             if (activeDoc && activeDoc.clabe) {
                 selectedAccount = activeDoc;
                 if (clabeDisplay) clabeDisplay.textContent = activeDoc.clabe;
-                const isExactType = foundDoc != null;
                 const bankLabel = activeDoc.banco || activeDoc.bank || 'Cuenta Oficial GhostKey';
                 if (bankTitle) {
-                    bankTitle.innerHTML = `<i class="fa-solid fa-credit-card"></i> ${escapeHtml(bankLabel)} ${!isExactType ? `<small style="font-size:0.75rem;opacity:0.8;">(${activeDoc.tipo || 'General'})</small>` : ''}`;
+                    bankTitle.innerHTML = `<i class="fa-solid fa-credit-card"></i> ${escapeHtml(bankLabel)}`;
                 }
                 if (extraDetails) {
                     let details = [];
@@ -272,17 +313,18 @@ async function setupRechargeMode(balance, suggestedAmount) {
             } else {
                 selectedAccount = null;
                 if (clabeDisplay) clabeDisplay.textContent = 'No configurada';
-                if (bankTitle) bankTitle.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:var(--warning);"></i> Sin método registrado en Firebase`;
+                if (bankTitle) bankTitle.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:var(--warning);"></i> Método no disponible`;
                 if (extraDetails) {
                     extraDetails.innerHTML = 'El administrador aún no ha configurado una cuenta para este método.';
                     extraDetails.style.display = 'block';
                 }
             }
         } catch (e) {
+            if (loadId !== accountLoadId || !clabeDisplay?.isConnected) return;
             console.error("Error loading account for tipo:", e);
             selectedAccount = null;
             if (clabeDisplay) clabeDisplay.textContent = 'Error al cargar';
-            if (bankTitle) bankTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i> Error al conectar con Firebase`;
+            if (bankTitle) bankTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i> No se pudo cargar esta cuenta`;
         }
     }
 
@@ -292,20 +334,23 @@ async function setupRechargeMode(balance, suggestedAmount) {
     }
 
     // Initial load for default active method ('transferencia')
-    await loadAccountForTipo('transferencia');
+    loadAccountForTipo('transferencia');
     
     // Select Method logic
     const methodBtns = document.querySelectorAll('.r-method-opt');
     const guideText = document.getElementById('pm-guide-text');
     methodBtns.forEach(mBtn => {
+        mBtn.setAttribute("aria-pressed", String(mBtn.classList.contains("active")));
         mBtn.onclick = async () => {
             methodBtns.forEach(b => {
                 b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
                 b.style.borderColor = 'var(--glass-border)';
                 b.style.background = 'var(--bg-card)';
                 b.style.color = 'var(--text-muted)';
             });
             mBtn.classList.add('active');
+            mBtn.setAttribute('aria-pressed', 'true');
             mBtn.style.borderColor = 'var(--accent-primary)';
             mBtn.style.background = 'rgba(161, 130, 232, 0.15)';
             mBtn.style.color = 'white';
@@ -315,7 +360,7 @@ async function setupRechargeMode(balance, suggestedAmount) {
             if (guideText) {
                 guideText.textContent = isTransfer 
                     ? 'Realiza la transferencia interbancaria SPEI y confirma tu depósito.'
-                    : 'Deposita en cualquier OXXO/Ventanilla a la cuenta CLABE y confirma tu pago.';
+                    : 'Deposita al número indicado y registra tu depósito.';
             }
 
             await loadAccountForTipo(methodKey);
@@ -360,19 +405,32 @@ async function setupRechargeMode(balance, suggestedAmount) {
                 return;
             }
             const clabeText = selectedAccount.clabe;
-            navigator.clipboard.writeText(clabeText).then(() => {
+            Promise.resolve().then(() => navigator.clipboard.writeText(clabeText)).then(() => {
                 copyClabeBtn.innerHTML = `<i class="fa-solid fa-check"></i> Copiado`;
                 setTimeout(() => { copyClabeBtn.innerHTML = `<i class="fa-solid fa-copy"></i> Copiar`; }, 2000);
-            });
+            }).catch(() => showError('Copia el número de cuenta manualmente.'));
         };
     }
     
     const rechargeBtn = document.getElementById('btn-process-recharge');
     rechargeBtn.onclick = () => {
         if(rechargeBtn.classList.contains('is-animating')) return;
+        errorEl.style.display = 'none';
+        if (!selectedAccount) {
+            showError('Espera a que aparezca una cuenta de pago disponible.');
+            return;
+        }
+        const user = currentUser;
+        const account = selectedAccount;
         rechargeBtn.classList.add('is-animating');
-        
+
         setTimeout(() => {
+            if (currentUser !== user || !rechargeBtn.isConnected) return;
+            if (selectedAccount !== account) {
+                rechargeBtn.classList.remove("is-animating");
+                showError("Revisa la cuenta seleccionada y registra el depósito de nuevo.");
+                return;
+            }
             processRecharge();
         }, 1300);
     };
@@ -393,7 +451,7 @@ async function processRecharge() {
             const iconEl = btn.querySelector('.pos-icon-btn');
             const textEl = btn.querySelector('.pos-new-btn');
             
-            if (textEl) textEl.textContent = 'Nueva Alerta';
+            if (textEl) textEl.textContent = 'Revisa los datos';
             if (iconEl) iconEl.textContent = '!';
             
             setTimeout(() => {
@@ -413,7 +471,7 @@ async function processRecharge() {
     const btn = document.getElementById('btn-process-recharge');
     const textEl = document.getElementById('btn-process-text');
     if (btn) {
-        btn.style.pointerEvents = 'none';
+        btn.disabled = true;
     }
     // Let the animation handle the visual feedback, no opacity change needed
 
@@ -446,14 +504,14 @@ async function processRecharge() {
             btn.classList.add('error-state');
             const iconEl = btn.querySelector('.pos-icon-btn');
             
-            if (textEl) textEl.textContent = 'Nueva Alerta';
+            if (textEl) textEl.textContent = 'Revisa los datos';
             if (iconEl) iconEl.textContent = '!';
             
             setTimeout(() => {
                 btn.classList.remove('is-animating', 'error-state');
                 if (textEl) textEl.textContent = 'Confirmar Pago';
                 if (iconEl) iconEl.textContent = '$';
-                btn.style.pointerEvents = 'auto';
+                btn.disabled = false;
             }, 3000);
         }
     }
@@ -609,17 +667,20 @@ async function processPurchase() {
 }
 
 async function processCartPurchase() {
-    const cartObj = userData.cart || {};
-    const cartItems = Object.keys(cartObj);
-    if (cartItems.length === 0) throw new Error("El carrito está vacío.");
-
+    const user = currentUser;
+    const reviewedCart = userData.cart || {};
     let finalTotal = 0;
     
     await runTransaction(db, async (transaction) => {
-        const userRef = doc(db, 'users', currentUser.uid);
+        const userRef = doc(db, 'users', user.uid);
         const uSnap = await transaction.get(userRef);
         const userData = uSnap.data();
-        const currentBal = userData.balance || 0;
+        const cartObj = userData.cart || {};
+        const cartItems = Object.keys(cartObj);
+        if (!cartItems.length || JSON.stringify(cartObj) !== JSON.stringify(reviewedCart)) {
+            throw new Error('Tu carrito cambió. Recarga la página para revisarlo.');
+        }
+        const currentBal = Number(userData.balance) || 0;
         const referredBy = userData.referredBy;
 
         let referrerSnap = null;
@@ -634,46 +695,27 @@ async function processCartPurchase() {
 
         // Fetch all product data and stock in transaction
         for (const pid of cartItems) {
-            let pQtyObj = cartObj[pid];
+            const pQtyObj = cartObj[pid];
             let pQty = 0;
             let duration = '';
             let itemNotes = '';
             if (typeof pQtyObj === 'number') {
                 pQty = pQtyObj;
             } else if (pQtyObj) {
-                pQty = parseInt(pQtyObj.qty) || 0;
+                pQty = Number(pQtyObj.qty);
                 duration = pQtyObj.duration || '';
                 itemNotes = pQtyObj.notes || '';
             }
-            if (isNaN(pQty) || !Number.isFinite(pQty) || pQty <= 0) {
-                throw new Error("Cantidad inválida en el carrito.");
-            }
             const pRef = doc(db, 'products', pid);
             const pSnap = await transaction.get(pRef);
-            if (pSnap.exists()) {
-                const p = pSnap.data();
-                let unitPrice = parseFloat(p.price) || 0;
-                
-                if (duration && p.streamingOptions) {
-                    const opts = p.streamingOptions.split(',').map(o => o.trim()).filter(o => o);
-                    const optMatch = opts.find(o => {
-                        if (o.includes(':')) return o.split(':')[0].trim() === duration;
-                        return o === duration;
-                    });
-                    if (optMatch && optMatch.includes(':')) {
-                        const parsedOptPrice = parseFloat(optMatch.split(':')[1].trim());
-                        if (!isNaN(parsedOptPrice)) unitPrice = parsedOptPrice;
-                    }
-                }
-
-                if (isNaN(unitPrice) || !Number.isFinite(unitPrice) || unitPrice < 0) {
-                    throw new Error(`Precio inválido en producto: ${p.name}`);
-                }
-                calculatedTotal += getProductTotalPrice(p, pQty, unitPrice);
-                productsData.push({ id: pid, qty: pQty, price: unitPrice, name: p.name, duration: duration, notes: itemNotes });
-            }
+            if (!pSnap.exists()) throw new Error("Un artículo ya no está disponible. Regresa a tu carrito.");
+            const p = pSnap.data();
+            const unitPrice = getUnitPrice(p, duration);
+            calculatedTotal += calculateLineTotal(p, pQty, unitPrice);
+            productsData.push({ id: pid, qty: pQty, price: unitPrice, name: p.name, duration, notes: itemNotes });
         }
         
+        if (calculatedTotal !== reviewedTotal) throw new Error("El total cambió. Vuelve a cargar la página para revisarlo.");
         if (currentBal < calculatedTotal) throw new Error("Saldo insuficiente (el carrito pudo haber cambiado de precio).");
         finalTotal = calculatedTotal;
 
@@ -724,8 +766,8 @@ async function processCartPurchase() {
 
             const newOrderRef = doc(collection(db, 'orders'));
             const orderPayload = {
-                uid: currentUser.uid,
-                userEmail: currentUser.email,
+                uid: user.uid,
+                userEmail: user.email,
                 productId: prod.id,
                 productName: prod.name,
                 price: prod.price * prod.qty,
@@ -757,21 +799,23 @@ async function processCartPurchase() {
         }
     });
     
-    sendNotification(currentUser.uid, "¡Compra Exitosa! 🛒", `Tu compra por $${finalTotal.toFixed(2)} fue procesada correctamente.`, 'compra');
+    sendNotification(user.uid, "¡Compra Exitosa! 🛒", `Tu compra por $${finalTotal.toFixed(2)} fue procesada correctamente.`, 'compra');
     showPremiumSuccess(`¡Compra realizada! Se descontaron ${finalTotal.toFixed(2)}.`, "perfil.html");
 }
 
 async function processSinglePurchase() {
     if (!productId) throw new Error("Producto inválido.");
+    if (isGift && !giftEmail) throw new Error("Falta el correo de la persona que recibirá el regalo.");
     
+    const user = currentUser;
     let productName = "Producto";
     const pagoNotesVal = document.getElementById('pago-notes-input')?.value.trim() || customerNotesParam || '';
     
     await runTransaction(db, async (transaction) => {
-        const userRef = doc(db, 'users', currentUser.uid);
+        const userRef = doc(db, 'users', user.uid);
         const uSnap = await transaction.get(userRef);
         const userData = uSnap.data();
-        const currentBal = userData.balance || 0;
+        const currentBal = Number(userData.balance) || 0;
         const referredBy = userData.referredBy;
         
         const pRef = doc(db, 'products', productId);
@@ -781,34 +825,17 @@ async function processSinglePurchase() {
         const pData = pSnap.data();
         productName = pData.name;
         
-        const parsedQty = parseInt(qty);
-        if (isNaN(parsedQty) || !Number.isFinite(parsedQty) || parsedQty <= 0) {
-            throw new Error("Cantidad inválida.");
-        }
-        let unitPrice = parseFloat(pData.price);
-        const singleDuration = urlParams.get('duration') || singleDurationParam || '';
-        if (singleDuration && pData.streamingOptions) {
-            const opts = pData.streamingOptions.split(',').map(o => o.trim()).filter(o => o);
-            const optMatch = opts.find(o => {
-                if (o.includes(':')) return o.split(':')[0].trim() === singleDuration;
-                return o === singleDuration;
-            });
-            if (optMatch && optMatch.includes(':')) {
-                const parsedOptPrice = parseFloat(optMatch.split(':')[1].trim());
-                if (!isNaN(parsedOptPrice)) unitPrice = parsedOptPrice;
-            }
-        }
-
-        if (isNaN(unitPrice) || !Number.isFinite(unitPrice) || unitPrice < 0) {
-            throw new Error("Precio inválido en el producto.");
-        }
-        
-        const actualPrice = getProductTotalPrice(pData, parsedQty, unitPrice);
+        const parsedQty = qty;
+        const singleDuration = singleDurationParam;
+        const actualPrice = calculateLineTotal(pData, parsedQty, getUnitPrice(pData, singleDuration));
+        if (actualPrice !== reviewedTotal) throw new Error("El total cambió. Vuelve a cargar la página para revisarlo.");
         
         if (currentBal < actualPrice) throw new Error("Saldo insuficiente.");
 
         const stockRef = doc(db, 'products_stock', productId);
         const sSnap = await transaction.get(stockRef);
+        const referrerRef = referredBy ? doc(db, "users", referredBy) : null;
+        const referrerSnap = referrerRef ? await transaction.get(referrerRef) : null;
         
         let credsToGive = [];
         let availableCount = 0;
@@ -851,8 +878,8 @@ async function processSinglePurchase() {
         
         const newOrderRef = doc(collection(db, 'orders'));
         const singleOrderPayload = {
-            uid: currentUser.uid,
-            userEmail: currentUser.email,
+            uid: user.uid,
+            userEmail: user.email,
             productId: productId,
             productName: pData.name,
             price: actualPrice,
@@ -864,6 +891,7 @@ async function processSinglePurchase() {
             textDelivered: credsToGive.join('\n'),
             isGift: isGift,
             giftEmail: isGift ? giftEmail : null,
+            giftRecipient: isGift ? giftEmail : null,
             timestamp: serverTimestamp()
         };
         if (singleDuration) {
@@ -879,7 +907,7 @@ async function processSinglePurchase() {
         sendNotification(null, "¡Tienes un regalo! 🎁", `Alguien te ha regalado ${productName}`, 'regalo', giftEmail);
         showAstronautModal(productName, giftEmail);
     } else {
-        sendNotification(currentUser.uid, "¡Compra Exitosa! 🛒", `Adquiriste ${productName} exitosamente.`, 'compra');
+        sendNotification(user.uid, "¡Compra Exitosa! 🛒", `Adquiriste ${productName} exitosamente.`, 'compra');
         showPremiumSuccess("Tu compra fue procesada correctamente.", "perfil.html");
     }
 }

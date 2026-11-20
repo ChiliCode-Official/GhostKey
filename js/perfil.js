@@ -64,24 +64,6 @@ function showProfile(user) {
             }
         });
 
-        const mainCard = document.querySelector('.main-container');
-        const hintEl = document.getElementById('copy-uid-hint');
-        if (mainCard) {
-            mainCard.style.cursor = 'pointer';
-            mainCard.onclick = () => {
-                if (user && user.uid) {
-                    navigator.clipboard.writeText(user.uid).then(() => {
-                        if (hintEl) {
-                            const origHTML = hintEl.innerHTML;
-                            hintEl.innerHTML = `<i class="fa-solid fa-check" style="color:var(--success);"></i> <strong style="color:var(--success);">¡UID copiado al portapapeles!</strong>`;
-                            setTimeout(() => { hintEl.innerHTML = origHTML; }, 2500);
-                        }
-                    }).catch(() => {
-                        alert("UID de amigo: " + user.uid);
-                    });
-                }
-            };
-        }
     } catch(e) {
         console.error('Error rendering profile header:', e);
     }
@@ -130,10 +112,64 @@ window.__perfil_logout = function() {
         .catch(e => { console.error('Logout error:', e); alert('Error al cerrar sesión: ' + e.message); });
 };
 
-// Also attach via addEventListener as belt & suspenders
-if (btnLogout) {
-    btnLogout.addEventListener('click', window.__perfil_logout);
+btnLogout?.addEventListener('click', window.__perfil_logout);
+
+document.getElementById('open-profile-login')?.addEventListener('click', () => {
+    document.getElementById('user-profile-btn')?.click();
+});
+
+const copyUidButton = document.getElementById('copy-profile-uid');
+const copyUidStatus = document.getElementById('copy-uid-hint');
+async function copyProfileUid() {
+    const uid = currentUser?.uid;
+    if (!uid) return;
+
+    try {
+        await navigator.clipboard.writeText(uid);
+        copyUidStatus.textContent = 'UID copiado al portapapeles.';
+    } catch {
+        copyUidStatus.textContent = 'Tu UID es ' + uid;
+    }
 }
+copyUidButton?.addEventListener('click', copyProfileUid);
+const memberCard = document.querySelector('.main-container');
+if (memberCard) {
+    memberCard.style.cursor = 'pointer';
+    memberCard.addEventListener('click', copyProfileUid);
+}
+
+document.querySelectorAll('#profile-content [role="tablist"]').forEach(tabList => {
+    const tabs = [...tabList.querySelectorAll('[role="tab"]')];
+
+    function selectTab(selectedTab) {
+        tabs.forEach(tab => {
+            const isSelected = tab === selectedTab;
+            tab.classList.toggle('active', isSelected);
+            tab.setAttribute('aria-selected', String(isSelected));
+            tab.tabIndex = isSelected ? 0 : -1;
+
+            const panel = document.getElementById(tab.getAttribute('aria-controls'));
+            panel.classList.toggle('active', isSelected);
+        });
+    }
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectTab(tab));
+        tab.addEventListener('keydown', event => {
+            const targetIndex = {
+                ArrowLeft: (index + tabs.length - 1) % tabs.length,
+                ArrowRight: (index + 1) % tabs.length,
+                Home: 0,
+                End: tabs.length - 1
+            }[event.key];
+            if (typeof targetIndex !== 'number') return;
+
+            event.preventDefault();
+            tabs[targetIndex].focus();
+            selectTab(tabs[targetIndex]);
+        });
+    });
+});
 
 // ─── Google Login ─────────────────────────────────────────────────────────────
 async function ensureUserDoc(user) {
@@ -267,6 +303,9 @@ async function loadClientData(uid) {
         });
 
 
+        if (tbody && allDocs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">Todavía no tienes pedidos.</td></tr>';
+        }
         for (const d of allDocs) {
             const o = d.data();
             if (o.status === 'pendiente') hasPending = true;
@@ -296,7 +335,7 @@ async function loadClientData(uid) {
                     <tr>
                         <td>${dDate}</td>
                         <td>${prodDisplay}${notesClient}</td>
-                        <td><span class="status-badge ${statusClass}">${(o.status||'PENDIENTE').toUpperCase()}</span></td>
+                        <td><span class="status-badge ${statusClass}">${escapeHtml(String(o.status || 'pendiente').toUpperCase())}</span></td>
                         <td>${escapeHtml(o.textDelivered || 'Procesando...')}</td>
                     </tr>`;
             }
@@ -324,11 +363,11 @@ async function loadClientData(uid) {
                     </p>
 
                     <div class="delivered-wrapper">
-                        <div class="delivered-card-image"><img src="${prodImg}" alt="${escapeHtml(o.productName||'Producto')}" onerror="this.src='https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=300'"></div>
+                        <div class="delivered-card-image"><img src="${escapeHtml(prodImg)}" alt="${escapeHtml(o.productName||'Producto')}" onerror="this.src='https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=300'"></div>
                         <div class="delivered-content">
                             <p class="delivered-title">${escapeHtml(o.productName||'Producto')}</p>
                             <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px;">${dDate}</span>
-                            <p class="delivered-title delivered-price">$${o.price||0}</p>
+                            <p class="delivered-title delivered-price">$${escapeHtml(o.price || 0)}</p>
                         </div>
                         <button class="delivered-card-btn" data-order-id="${d.id}" data-gift-opened="${o.giftOpened ? 'true' : 'false'}" data-credential="${escapeHtml(o.textDelivered||'')}" data-is-received-gift="${isReceivedGift ? 'true' : 'false'}" data-sender="${escapeHtml(o.userEmail || '')}" data-prod-name="${escapeHtml(o.productName||'')}" data-is-streaming="${isStreaming ? 'true' : 'false'}">
                             <i class="fa-solid fa-key"></i> OBTENER
@@ -365,8 +404,6 @@ async function loadClientData(uid) {
                 if (isReceivedGift && redemptionModal) {
                     if (!isOpened && orderId) {
                         try {
-                            const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                            const { db } = await import('./firebase-config.js');
                             await updateDoc(doc(db, 'orders', orderId), { giftOpened: true });
                             btn.dataset.giftOpened = 'true';
                             const tagEl = document.getElementById('tag-' + orderId);
@@ -377,7 +414,17 @@ async function loadClientData(uid) {
                     }
                     rSender.textContent = "Enviado por: " + sender;
                     rProduct.textContent = "Producto: " + prodName;
-                    rCreds.innerHTML = (isStreaming ? "<p style='color:var(--danger); font-size:0.75rem; margin-bottom:10px; font-weight:bold;'>" + streamingWarning + "</p>" : "") + text.replace(/\n/g, '<br>');
+                    rCreds.replaceChildren();
+                    if (isStreaming) {
+                        const warning = document.createElement('p');
+                        warning.style.cssText = 'color:var(--danger);font-size:0.75rem;margin-bottom:10px;font-weight:bold;';
+                        warning.textContent = streamingWarning;
+                        rCreds.append(warning);
+                    }
+                    const credential = document.createElement('div');
+                    credential.style.whiteSpace = 'pre-wrap';
+                    credential.textContent = text;
+                    rCreds.append(credential);
                     redemptionModal.classList.add('active');
 
                     rShareBtn.onclick = async () => {
@@ -409,7 +456,11 @@ async function loadClientData(uid) {
         if (noticeBox)        noticeBox.style.display       = hasPending  ? 'block' : 'none';
         if (deliveredSection) deliveredSection.style.display = hasDelivered ? 'block' : 'none';
     } catch(e) {
-        console.error('Error loading client orders:', e); alert('Error loading client orders: ' + e.message);
+        console.error('Error loading client orders:', e);
+        const tbody = document.getElementById('client-orders-body');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4">No se pudieron cargar tus pedidos. Recarga la página para intentarlo de nuevo.</td></tr>';
+        }
     }
 
     // 3. Client Balance Requests
@@ -574,9 +625,9 @@ async function loadAdminData() {
     // 1. Pending Orders
     const tbodyOrders = document.getElementById('admin-orders-body');
     if (tbodyOrders) {
-        tbodyOrders.innerHTML = '';
         try {
             const snap = await getDocs(query(collection(db, 'orders'), where('status', '==', 'pendiente')));
+            tbodyOrders.replaceChildren();
             if (snap.empty) {
                 tbodyOrders.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:1.5rem;">No hay pedidos pendientes.</td></tr>`;
             }
@@ -625,15 +676,18 @@ async function loadAdminData() {
                         </td>
                     </tr>`;
             });
-        } catch(e) { console.error('Admin orders error:', e); }
+        } catch(e) {
+            console.error('Admin orders error:', e);
+            tbodyOrders.innerHTML = '<tr><td colspan="3">No se pudieron cargar los pedidos pendientes. Recarga la página para intentarlo de nuevo.</td></tr>';
+        }
     }
 
     // 2. Pending Recharges
     const tbodyRecharges = document.getElementById('admin-recharge-body');
     if (tbodyRecharges) {
-        tbodyRecharges.innerHTML = '';
         try {
             const snap = await getDocs(query(collection(db, 'balance_requests'), where('status', '==', 'pendiente')));
+            tbodyRecharges.replaceChildren();
             if (snap.empty) {
                 tbodyRecharges.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;">No hay solicitudes de recarga pendientes.</td></tr>`;
             }
@@ -652,17 +706,20 @@ async function loadAdminData() {
                         <td><small style="color:var(--text-muted);">${rDate}</small></td>
                         <td>
                             <div style="display:flex;gap:6px;">
-                                <button class="btn-primary" style="padding:6px 12px;background:var(--success);font-size:0.82rem;" onclick="approveRecharge('${d.id}','${r.uid}',${r.amount})">
+                                <button class="btn-primary" style="padding:6px 12px;background:var(--success);font-size:0.82rem;" data-approve-recharge="${escapeHtml(d.id)}" data-recharge-amount="${Number(r.amount)}">
                                     <i class="fa-solid fa-check"></i> Sí recibí el pago
                                 </button>
-                                <button class="btn-secondary" style="padding:6px 12px;color:var(--danger);border-color:var(--danger);font-size:0.82rem;" onclick="rejectRecharge('${d.id}')">
+                                <button class="btn-secondary" style="padding:6px 12px;color:var(--danger);border-color:var(--danger);font-size:0.82rem;" data-reject-recharge="${escapeHtml(d.id)}">
                                     <i class="fa-solid fa-xmark"></i> Negar pago
                                 </button>
                             </div>
                         </td>
                     </tr>`;
             });
-        } catch(e) { console.error('Admin recharges error:', e); }
+        } catch(e) {
+            console.error('Admin recharges error:', e);
+            tbodyRecharges.innerHTML = '<tr><td colspan="5">No se pudieron cargar las recargas pendientes. Recarga la página para intentarlo de nuevo.</td></tr>';
+        }
     }
 
     // 3. Products / Stock
@@ -688,13 +745,13 @@ async function loadAdminData() {
                 tbodyStock.innerHTML += `
                     <tr>
                         <td><div style="display:flex;align-items:center;gap:8px;">
-                            <img src="${p.image||''}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;">
+                            <img src="${escapeHtml(p.image || '')}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;">
                             <strong>${escapeHtml(p.name||'Sin nombre')}</strong>
                         </div></td>
                         <td>${escapeHtml(p.category||'N/A')}</td>
-                        <td>$${p.price||0}</td>
+                        <td>$${escapeHtml(p.price || 0)}</td>
                         <td><small style="color:var(--text-muted);display:block;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.description||'')}</small></td>
-                        <td><span class="status-badge ${statusClass}">${s.status==='disponible'?`Disponible (${poolCount})`:s.status}</span></td>
+                        <td><span class="status-badge ${statusClass}">${s.status==='disponible'?`Disponible (${poolCount})`:escapeHtml(s.status)}</span></td>
                         <td>
                             <div style="display:flex;gap:6px;">
                                 <button class="btn-secondary" style="padding:4px 8px;font-size:0.8rem;" onclick="openEditModal('${d.id}')"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -712,9 +769,9 @@ async function loadAdminData() {
     // 4. Users
     const tbodyUsers = document.getElementById('admin-users-body');
     if (tbodyUsers) {
-        tbodyUsers.innerHTML = '';
         try {
             const qUsers = await getDocs(collection(db, 'users'));
+            tbodyUsers.replaceChildren();
             if (qUsers.empty) {
                 tbodyUsers.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:1rem;">No hay usuarios registrados.</td></tr>`;
             }
@@ -727,7 +784,10 @@ async function loadAdminData() {
                         <td>$${Number(u.balance||0).toFixed(2)}</td>
                     </tr>`;
             });
-        } catch(e) { console.error('Admin users error:', e); }
+        } catch(e) {
+            console.error('Admin users error:', e);
+            tbodyUsers.innerHTML = '<tr><td colspan="3">No se pudieron cargar los usuarios. Recarga la página para intentarlo de nuevo.</td></tr>';
+        }
     }
 
     // 5. Collections
@@ -842,33 +902,56 @@ window.deletePaymentMethodAdmin = async function(id) {
 };
 
 // ─── Admin Actions ────────────────────────────────────────────────────────────
-window.approveRecharge = async function(reqId, uid, amount) {
-    if (!confirm(`¿Aprobar $${amount} para este usuario?`)) return;
-    try {
-        await runTransaction(db, async (transaction) => {
-            const userRef = doc(db, 'users', uid);
-            const reqRef = doc(db, 'balance_requests', reqId);
-            
-            const reqSnap = await transaction.get(reqRef);
-            if (!reqSnap.exists()) throw new Error("Solicitud no encontrada.");
-            if (reqSnap.data().status !== 'pendiente') throw new Error("La solicitud ya fue procesada.");
+document.getElementById('admin-recharge-body')?.addEventListener('click', event => {
+    const approve = event.target.closest('[data-approve-recharge]');
+    const reject = event.target.closest('[data-reject-recharge]');
+    if (approve) approveRecharge(approve.dataset.approveRecharge, Number(approve.dataset.rechargeAmount));
+    if (reject) window.rejectRecharge(reject.dataset.rejectRecharge);
+});
 
-            transaction.update(userRef, { balance: increment(Number(amount)) });
+async function approveRecharge(reqId, displayedAmount) {
+    if (!Number.isFinite(displayedAmount) || displayedAmount <= 0) {
+        alert('El importe de esta solicitud es inválido.');
+        return;
+    }
+    if (!confirm('¿Aprobar $' + displayedAmount + ' para este usuario?')) return;
+    try {
+        const { uid, amount } = await runTransaction(db, async transaction => {
+            const reqRef = doc(db, 'balance_requests', reqId);
+            const reqSnap = await transaction.get(reqRef);
+            if (!reqSnap.exists() || reqSnap.data().status !== 'pendiente') {
+                throw new Error('La solicitud ya no está pendiente.');
+            }
+            const { uid, amount: savedAmount } = reqSnap.data();
+            const amount = Number(savedAmount);
+            if (!uid || amount !== displayedAmount) {
+                throw new Error('Los datos de la solicitud cambiaron. Recarga el panel antes de aprobarla.');
+            }
+
+            transaction.update(doc(db, 'users', uid), { balance: increment(amount) });
             transaction.update(reqRef, { status: 'aprobado' });
+            return { uid, amount };
         });
-        sendNotification(uid, "¡Recarga Exitosa! 💰", `Se han añadido $${amount} a tu saldo.`, 'transferencia');
+        sendNotification(uid, "¡Recarga Exitosa! 💰", 'Se han añadido $' + amount + ' a tu saldo.', 'transferencia');
         alert('Recarga aprobada exitosamente.');
         loadAdminData();
     } catch(e) { console.error(e); alert('Error al aprobar recarga: ' + e.message); }
-};
+}
 
 window.rejectRecharge = async function(reqId) {
     if (!confirm('¿Deseas rechazar este pago?')) return;
     try {
-        await updateDoc(doc(db, 'balance_requests', reqId), { status: 'rechazado' });
+        await runTransaction(db, async transaction => {
+            const requestRef = doc(db, 'balance_requests', reqId);
+            const request = await transaction.get(requestRef);
+            if (!request.exists() || request.data().status !== 'pendiente') {
+                throw new Error('La solicitud ya no está pendiente.');
+            }
+            transaction.update(requestRef, { status: 'rechazado' });
+        });
         alert('Solicitud rechazada.');
         loadAdminData();
-    } catch(e) { console.error(e); alert('Error al rechazar.'); }
+    } catch(e) { console.error(e); alert('No se pudo rechazar la solicitud: ' + e.message); }
 };
 
 window.deliverOrder = async function(orderId) {

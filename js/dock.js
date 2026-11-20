@@ -44,8 +44,12 @@
 
     /* ── localStorage helpers ── */
     function getRecent() {
-        try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
-        catch (e) { return []; }
+        try {
+            const recent = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+            return Array.isArray(recent) ? recent.filter(term => typeof term === 'string' && term.trim()) : [];
+        } catch {
+            return [];
+        }
     }
 
     function saveRecent(term) {
@@ -177,17 +181,16 @@
         }
         searchOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
-        setTimeout(() => {
-            if (searchOverlayInput) searchOverlayInput.focus();
-            renderSuggestions('');
-        }, 300);
+        renderSuggestions(searchOverlayInput?.value || '');
+        searchOverlayInput?.focus();
     }
 
     function closeSearchOverlay() {
-        if (!searchOverlay) return;
+        if (!searchOverlay?.classList.contains('open')) return;
         searchOverlay.classList.remove('open');
         document.body.style.overflow = '';
         if (searchOverlayInput) searchOverlayInput.value = '';
+        dockSearchBtn?.focus();
     }
 
     function doSearch() {
@@ -246,7 +249,7 @@
     }
 
     function closeFriends() {
-        if (!friendsPanel) return;
+        if (!friendsPanel?.classList.contains('open')) return;
         friendsPanel.classList.remove('open');
         if (friendsBackdrop) friendsBackdrop.classList.remove('open');
         document.body.style.overflow = '';

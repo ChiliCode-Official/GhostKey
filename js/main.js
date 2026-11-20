@@ -42,7 +42,7 @@ import { initNotifications } from './notifications.js';
 let currentUser = null;
 let currentUserWishlist = [];
 
-// --- GSAP Animations (GooeyNav & Dock) ---
+// --- Navigation indicator ---
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const indicator = document.querySelector('.nav-indicator');
@@ -60,54 +60,7 @@ function initNavigation() {
             item.classList.add('active');
             if (indicator) {
                 indicator.style.top = `${item.offsetTop}px`;
-                createParticles(item.offsetTop + 22);
             }
-        });
-    });
-}
-
-function createParticles(yPos) {
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar) return;
-
-    for (let i = 0; i < 5; i++) {
-        const particle = document.createElement('div');
-        particle.style.position = 'absolute';
-        particle.style.width = '8px';
-        particle.style.height = '8px';
-        particle.style.background = 'var(--accent-primary)';
-        particle.style.borderRadius = '50%';
-        particle.style.left = '40px';
-        particle.style.top = `${yPos}px`;
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '0';
-
-        sidebar.appendChild(particle);
-
-        const angle = Math.random() * Math.PI * 2;
-        const velocity = 20 + Math.random() * 30;
-        const tx = Math.cos(angle) * velocity;
-        const ty = Math.sin(angle) * velocity;
-
-        gsap.to(particle, {
-            x: tx,
-            y: ty,
-            opacity: 0,
-            duration: 0.6 + Math.random() * 0.4,
-            ease: "power2.out",
-            onComplete: () => particle.remove()
-        });
-    }
-}
-
-function initMobileDock() {
-    const dockItems = document.querySelectorAll('.dock-item');
-    dockItems.forEach(item => {
-        item.addEventListener('touchstart', () => {
-            gsap.to(item, { scale: 1.2, y: -5, duration: 0.2 });
-        });
-        item.addEventListener('touchend', () => {
-            gsap.to(item, { scale: 1, y: 0, duration: 0.2 });
         });
     });
 }
@@ -516,9 +469,51 @@ async function loadCategories() {
     }
 }
 
+function renderFeaturedProducts(products) {
+    const heroBgImg = document.getElementById('hero-bg-img');
+    const titleEl = document.getElementById('hero-title');
+    const priceEl = document.getElementById('hero-price');
+    const buyBtn = document.getElementById('hero-buy-btn');
+    const controls = document.getElementById('hero-dots');
+    const selectedId = controls.querySelector('[aria-pressed=true]')?.dataset.productId;
+    controls.replaceChildren();
+    const buttons = products.length > 1 ? products.map((product, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'gk-hero-dot';
+        button.dataset.productId = product.id;
+        button.textContent = String(index + 1);
+        button.setAttribute('aria-label', 'Ver destacado: ' + product.data().name);
+        button.addEventListener('click', () => selectProduct(product));
+        controls.append(button);
+        return button;
+    }) : [];
+
+    function selectProduct(heroProd) {
+        const hData = heroProd.data();
+        if (hData.image) heroBgImg.src = hData.image;
+        else heroBgImg.removeAttribute('src');
+        titleEl.textContent = hData.name;
+        buyBtn.href = `producto.html?id=${encodeURIComponent(heroProd.id)}`;
+
+        const optionPrices = hData.isStreaming && typeof hData.streamingOptions === 'string'
+            ? hData.streamingOptions.split(',').map(option => Number.parseFloat(option.split(':')[1]))
+                .filter(Number.isFinite)
+            : [];
+        priceEl.textContent = optionPrices.length
+            ? `Desde $${Math.min(...optionPrices).toFixed(2)} MXN`
+            : Number(hData.price) === 0 ? 'Gratis' : `$${hData.price} MXN`;
+        buttons.forEach(button => {
+            button.setAttribute('aria-pressed', String(button.dataset.productId === heroProd.id));
+        });
+    }
+
+    selectProduct(products.find(product => product.id === selectedId) ?? products[0]);
+}
+
 async function loadIndexProducts() {
     const container = document.getElementById('products-container');
-    const heroSkeleton = document.getElementById('hero-skeleton');
+    if (!container) return;
 
     if (container) {
         container.innerHTML = getGhostLoaderHTML('Cargando productos...');
@@ -541,79 +536,12 @@ async function loadIndexProducts() {
             heroProds.push(prodsSnap.docs[0]);
         }
 
-        if (heroProds.length > 0) {
-            const banner = document.getElementById('hero-banner');
-            const heroBgImg = document.getElementById('hero-bg-img');
-            const titleEl = document.getElementById('hero-title');
-            const priceEl = document.getElementById('hero-price');
-            const buyBtn = document.getElementById('hero-buy-btn');
-            
-            if (banner) {
-                banner.style.display = 'flex';
-                let currentHeroIndex = 0;
-                
-                if (heroBgImg) {
-                    heroBgImg.style.transition = 'opacity 0.4s ease';
-                }
-                if (titleEl) {
-                    titleEl.style.transition = 'opacity 0.4s ease';
-                }
+        const fallback = document.getElementById('hero-fallback');
+        const banner = document.getElementById('hero-banner');
+        fallback.style.display = heroProds.length ? 'none' : 'flex';
+        banner.style.display = heroProds.length ? 'flex' : 'none';
+        if (heroProds.length) renderFeaturedProducts(heroProds);
 
-                const updateHeroUI = () => {
-                    const heroProd = heroProds[currentHeroIndex];
-                    const hData = heroProd.data();
-                    
-                    if (heroBgImg) heroBgImg.style.opacity = '0';
-                    if (titleEl) titleEl.style.opacity = '0';
-                    if (priceEl) priceEl.style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        if (heroBgImg) {
-                            heroBgImg.src = hData.image || '';
-                            heroBgImg.style.opacity = '1';
-                        } else {
-                            banner.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)), url('${hData.image}')`;
-                        }
-                        if (titleEl) {
-                            titleEl.textContent = hData.name;
-                            titleEl.style.opacity = '1';
-                        }
-                        if (priceEl) {
-                            let displayPrice = `${hData.price} MXN`;
-                            if (hData.isStreaming && hData.streamingOptions) {
-                                let minPrice = Infinity;
-                                const opts = hData.streamingOptions.split(',').filter(o => o.trim() !== '');
-                                opts.forEach(o => {
-                                    if (o.includes(':')) {
-                                        const optPrice = parseFloat(o.split(':')[1].trim());
-                                        if (!isNaN(optPrice) && optPrice < minPrice) minPrice = optPrice;
-                                    }
-                                });
-                                if (minPrice !== Infinity) {
-                                    displayPrice = `Desde $${minPrice.toFixed(2)}`;
-                                } else if (hData.price == 0) {
-                                    displayPrice = `¡Gratis!`;
-                                }
-                            }
-                            priceEl.textContent = displayPrice;
-                            priceEl.style.opacity = '1';
-                        }
-                        if (buyBtn) buyBtn.href = `producto.html?id=${heroProd.id}`;
-                    }, 400);
-
-                    currentHeroIndex = (currentHeroIndex + 1) % heroProds.length;
-                };
-
-                updateHeroUI();
-                
-                if (heroProds.length > 1) {
-                    if (window.heroInterval) clearInterval(window.heroInterval);
-                    window.heroInterval = setInterval(updateHeroUI, 3000);
-                }
-            }
-        }
-
-        if (heroSkeleton) heroSkeleton.style.display = 'none';
 
         if (container) container.innerHTML = '';
 
@@ -694,7 +622,9 @@ async function loadIndexProducts() {
         });
     } catch (e) {
         console.error("Error loading products on index", e);
-        if (heroSkeleton) heroSkeleton.style.display = 'none';
+        if (document.getElementById('hero-banner').style.display === 'none') {
+            document.getElementById('hero-fallback').style.display = 'flex';
+        }
         if (container) {
             container.innerHTML = `<p style="color:var(--danger); width:100%; text-align:center; padding:2rem;">No se pudieron cargar los productos.</p>`;
         }
@@ -904,7 +834,6 @@ async function handleReviewSubmit() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
-    initMobileDock();
     initGlobalNavFilters();
     setUserProfileLoading(true);
 
@@ -1005,28 +934,4 @@ document.addEventListener('click', async (e) => {
             alert('Enlace copiado al portapapeles: ' + link);
         }
     }
-});
-
-
-// Global Friends Panel Toggle
-document.addEventListener('DOMContentLoaded', () => {
-    const friendsPanel = document.getElementById('friends-panel');
-    const friendsBackdrop = document.getElementById('friends-backdrop');
-    function openFriends() {
-        if(friendsPanel) friendsPanel.classList.add('open');
-        if(friendsBackdrop) friendsBackdrop.classList.add('open');
-    }
-    function closeFriends() {
-        if(friendsPanel) friendsPanel.classList.remove('open');
-        if(friendsBackdrop) friendsBackdrop.classList.remove('open');
-    }
-    
-    const navBtn = document.getElementById('nav-friends-btn');
-    const dockBtn = document.getElementById('dock-friends-btn');
-    const closeBtn = document.getElementById('close-friends-panel');
-    
-    if (navBtn) navBtn.addEventListener('click', openFriends);
-    if (dockBtn) dockBtn.addEventListener('click', openFriends);
-    if (closeBtn) closeBtn.addEventListener('click', closeFriends);
-    if (friendsBackdrop) friendsBackdrop.addEventListener('click', closeFriends);
 });

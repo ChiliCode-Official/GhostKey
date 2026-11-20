@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -102,7 +102,7 @@
     <nav class="gk-navbar">
         <a href="index.html" class="gk-nav-logo"><img src="img/ghost-logo.png" alt="GhostKey"></a>
         <div class="gk-search-wrap">
-            <input id="gk-nav-search" type="text" placeholder="Buscar productos..." autocomplete="off">
+            <input id="gk-nav-search" type="search" aria-label="Buscar en el catálogo" placeholder="Buscar productos..." autocomplete="off">
             <button class="gk-search-btn-nav" id="gk-nav-search-btn" title="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         <div class="gk-nav-actions">
@@ -138,254 +138,181 @@
     
     <style>
         .catalog-layout {
-            display: flex;
-            gap: 2rem;
-            align-items: flex-start;
+            display: grid;
+            grid-template-columns: minmax(0, 235px) minmax(0, 1fr);
+            align-items: start;
+            gap: clamp(1rem, 3vw, 2rem);
         }
         .catalog-sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1.5rem;
             position: sticky;
             top: 80px;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            background: var(--bg-card);
         }
-        .catalog-main {
-            flex: 1;
+        .catalog-sidebar-title {
+            margin: 0 0 .75rem;
+            font-size: 1rem;
         }
-        @media(max-width: 768px) {
-            .catalog-layout {
-                flex-direction: column;
+        #catalog-filters {
+            display: grid;
+            align-items: end;
+            gap: .75rem;
+        }
+        #catalog-filters label {
+            display: grid;
+            gap: .35rem;
+            min-width: 0;
+            color: var(--text-muted);
+            font-size: .85rem;
+            font-weight: 600;
+        }
+        #catalog-filters select {
+            min-width: 0;
+            width: 100%;
+            min-height: 42px;
+            padding: .4rem .55rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: var(--bg-main);
+            color: var(--text-main);
+            font: inherit;
+        }
+        #catalog-filters button {
+            min-height: 42px;
+            justify-self: start;
+        }
+        .catalog-heading {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: .5rem 1rem;
+        }
+        .catalog-heading h1 {
+            margin: 0;
+            font-size: clamp(1.75rem, 5vw, 2.45rem);
+        }
+        #results-count {
+            color: var(--text-muted);
+            font-size: .9rem;
+        }
+        .catalog-message {
+            grid-column: 1 / -1;
+            padding: 1.25rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #catalog-grid .card {
+                transition: none;
             }
-            .catalog-sidebar {
-                width: 100%;
-                position: static;
-            }
         }
-        /* =========================================================
-           UX MOVIL ESTILO ENEBA: 1 PRODUCTO POR FILA Y COMPRA DIRECTA
-           ========================================================= */
+        #catalog-grid img.card__image {
+            object-fit: cover;
+        }
+        #catalog-grid .card__add-btn {
+            position: static;
+            z-index: auto;
+            display: block;
+            text-align: center;
+        }
+        #catalog-grid .card__add-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+        }
+        #catalog-grid .wishlist-btn {
+            position: absolute;
+            inset: 12px auto auto 12px;
+            z-index: 5;
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            background: var(--bg-panel);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        #catalog-grid .wishlist-btn.active {
+            color: var(--danger) !important;
+        }
+        #catalog-grid .card:focus-within {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 3px;
+        }
         @media (max-width: 768px) {
-            .catalog-grid, #catalog-grid {
-                display: flex !important;
-                flex-direction: column !important;
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-                width: 100% !important;
+            .catalog-layout {
+                grid-template-columns: minmax(0, 1fr);
             }
-
-            .card {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: stretch !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                min-height: 110px !important;
-                height: auto !important;
-                background: #151624 !important;
-                border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                border-radius: 12px !important;
-                overflow: hidden !important;
-                position: relative !important;
-                text-decoration: none !important;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
-                padding: 0 !important;
-                margin: 0 !important;
+            #catalog-filters {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-
-            .card:active {
-                transform: scale(0.99) !important;
-                border-color: var(--accent-primary, #A182E8) !important;
+            #catalog-grid .card .card__add-btn {
+                display: inline-flex !important;
+                width: fit-content;
+                text-align: left;
+                margin: .35rem 0 0;
+                padding: 0;
+                border: 0;
+                background: transparent;
+                color: var(--text-main);
+                font-size: .75rem;
             }
-
-            .card__shine, .card__glow {
-                display: none !important;
-            }
-
-            .card__content {
-                display: flex !important;
-                flex-direction: row !important;
-                width: 100% !important;
-                height: 100% !important;
-                position: relative !important;
-            }
-
-            /* Portada vertical a la izquierda tipo carÃ¡tula (3:4) */
-            .card__image {
-                width: 95px !important;
-                min-width: 95px !important;
-                max-width: 95px !important;
-                height: 100% !important;
-                min-height: 115px !important;
-                background-size: cover !important;
-                background-position: center !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-                flex-shrink: 0 !important;
-            }
-
-            /* Badge de estado sobre la portada */
-            .card__badge {
-                position: absolute !important;
-                top: 8px !important;
-                left: 8px !important;
-                z-index: 3 !important;
-                font-size: 0.65rem !important;
-                font-weight: 800 !important;
-                padding: 2px 7px !important;
-                border-radius: 4px !important;
-                text-transform: uppercase !important;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
-            }
-
-            /* BotÃ³n de favoritos corazÃ³n */
-            .wishlist-btn {
-                position: absolute !important;
-                top: 8px !important;
-                right: 8px !important;
-                left: auto !important;
-                z-index: 5 !important;
-                background: rgba(20, 20, 32, 0.7) !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                color: var(--text-muted, #94a3b8) !important;
-                width: 30px !important;
-                height: 30px !important;
-                border-radius: 50% !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 0.8rem !important;
-            }
-
-            /* Cuerpo central de informaciÃ³n */
-            .card__details {
-                flex: 1 !important;
-                padding: 10px 12px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                min-width: 0 !important;
-                padding-right: 50px !important; /* Margen para no colisionar con el botÃ³n de compra */
-            }
-
-            .card__title {
-                font-size: 0.88rem !important;
-                font-weight: 700 !important;
-                line-height: 1.25 !important;
-                color: #f8fafc !important;
-                margin: 0 0 4px 0 !important;
-                display: -webkit-box !important;
-                -webkit-line-clamp: 2 !important;
-                -webkit-box-orient: vertical !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-            }
-
-            .card__reviews {
-                display: flex !important;
-                align-items: center !important;
-                gap: 4px !important;
-                font-size: 0.68rem !important;
-                color: #ffa723 !important;
-                margin-bottom: 4px !important;
-            }
-
-            .card__reviews .rating {
-                color: var(--text-muted, #94a3b8) !important;
-            }
-
-            .card__price-large {
-                font-size: 1.15rem !important;
-                font-weight: 900 !important;
-                color: #ffffff !important;
-                margin: 0 !important;
-            }
-
-            /* Ocultar el botÃ³n original "Ver producto" en mÃ³viles */
-            .card__add-btn {
-                display: none !important;
-            }
-
-            /* BotÃ³n de compra directa / carrito estilo Eneba en mÃ³vil */
-            .card__quick-buy-btn {
-                display: flex !important;
-                position: absolute !important;
-                bottom: 10px !important;
-                right: 10px !important;
-                width: 36px !important;
-                height: 36px !important;
-                border-radius: 8px !important;
-                background: linear-gradient(135deg, var(--accent-primary, #9333ea), #6366f1) !important;
-                border: none !important;
-                color: #ffffff !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 0.95rem !important;
-                cursor: pointer !important;
-                z-index: 5 !important;
-                box-shadow: 0 3px 10px rgba(147, 51, 234, 0.4) !important;
-                transition: transform 0.15s, filter 0.15s !important;
-            }
-
-            .card__quick-buy-btn:active {
-                transform: scale(0.9) !important;
-                filter: brightness(1.2) !important;
+            #catalog-grid .card .wishlist-btn,
+            #catalog-grid .card .card__quick-buy-btn {
+                width: 40px !important;
+                height: 40px !important;
             }
         }
     </style>
     <div class="gk-page-body" style="padding-top: 2rem;">
         <div class="catalog-layout">
-                        <aside class="catalog-sidebar">
-                <h2 class="catalog-sidebar-title" style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-sliders" style="color: var(--accent-primary);"></i> Filtros
-                </h2>
-                <div class="catalog-sidebar-inner">
-                    <div class="catalog-sidebar-group" style="margin-bottom: 1rem;">
-                        <label style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Colecciones</label>
-                        <select id="collection-select" style="width: 100%; background: var(--bg-main); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-family: inherit; font-size: 0.88rem; outline: none; cursor: pointer; margin-top: 4px;">
+            <aside class="catalog-sidebar" aria-label="Filtros del catálogo">
+                <h2 class="catalog-sidebar-title">Filtros</h2>
+                <form id="catalog-filters">
+                    <label>
+                        Colección
+                        <select id="collection-select">
                             <option value="all">Todas las colecciones</option>
                         </select>
-                    </div>
-
-                    <div class="catalog-sidebar-group">
-                        <label style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Precio</label>
-                        <select id="price-select" style="width: 100%; background: var(--bg-main); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-family: inherit; font-size: 0.88rem; outline: none; cursor: pointer;">
+                    </label>
+                    <label>
+                        Precio (MXN)
+                        <select id="price-select">
                             <option value="all">Todos los precios</option>
                             <option value="under-100">Menos de $100</option>
                             <option value="100-500">$100 a $500</option>
                             <option value="over-500">Más de $500</option>
                         </select>
-                    </div>
-
-                    <div class="catalog-sidebar-group">
-                        <label style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Ordenar</label>
-                        <select id="sort-select" style="width: 100%; background: var(--bg-main); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-family: inherit; font-size: 0.88rem; outline: none; cursor: pointer;">
+                    </label>
+                    <label>
+                        Ordenar
+                        <select id="sort-select">
                             <option value="default">Relevancia</option>
                             <option value="price-asc">Precio: menor a mayor</option>
                             <option value="price-desc">Precio: mayor a menor</option>
                             <option value="newest">Lo más nuevo</option>
                         </select>
-                    </div>
-                </div>
+                    </label>
+                    <button class="btn-secondary" type="reset">Limpiar filtros</button>
+                </form>
             </aside>
-            
-            <main class="catalog-main">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0;">Catálogo</h1>
-                    <span id="results-count" style="color: var(--text-muted); font-size: 0.9rem;">Cargando...</span>
-                </div>
-                
-                <div class="catalog-grid" id="catalog-grid">
 
-                    <!-- Products injected by JS -->
+            <main class="catalog-main">
+                <div class="catalog-heading">
+                    <h1>Catálogo</h1>
+                    <span id="results-count" role="status">Cargando…</span>
                 </div>
+                <div class="catalog-grid" id="catalog-grid" aria-busy="true"></div>
             </main>
         </div>
     </div>
-
-    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/main.js"></script>
@@ -397,7 +324,7 @@
         <div class="gk-search-overlay-header">
             <div class="gk-search-overlay-bar">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="gk-search-overlay-input" type="text" placeholder="Buscar..." autocomplete="off">
+                <input id="gk-search-overlay-input" type="search" aria-label="Buscar productos" placeholder="Buscar..." autocomplete="off">
             </div>
             <button id="search-cancel-btn" class="gk-search-cancel">Cancelar</button>
         </div>
@@ -405,7 +332,7 @@
     </div>
 
     <!-- ===== MOBILE BOTTOM DOCK (Eneba-style) ===== -->
-    <nav class="gk-dock" role="navigation" aria-label="Navegaci鏮 principal">
+    <nav class="gk-dock" role="navigation" aria-label="Navegación principal">
         <a href="index.html" class="gk-dock-item" id="dock-home-btn" aria-label="GhostKey inicio">
             <span class="dock-icon">
                 <span class="gk-dock-logo-icon"><img src="https://i.imgur.com/LbMnNUg.png" alt="GhostKey"></span>
@@ -443,7 +370,7 @@
         <!-- Search -->
         <div class="brutalist-container" style="width: 100%; margin-top: 4px;">
             <input id="search-friend-input" placeholder="Correo o UID de amigo..." class="brutalist-input smooth-type" type="text" style="padding: 10px; font-size: 14px; border-width: 2px;" />
-            <label class="brutalist-label" style="top: -20px; font-size: 10px;">BUSCAR / A哻DIR</label>
+            <label class="brutalist-label" style="top: -20px; font-size: 10px;">Buscar o añadir</label>
         </div>
         <button type="button" class="btn-primary" id="search-friend-btn" style="width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <i class="fa-solid fa-user-plus"></i> Buscar Amigo
@@ -455,20 +382,20 @@
                 Miembros de la Comunidad
             </h4>
             <div class="friends-list" id="friends-list" style="display: flex; flex-direction: column; gap: 8px;">
-                <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Cargando... amigos...</p>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Cargando amigos…</p>
             </div>
         </div>
 
         <!-- Referral -->
         <div class="referral-box" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--border-radius-md, 12px);">
             <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; color: var(--accent-primary);">
-                <i class="fa-solid fa-gift"></i> Tu Enlace de Invitaci鏮
+                <i class="fa-solid fa-gift"></i> Tu enlace de invitación
             </h4>
             <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
-                ：ana 3% en saldo cuando tus amigos compren usando tu link!
+                Gana un 3% en saldo cuando tus amigos compren usando tu enlace.
             </p>
             <div style="display:flex; gap: 6px;">
-                <input type="text" id="ref-link-input" readonly value="Inici鏇 sesi鏮 para ver tu enlace" style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
+                <input type="text" id="ref-link-input" readonly value="Inicia sesión para ver tu enlace" style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
                 <button class="btn-primary" id="copy-ref-btn" style="padding: 6px 10px; font-size: 0.8rem;"><i class="fa-solid fa-copy"></i></button>
             </div>
         </div>

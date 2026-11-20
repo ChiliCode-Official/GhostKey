@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Virtual - Pago</title>
+    <title>Pago y recargas | GhostKey</title>
 
     <meta name="description" content="Compra cuentas premium, claves de juegos y saldo virtual en GhostKey. Entrega rápida, transacciones seguras y soporte dedicado.">
     <meta name="keywords" content="cuentas premium, claves juegos, saldo virtual, GhostKey, tienda digital, videojuegos">
@@ -66,6 +66,15 @@
         .r-opt:hover, .r-opt.selected {
             border-color: var(--accent-primary);
             background: rgba(161, 130, 232, 0.1);
+        }
+        .pago-container > * { min-width: 0; }
+        #pm-clabe-display { overflow-wrap: anywhere; }
+        .pos-anim-container-btn:disabled { cursor: not-allowed; }
+        @media (prefers-reduced-motion: reduce) {
+            .pago-container *, .pago-container *::before, .pago-container *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
         .payment-box {
             display: flex;
@@ -165,20 +174,21 @@
             }
         })();
     </script>
-    <div class="gk-page-body">
+    <main class="gk-page-body">
             <header class="top-bar">
                 <button class="btn-secondary" onclick="window.history.back()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
             </header>
 
             <div id="auth-state-message" style="display:none; text-align:center; padding:3rem; color:var(--warning);">
                 <h2><i class="fa-solid fa-circle-exclamation"></i> Necesitas iniciar sesión para continuar.</h2>
+                <a class="btn-primary" href="perfil.html" style="margin-top: 1rem;">Ir a mi cuenta</a>
             </div>
 
             <section class="pago-container" id="pago-content" style="display:none;">
                 <!-- Left: Animation -->
                 <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:var(--bg-card); border-radius:12px; padding:2rem; min-height: 250px;">
                     <!-- Typewriter Animation (Nawsome) -->
-                    <div class="typewriter">
+                    <div class="typewriter" aria-hidden="true">
                         <div class="slide"><i></i></div>
                         <div class="paper"></div>
                         <div class="keyboard"></div>
@@ -188,7 +198,7 @@
 
                 <!-- Right: Logic Form -->
                 <div class="payment-box">
-                    <h2 id="pago-title" style="margin-bottom: 5px;">Procesando...</h2>
+                    <h1 id="pago-title" style="margin-bottom: 5px;">Cargando pago…</h1>
                     <p id="pago-subtitle" style="color:var(--text-muted); margin-bottom: 2rem;">Calculando opciones de pago.</p>
                     
                     <!-- Dynamic Content Area -->
@@ -200,11 +210,11 @@
                         <!-- Filled by JS -->
                     </div>
                     
-                    <p id="pago-error" style="color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; text-align: center;"></p>
+                    <p id="pago-error" role="alert" style="color: var(--danger); font-size: 0.9rem; margin-top: 1rem; display: none; text-align: center;"></p>
                 </div>
             </section>
         
-    </div>
+    </main>
 
     <!-- Astronaut Modal for Gifts -->
     <div class="modal" id="gift-confirmation-modal">
@@ -260,7 +270,7 @@
                 </div>
             </div>
             <p id="gift-modal-message" style="margin-top: 1rem; line-height: 1.6; color: var(--text-main);">
-                Â¡Nos esforzaremos lo necesario para entregar tu regalo a <strong id="gift-friend-name">amigo</strong> con la mayor rapidez posible!
+                ¡Nos esforzaremos lo necesario para entregar tu regalo a <strong id="gift-friend-name">amigo</strong> con la mayor rapidez posible!
             </p>
             <div style="display: flex; gap: 10px; margin-top: 1.5rem; flex-direction: column;">
                 <button class="btn-primary" id="share-whatsapp-btn" style="background: #25D366; color: #fff;">
@@ -351,7 +361,7 @@
                 ¡Gana 3% en saldo cuando tus amigos compren usando tu link!
             </p>
             <div style="display:flex; gap: 6px;">
-                <input type="text" id="ref-link-input" readonly value="Inicióa sesión para ver tu enlace" style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
+                <input type="text" id="ref-link-input" readonly value="Inicia sesión para ver tu enlace" style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-main); color: var(--text-main); font-size: 0.8rem;">
                 <button class="btn-primary" id="copy-ref-btn" style="padding: 6px 10px; font-size: 0.8rem;"><i class="fa-solid fa-copy"></i></button>
             </div>
         </div>

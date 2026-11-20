@@ -1,4 +1,4 @@
-﻿import { auth, db } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc, getDocs, collection, serverTimestamp, runTransaction, updateDoc, arrayUnion, arrayRemove, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { updateCartBadge } from './cart.js';
@@ -33,6 +33,16 @@ const pTitle = document.getElementById('p-title');
 const pDesc = document.getElementById('p-desc');
 const pBadge = document.getElementById('p-badge');
 const pPrice = document.getElementById('p-price');
+const buyPanel = document.getElementById('product-buy-panel');
+const reviewsSection = document.getElementById('product-reviews');
+const streamSelect = document.getElementById('streaming-duration-select');
+const shareBtn = document.getElementById('btn-share-product');
+const backLink = document.getElementById('back-to-catalog');
+const previousPage = document.referrer ? new URL(document.referrer) : null;
+
+if (backLink && previousPage?.origin === window.location.origin && previousPage.pathname.split('/').pop() === 'catalogo.html') {
+    backLink.href = previousPage.href;
+}
 
 const authMsg = document.getElementById('auth-state-message');
 const buyControls = document.getElementById('buy-controls');
@@ -96,8 +106,7 @@ if (btnGift) {
 
 async function loadProductDetails() {
     if (!productId) {
-        if (pTitle) pTitle.textContent = "Producto no especificado";
-        if (pDesc) pDesc.textContent = "No se proporcionó un ID de producto válido.";
+        showUnavailableProduct('Producto no especificado', 'Selecciona un producto en el catálogo.');
         return;
     }
 
@@ -106,29 +115,25 @@ async function loadProductDetails() {
         const pSnap = await getDoc(pRef);
 
         if (!pSnap.exists()) {
-            if (pTitle) pTitle.textContent = "Producto no encontrado";
-            if (pDesc) pDesc.textContent = "El producto que buscas ya no existe o fue eliminado.";
+            showUnavailableProduct("Producto no encontrado", "Este producto ya no está disponible en el catálogo.");
             return;
         }
 
         productData = { id: pSnap.id, ...pSnap.data() };
-        currentQty = productData.minQuantity || 1;
-        updateQtyUI();
+        currentQty = Number(productData.minQuantity) || 1;
 
         if (pImage) {
-            const fallbackImg = 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400';
-            pImage.src = productData.image || fallbackImg;
-            pImage.onerror = () => { pImage.src = fallbackImg; pImage.onerror = null; };
+            const fallbackImg = 'img/ghost-logo.png';
+            pImage.addEventListener('error', () => { pImage.src = fallbackImg; }, { once: true });
+            pImage.src = normalizeImageUrl(productData.image) || fallbackImg;
         }
-        if (pTitle) {
-            pTitle.textContent = productData.name || 'Producto';
-            pTitle.classList.remove('skeleton');
-        }
+        if (pTitle) pTitle.textContent = productData.name || 'Producto';
         if (pDesc) pDesc.textContent = productData.description || 'Sin descripción disponible.';
-        if (pPrice) pPrice.textContent = `$${Number(productData.price || 0).toFixed(2)} MXN`;
+        if (buyPanel) buyPanel.hidden = false;
+        if (reviewsSection) reviewsSection.hidden = false;
+        if (shareBtn) shareBtn.disabled = false;
 
         const streamContainer = document.getElementById('streaming-options-container');
-        const streamSelect = document.getElementById('streaming-duration-select');
         if (streamContainer && streamSelect) {
             if (productData.isStreaming && productData.streamingOptions) {
                 streamContainer.style.display = 'block';
@@ -154,28 +159,16 @@ async function loadProductDetails() {
                     streamSelect.appendChild(opt);
                 });
 
-                const hasCustomPrices = opts.some(o => o.includes(':'));
-                if (hasCustomPrices && minPrice !== Infinity) {
-                    if (pPrice) pPrice.textContent = `Desde $${minPrice.toFixed(2)} MXN`;
+                if (opts.some(option => option.includes(':')) && Number.isFinite(minPrice)) {
+                    streamSelect.dataset.startingPrice = String(minPrice);
                 }
-
-                streamSelect.addEventListener('change', (e) => {
-                    const selectedOpt = streamSelect.options[streamSelect.selectedIndex];
-                    if (selectedOpt && selectedOpt.value) {
-                        const price = parseFloat(selectedOpt.getAttribute('data-price'));
-                        if (!isNaN(price) && pPrice) {
-                            pPrice.textContent = `$${price.toFixed(2)} MXN`;
-                        }
-                    } else if (hasCustomPrices && minPrice !== Infinity) {
-                        if (pPrice) pPrice.textContent = `Desde $${minPrice.toFixed(2)} MXN`;
-                    } else {
-                        if (pPrice) pPrice.textContent = `$${Number(productData.price || 0).toFixed(2)} MXN`;
-                    }
-                });
+                streamSelect.addEventListener('change', updateQtyUI);
             } else {
                 streamContainer.style.display = 'none';
             }
         }
+
+        updateQtyUI();
 
         // Check product stock status
         try {
@@ -209,65 +202,61 @@ async function loadProductDetails() {
             }
         } catch (e) {
             console.error('Error fetching stock:', e);
+            if (pBadge) pBadge.textContent = 'Stock sin confirmar';
         }
 
-        // Listen to Auth State for buying
+        let focusQuickBuy = urlParams.get('action') === 'buy';
         setPersistence(auth, browserLocalPersistence).catch(console.error);
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            if (user) {
-                if (authMsg) authMsg.style.display = 'none';
-                if (buyControls) buyControls.style.display = 'flex';
-                // Auto-scroll y foco si vino por accion directa de compra
-                if (urlParams.get("action") === "buy") {
-                    setTimeout(() => {
-                        const buyBtn = document.getElementById("buy-btn");
-                        if (buyBtn) {
-                            buyBtn.scrollIntoView({ behavior: "smooth", block: "center" });
-                            buyBtn.classList.add("pulse-highlight");
-                        }
-                    }, 300);
-                }
-                
-                try {
-                    const uRef = doc(db, 'users', user.uid);
-                    const uSnap = await getDoc(uRef);
-                    if (uSnap.exists()) {
-                        const bal = uSnap.data().balance || 0;
-                        if (userBalanceDisplay) userBalanceDisplay.textContent = `$${Number(bal).toFixed(2)} MXN`;
-                    }
-                } catch(e) {
-                    console.error('Error fetching user balance:', e);
-                }
-            } else {
-                if (authMsg) authMsg.style.display = 'block';
-                if (buyControls) buyControls.style.display = 'none';
+            if (authMsg) authMsg.hidden = Boolean(user);
+            if (buyControls) buyControls.style.display = user ? 'flex' : 'none';
+
+            if (focusQuickBuy) {
+                focusQuickBuy = false;
+                const target = user ? btnBuy : authMsg;
+                target?.focus({ preventScroll: true });
+                target?.scrollIntoView({
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+                    block: 'center'
+                });
+                target?.classList.add('pulse-highlight');
+            }
+
+            if (!user) return;
+            if (userBalanceDisplay) userBalanceDisplay.textContent = 'Consultando…';
+            try {
+                const uSnap = await getDoc(doc(db, 'users', user.uid));
+                if (currentUser?.uid !== user.uid) return;
+                const balance = Number(uSnap.data()?.balance) || 0;
+                if (userBalanceDisplay) userBalanceDisplay.textContent = `$${balance.toFixed(2)} MXN`;
+            } catch (error) {
+                console.error('Error fetching user balance:', error);
+                if (currentUser?.uid === user.uid && userBalanceDisplay) userBalanceDisplay.textContent = 'No disponible';
             }
         });
 
-        if (authMsg) {
-            authMsg.addEventListener('click', () => {
-                const modal = document.getElementById('auth-modal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                } else if (userProfileBtn) {
-                    userProfileBtn.click();
-                }
-            });
-        }
+        authMsg?.addEventListener('click', () => {
+            document.getElementById('user-profile-btn')?.click();
+        });
 
         // Load reviews
         loadProductReviews(productId);
 
     } catch (err) {
         console.error("Error loading product details:", err);
-        if (pTitle) {
-            pTitle.textContent = "Error al cargar producto";
-            pTitle.classList.remove('skeleton');
-        }
+        showUnavailableProduct('No se pudo cargar el producto', 'Recarga la página o vuelve al catálogo.');
     }
 }
 
+function showUnavailableProduct(title, description) {
+    if (pTitle) pTitle.textContent = title;
+    if (pDesc) pDesc.textContent = description;
+    if (pImage) pImage.hidden = true;
+    if (buyPanel) buyPanel.hidden = true;
+    if (reviewsSection) reviewsSection.hidden = true;
+    if (shareBtn) shareBtn.disabled = true;
+}
 
 async function loadFriendsInGiftModal() {
     if (!currentUser) return;
@@ -691,15 +680,25 @@ function checkAndDisplayStockNotice() {
 }
 
 function updateQtyUI() {
+    if (!productData) return;
+
+    if (isFollowersProduct() && currentQty > 0) currentQty = Math.floor(currentQty / 100) * 100;
     const qtyDisplay = document.getElementById('qty-display');
-    const pPrice = document.getElementById('p-price');
-    
-    if(qtyDisplay) qtyDisplay.textContent = currentQty;
-    
-    if(pPrice && productData) {
-        if (isFollowersProduct() && currentQty > 0) currentQty = Math.floor(currentQty / 100) * 100;
-        const total = getProductTotal();
-        pPrice.textContent = `$${total.toFixed(2)}`;
+    if (qtyDisplay) qtyDisplay.textContent = currentQty;
+
+    if (pPrice) {
+        const selection = streamSelect?.selectedOptions[0];
+        const selectedPrice = selection?.value ? Number(selection.dataset.price) : NaN;
+        const startingPrice = Number(streamSelect?.dataset.startingPrice);
+        if (isFollowersProduct()) {
+            pPrice.textContent = `$${getProductTotal().toFixed(2)} MXN`;
+        } else if (Number.isFinite(selectedPrice)) {
+            pPrice.textContent = `$${(selectedPrice * currentQty).toFixed(2)} MXN`;
+        } else if (Number.isFinite(startingPrice)) {
+            pPrice.textContent = `Desde $${(startingPrice * currentQty).toFixed(2)} MXN`;
+        } else {
+            pPrice.textContent = `$${getProductTotal().toFixed(2)} MXN`;
+        }
     }
 
     checkAndDisplayStockNotice();
@@ -710,7 +709,7 @@ const btnPlus = document.getElementById('btn-qty-plus');
 
 if(btnMinus) {
     btnMinus.addEventListener('click', () => {
-        const minQ = productData ? (productData.minQuantity || 1) : 1;
+        const minQ = Number(productData?.minQuantity) || 1;
         if (currentQty > minQ) {
             currentQty -= isFollowersProduct() ? 100 : 1;
         } else if (currentQty === minQ) {
@@ -722,7 +721,7 @@ if(btnMinus) {
 
 if(btnPlus) {
     btnPlus.addEventListener('click', () => {
-        const minQ = productData ? (productData.minQuantity || 1) : 1;
+        const minQ = Number(productData?.minQuantity) || 1;
         if (currentQty === 0) {
             currentQty = minQ;
         } else if (currentQty < minQ) {
@@ -779,25 +778,19 @@ async function loadProductReviews(pid) {
 }
 
 
-const shareBtn = document.getElementById('btn-share-product');
-if (shareBtn) {
-    shareBtn.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            const originalIcon = shareBtn.innerHTML;
-            shareBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
-            shareBtn.style.color = 'var(--success)';
-            shareBtn.style.borderColor = 'var(--success)';
-            setTimeout(() => {
-                shareBtn.innerHTML = originalIcon;
-                shareBtn.style.color = '';
-                shareBtn.style.borderColor = '';
-            }, 2000);
-        } catch(e) {
-            alert('Enlace copiado: ' + window.location.href);
-        }
-    });
-}
+shareBtn?.addEventListener('click', async () => {
+    const status = document.getElementById('product-share-status');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('action');
+
+    try {
+        await navigator.clipboard.writeText(url.href);
+        if (status) status.textContent = 'Enlace copiado.';
+    } catch {
+        if (status) status.textContent = `Copia este enlace: ${url.href}`;
+        else alert(`Copia este enlace: ${url.href}`);
+    }
+});
 
 loadProductDetails();
 
