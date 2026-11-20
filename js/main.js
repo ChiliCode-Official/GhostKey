@@ -272,6 +272,8 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
+    const navBalance = document.getElementById('nav-balance-label');
+    if (navBalance) navBalance.textContent = 'Saldo';
 
     updateUserProfileUI(user);
     checkReferralBanner(user);
@@ -292,15 +294,19 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     if (user) {
-        const uSnap = await getDoc(doc(db, 'users', user.uid));
-        if (uSnap.exists()) {
-            currentUserWishlist = uSnap.data().wishlist || [];
-            const navBalance = document.getElementById('nav-balance-label');
-            if (navBalance) {
-                navBalance.textContent = `$${(uSnap.data().balance || 0).toFixed(2)}`;
+        try {
+            const uSnap = await getDoc(doc(db, 'users', user.uid));
+            if (currentUser !== user) return;
+            const data = uSnap.data();
+            currentUserWishlist = data?.wishlist || [];
+            const balance = Number(data?.balance ?? 0);
+            if (navBalance && uSnap.exists() && Number.isFinite(balance)) {
+                navBalance.textContent = '$' + balance.toFixed(2);
             }
-        } else {
+        } catch (error) {
+            if (currentUser !== user) return;
             currentUserWishlist = [];
+            console.error('No se pudo cargar el saldo:', error);
         }
     } else {
         currentUserWishlist = [];

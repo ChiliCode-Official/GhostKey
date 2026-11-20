@@ -237,41 +237,40 @@
     const friendsPanel = document.getElementById('friends-panel');
     const friendsBackdrop = document.getElementById('friends-backdrop');
 
-    function openFriends() {
+    const friendTriggers = document.querySelectorAll('#nav-friends-btn, #dock-friends-btn, [data-friends-trigger]');
+    const closeFriendsBtn = document.getElementById('close-friends-panel');
+    let friendsTrigger = null;
+    let previousOverflow = '';
+
+    function openFriends(event) {
         if (!friendsPanel) {
-            // Redirect to perfil on pages without the panel
             window.location.href = 'perfil.html';
             return;
         }
+        if (friendsPanel.classList.contains('open')) return;
+        friendsTrigger = event.currentTarget;
+        previousOverflow = document.body.style.overflow;
+        friendsPanel.inert = false;
         friendsPanel.classList.add('open');
-        if (friendsBackdrop) friendsBackdrop.classList.add('open');
+        friendsBackdrop?.classList.add('open');
+        friendTriggers.forEach(button => button.setAttribute('aria-expanded', 'true'));
         document.body.style.overflow = 'hidden';
+        closeFriendsBtn?.focus();
     }
 
     function closeFriends() {
         if (!friendsPanel?.classList.contains('open')) return;
         friendsPanel.classList.remove('open');
-        if (friendsBackdrop) friendsBackdrop.classList.remove('open');
-        document.body.style.overflow = '';
+        friendsPanel.inert = true;
+        friendsBackdrop?.classList.remove('open');
+        friendTriggers.forEach(button => button.setAttribute('aria-expanded', 'false'));
+        document.body.style.overflow = previousOverflow;
+        friendsTrigger?.focus();
     }
 
-    // Navbar button
-    const navFriendsBtn = document.getElementById('nav-friends-btn');
-    if (navFriendsBtn) {
-        navFriendsBtn.addEventListener('click', openFriends);
-    }
-
-    // Dock friends button (if still present on any page)
-    const dockFriendsBtn = document.getElementById('dock-friends-btn');
-    if (dockFriendsBtn) {
-        dockFriendsBtn.addEventListener('click', openFriends);
-    }
-
-    // Close button inside panel
-    const closeFriendsBtn = document.getElementById('close-friends-panel');
-    if (closeFriendsBtn) {
-        closeFriendsBtn.addEventListener('click', closeFriends);
-    }
+    friendTriggers.forEach(button => button.addEventListener('click', openFriends));
+    closeFriendsBtn?.addEventListener('click', closeFriends);
+    friendsPanel?.querySelector('.friends-gift-guide a')?.addEventListener('click', closeFriends);
 
     // Backdrop click
     if (friendsBackdrop) {

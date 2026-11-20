@@ -95,3 +95,160 @@
     .store-rail a[aria-current="page"] { color: #e2d6ff; background: #342c46; }
     .store-rail .store-brand, .ghost-store .gk-nav-links { display: none; }
 }
+
+.ghost-store {
+    --store-text: "Inter", system-ui, sans-serif;
+    --store-heading: "Outfit", var(--store-text);
+}
+
+.ghost-store, .ghost-store :where(p, a, button, label, input, select, textarea, span, li, small) { font-family: var(--store-text); }
+.ghost-store :is(h1, h2, h3, h4, h5, .store-brand, .gk-footer-brand span) {
+    font-family: var(--store-heading);
+}
+
+.store-rail button[data-friends-trigger] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 46px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.store-rail button[data-friends-trigger]:is(:hover, [aria-expanded="true"]) {
+    color: var(--text-main);
+    background: var(--bg-card);
+}
+
+.ghost-store .gk-friends-panel { width: min(420px, 94vw); z-index: 2101; }
+.ghost-store .gk-friends-panel:not(.open) { visibility: hidden; }
+.ghost-store .gk-friends-panel-backdrop { z-index: 2100; }
+.ghost-store :is(.gk-friends-panel, .gk-search-overlay).open ~ .gk-help-bubble-wrap { visibility: hidden; }
+.ghost-store #close-friends-panel { min-width: 44px; min-height: 44px; }
+.ghost-store .dock-label { font-size: .72rem; }
+.ghost-store .gk-dock-item { min-width: 0; padding-inline: 4px; }
+.friends-gift-guide {
+    padding: 14px;
+    border: 1px solid rgba(161,130,232,.28);
+    border-radius: 12px;
+    background: var(--bg-panel);
+    line-height: 1.55;
+}
+.friends-gift-guide a { color: var(--accent-hover); display: inline-block; margin-top: 8px; }
+
+.ghost-store .gk-page { padding-bottom: clamp(32px, 5vw, 64px); }
+.ghost-store #como-comprar h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.ghost-store :is(#como-comprar, #como-regalar) { scroll-margin-top: 90px; }
+.store-guides {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+.store-guides .gk-how-card {
+    padding: clamp(16px, 3vw, 24px);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    background: var(--bg-panel);
+}
+.store-guides h3 { font-size: 1.25rem; margin-bottom: 8px; }
+.store-guides p { color: var(--text-muted); max-width: 58ch; }
+.store-guides .gk-see-all { display: inline-flex; margin-top: 12px; }
+.ghost-store .gk-footer :is(p, li a, .gk-footer-bottom) { font-size: .9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ghost-store :is(.gk-search-overlay, .gk-friends-panel) { transition: none; }
+}
+
+/* The two flexible tracks keep the brand centered in the store header. */
+.ghost-store .gk-navbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: clamp(6px, 1.5vw, 20px);
+}
+.ghost-store .gk-navbar .gk-search-wrap {
+    grid-column: 1;
+    grid-row: 1;
+    width: min(100%, 360px);
+    min-width: 0;
+}
+.ghost-store .gk-navbar .gk-search-wrap input { min-width: 0; }
+.ghost-store .gk-navbar .gk-nav-logo {
+    display: inline-flex;
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: center;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+.ghost-store .gk-navbar .gk-nav-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+.ghost-store .gk-navbar .gk-nav-actions {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+}
+.ghost-store .gk-navbar .gk-nav-balance {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 5px 8px;
+    border: 1px solid rgba(161, 130, 232, .35);
+    border-radius: 999px;
+    background: var(--bg-main);
+    color: var(--text-main) !important;
+    font-variant-numeric: tabular-nums;
+}
+.store-balance-coin, .store-balance-add {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+}
+.store-balance-coin {
+    width: 24px;
+    height: 24px;
+    background: rgba(161, 130, 232, .18);
+    color: var(--accent-hover);
+}
+.ghost-store .gk-nav-balance .store-balance-add {
+    width: 20px;
+    height: 20px;
+    color: var(--bg-main);
+    background: var(--accent-primary);
+    font-size: .7rem;
+}
+.store-rail .store-library { color: var(--accent-hover); }
+
+@media (min-width: 769px) {
+    .ghost-store .gk-navbar #nav-friends-btn { display: none; }
+    .ghost-store .gk-navbar .gk-nav-actions .label:not(#nav-balance-label),
+    .ghost-store .gk-navbar #user-name { display: none; }
+}
+@media (max-width: 768px) {
+    .ghost-store .gk-navbar { padding-inline: 10px; }
+    .ghost-store .gk-navbar .gk-search-wrap,
+    .ghost-store .gk-navbar .gk-nav-actions > :not(.gk-nav-balance) { display: none; }
+    .ghost-store .gk-navbar .gk-nav-balance .label { display: inline !important; }
+    .ghost-store .gk-navbar .gk-nav-balance {
+        min-height: 44px;
+        gap: 4px;
+        padding-inline: 6px;
+        font-size: .78rem;
+    }
+    .ghost-store .gk-navbar .store-balance-coin { width: 20px; height: 20px; }
+    .ghost-store .gk-nav-balance .store-balance-add { width: 17px; height: 17px; }
+}

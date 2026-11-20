@@ -69,13 +69,19 @@ function showProfile(user) {
     }
 
     try {
-        if ((user.email || '').toLowerCase().trim() === ADMIN_EMAIL.toLowerCase()) {
+        const isAdmin = (user.email || '').toLowerCase().trim() === ADMIN_EMAIL.toLowerCase();
+        const showLibrary = location.hash === '#tab-pedidos';
+        if (isAdmin && !showLibrary) {
             if (adminView)  adminView.style.display  = 'block';
             if (clientView) clientView.style.display = 'none';
             loadAdminData();
         } else {
             if (adminView)  adminView.style.display  = 'none';
             if (clientView) clientView.style.display = 'block';
+            if (showLibrary) {
+                document.getElementById('tab-pedidos-control')?.click();
+                document.getElementById('tab-pedidos')?.scrollIntoView({ block: 'start' });
+            }
             loadClientData(user.uid);
         }
     } catch(e) {

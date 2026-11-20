@@ -274,32 +274,28 @@ function initFriendsPanel() {
     // Works with both old sidebar panel and new slide-over panel
     if (!panel) return;
 
-    const saved = localStorage.getItem(PANEL_KEY);
-    const isCollapsed = saved === null ? true : saved === '1';
-    // For new slide-over panels, start closed
-    if (!dashboard || dashboard === document.body) {
-        // new layout — start closed
-    } else {
-        setPanelCollapsed(isCollapsed);
+    if (!document.body.classList.contains('ghost-store')) {
+        const saved = localStorage.getItem(PANEL_KEY);
+        if (dashboard !== document.body) setPanelCollapsed(saved === null || saved === '1');
+
+        toggleBtn?.addEventListener('click', () => {
+            const currentlyCollapsed = panel.classList.contains('is-collapsed');
+            setPanelCollapsed(!currentlyCollapsed);
+        });
+
+        reopenTab?.addEventListener('click', () => setPanelCollapsed(false));
+
+        document.querySelectorAll('.fa-users, [data-action="toggle-friends"]').forEach(icon => {
+            const parentBtn = icon.closest('button, a, .dock-item');
+            if (parentBtn && parentBtn !== toggleBtn) {
+                parentBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const currentlyCollapsed = panel.classList.contains('is-collapsed');
+                    setPanelCollapsed(!currentlyCollapsed);
+                });
+            }
+        });
     }
-
-    toggleBtn?.addEventListener('click', () => {
-        const currentlyCollapsed = panel.classList.contains('is-collapsed');
-        setPanelCollapsed(!currentlyCollapsed);
-    });
-
-    reopenTab?.addEventListener('click', () => setPanelCollapsed(false));
-
-    document.querySelectorAll('.fa-users, [data-action="toggle-friends"]').forEach(icon => {
-        const parentBtn = icon.closest('button, a, .dock-item');
-        if (parentBtn && parentBtn !== toggleBtn) {
-            parentBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const currentlyCollapsed = panel.classList.contains('is-collapsed');
-                setPanelCollapsed(!currentlyCollapsed);
-            });
-        }
-    });
 
     onAuthStateChanged(auth, (user) => {
         loadRealFriends(user);
