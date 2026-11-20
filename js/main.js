@@ -575,9 +575,8 @@ async function loadIndexProducts() {
                 }
             }
 
-            const starsHtml = '<i class="fa-solid fa-star"></i>'.repeat(5);
 
-            let displayPrice = `$${p.price} <span class="gk-card-original">MXN</span>`;
+            let displayPrice = `${escapeHtml(String(p.price))} <span class="gk-card-original">MXN</span>`;
             if (p.isStreaming && p.streamingOptions) {
                 let minPrice = Infinity;
                 const opts = p.streamingOptions.split(',').filter(o => o.trim() !== '');
@@ -595,31 +594,23 @@ async function loadIndexProducts() {
             }
 
             container.innerHTML += `
-                <a href="producto.html?id=${d.id}" class="gk-card">
-                    <img class="gk-card-img" src="${p.image || 'https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&w=400'}" alt="${p.name}" loading="lazy">
+                <article class="gk-card">
+                    <img class="gk-card-img" src="${escapeHtml(p.image || 'img/ghost-logo.png')}" alt="" loading="lazy" decoding="async">
                     <div class="gk-card-body">
-                        <span class="gk-card-badge" style="background:${badgeBg}">${stockLabel}</span>
-                        <div class="gk-card-name">${escapeHtml(p.name)}</div>
-                        <div class="gk-card-stars">${starsHtml} <span style="color:var(--text-muted); font-size:0.7rem;">(4.8)</span></div>
-                        <div class="gk-card-price">${displayPrice}</div>
-                        <button class="gk-card-add-btn" data-buy-id="${d.id}" type="button" aria-label="Comprar directamente" title="Comprar directamente">
-                            <i class="fa-solid fa-cart-plus"></i>
-                        </button>
+                        <span class="gk-card-badge" style="color:${badgeBg}">${stockLabel}</span>
+                        <h3 class="gk-card-name"><a href="producto.html?id=${encodeURIComponent(d.id)}">${escapeHtml(p.name)}</a></h3>
+                        <div class="gk-card-footer">
+                            <div class="gk-card-price">${displayPrice}</div>
+                            <a class="gk-card-add-btn" href="producto.html?id=${encodeURIComponent(d.id)}&amp;action=buy" aria-label="Comprar directamente: ${escapeHtml(p.name)}" title="Comprar directamente">
+                                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                            </a>
+                        </div>
                     </div>
-                </a>
+                </article>
             `;
         });
 
         initWishlistButtons(currentUserWishlist);
-        // Compra directa estilo Eneba en Home
-        container.querySelectorAll(".gk-card-add-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const pid = btn.getAttribute("data-buy-id");
-                if (pid) window.location.href = `producto.html?id=${pid}&action=buy`;
-            });
-        });
     } catch (e) {
         console.error("Error loading products on index", e);
         if (document.getElementById('hero-banner').style.display === 'none') {

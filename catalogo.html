@@ -69,6 +69,7 @@
     </script>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <!-- ===== GLOBAL NAVBAR (GhostKey) ===== -->
     <style>
         html, body { height: auto !important; overflow: visible !important; overflow-x: hidden !important; }
@@ -103,7 +104,7 @@
         <a href="index.html" class="gk-nav-logo"><img src="img/ghost-logo.png" alt="GhostKey"></a>
         <div class="gk-search-wrap">
             <input id="gk-nav-search" type="search" aria-label="Buscar en el catálogo" placeholder="Buscar productos..." autocomplete="off">
-            <button class="gk-search-btn-nav" id="gk-nav-search-btn" title="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="gk-search-btn-nav" id="gk-nav-search-btn" title="Buscar" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         <div class="gk-nav-actions">
             <a href="pago.html" class="gk-nav-btn gk-nav-balance" id="nav-balance-btn" title="Mi saldo">
@@ -270,8 +271,95 @@
                 height: 40px !important;
             }
         }
+
+        .catalog-page { padding-top: clamp(20px, 4vw, 44px); }
+        .catalog-heading { margin-bottom: 20px; }
+        .catalog-heading h1 {
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            letter-spacing: -.035em;
+            line-height: 1.08;
+        }
+        #results-count, #catalog-filters label { font-size: .95rem; }
+        #catalog-filters select, #catalog-filters button { min-height: 44px; }
+        #catalog-grid { margin-top: 0; }
+        #catalog-grid .card {
+            height: auto;
+            min-height: 0;
+            background: var(--bg-card) !important;
+            border: 1px solid rgba(255,255,255,.1);
+            box-shadow: none !important;
+            transform: none !important;
+        }
+        #catalog-grid .card:hover { border-color: var(--accent-primary); }
+        #catalog-grid .card .card__image {
+            height: auto;
+            aspect-ratio: 16 / 10;
+            background: var(--bg-main);
+            transform: none;
+        }
+        #catalog-grid .card .card__content { padding: 12px; }
+        #catalog-grid .card .card__title {
+            color: var(--text-main);
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+        #catalog-grid .card .card__price-large { color: var(--accent-hover); }
+        #catalog-grid .card .card__add-btn {
+            text-decoration: none;
+            min-height: 44px;
+            background: var(--bg-panel);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 8px;
+            color: var(--text-main);
+        }
+        #catalog-grid .card .wishlist-btn,
+        #catalog-grid .card .card__quick-buy-btn {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        @media (max-width: 768px) {
+            .catalog-page .catalog-sidebar-title { display: block !important; }
+            #catalog-grid .card .card__title {
+                display: block !important;
+                font-size: 1rem !important;
+                line-height: 1.35 !important;
+            }
+            #catalog-grid .card .card__content {
+                height: auto !important;
+                padding: 0;
+                gap: 0;
+            }
+            #catalog-grid .card .card__image {
+                align-self: stretch;
+                height: auto !important;
+                aspect-ratio: auto;
+            }
+            #catalog-grid .card .card__badge {
+                transform: none;
+                letter-spacing: 0;
+                text-transform: none !important;
+            }
+            #catalog-grid .card .card__add-btn {
+                min-height: 44px;
+                margin: 0;
+                padding: 0;
+                align-items: center;
+                gap: .4rem;
+                background: transparent;
+                border: 0;
+                font-size: .87rem;
+            }
+        }
+        @media (max-width: 355px) {
+            #catalog-filters { grid-template-columns: 1fr; }
+        }
     </style>
-    <div class="gk-page-body" style="padding-top: 2rem;">
+    <main class="gk-page-body catalog-page" id="main-content" tabindex="-1">
+        <div class="catalog-heading">
+            <h1>Catálogo</h1>
+            <span id="results-count" role="status">Cargando…</span>
+        </div>
+
         <div class="catalog-layout">
             <aside class="catalog-sidebar" aria-label="Filtros del catálogo">
                 <h2 class="catalog-sidebar-title">Filtros</h2>
@@ -304,15 +392,11 @@
                 </form>
             </aside>
 
-            <main class="catalog-main">
-                <div class="catalog-heading">
-                    <h1>Catálogo</h1>
-                    <span id="results-count" role="status">Cargando…</span>
-                </div>
+            <div class="catalog-main">
                 <div class="catalog-grid" id="catalog-grid" aria-busy="true"></div>
-            </main>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script type="module" src="js/main.js"></script>
@@ -406,7 +490,7 @@
     <!-- ===== FLOATING HELP BUBBLE (WhatsApp) ===== -->
     <div class="gk-help-bubble-wrap" id="gk-help-bubble-wrap">
         <div class="gk-help-tooltip" id="gk-help-tooltip">
-            <i class="fa-brands fa-whatsapp"></i> 燒ecesitas ayuda?
+            <i class="fa-brands fa-whatsapp"></i> ¿Necesitas ayuda?
         </div>
         <a href="https://api.whatsapp.com/send?phone=525574123521&text=Hola,%20tengo%20una%20duda%20sobre%20mi%20cuenta%20de%20GhostKey" target="_blank" rel="noopener noreferrer" class="gk-help-orb" id="gk-help-orb" aria-label="Contactar soporte por WhatsApp">
             <div class="loader"><div class="circle"></div></div>

@@ -43,16 +43,20 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 1rem;
-            margin-top: 1.25rem;
+            margin-bottom: 1rem;
         }
         #p-title {
             margin: 0;
-            font-size: clamp(1.45rem, 4vw, 2.5rem);
+            font-size: clamp(1.75rem, 4vw, 3rem);
+            line-height: 1.12;
+            letter-spacing: -.025em;
             overflow-wrap: anywhere;
         }
         #p-desc {
             margin-top: .85rem;
-            line-height: 1.65;
+            max-width: 65ch;
+            font-size: 1rem;
+            line-height: 1.7;
             white-space: pre-line;
             overflow-wrap: anywhere;
         }
@@ -67,6 +71,7 @@
             min-height: 44px;
             padding: .5rem;
         }
+        #product-share-status:empty { display: none; }
         #product-share-status {
             display: block;
             color: var(--text-muted);
@@ -138,6 +143,7 @@
     </script>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
     <!-- ===== GLOBAL NAVBAR (GhostKey) ===== -->
     <style>
         html, body { height: auto !important; overflow: visible !important; overflow-x: hidden !important; }
@@ -206,7 +212,7 @@
             }
         })();
     </script>
-    <main class="gk-page-body">
+    <main class="gk-page-body" id="main-content" tabindex="-1">
             <header class="top-bar">
                 <a class="btn-secondary" href="catalogo.html" id="back-to-catalog"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver al catálogo</a>
             </header>
@@ -214,12 +220,12 @@
             <section class="product-detail-container">
                 <!-- Left: Image and Description -->
                 <div>
-                    <img src="img/ghost-logo.png" alt="" id="p-image" class="product-cover">
                     <div class="product-heading">
                         <h1 id="p-title" aria-live="polite">Cargando producto…</h1>
                         <button class="btn-secondary" id="btn-share-product" type="button" disabled aria-label="Copiar enlace del producto" title="Copiar enlace"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
                     </div>
                     <output id="product-share-status" role="status"></output>
+                    <img src="img/ghost-logo.png" alt="" id="p-image" class="product-cover">
                     <p id="p-desc" class="text-muted"></p>
                 </div>
                 

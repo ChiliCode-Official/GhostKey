@@ -268,84 +268,72 @@
         ========================================= */
         .gk-hero {
             position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 24px 0 0;
-            min-height: 380px;
             display: flex;
-            align-items: flex-end;
-            background: linear-gradient(135deg, #0f0c29, #1a1040, #24243e);
-        }
-        /* Animated edge glow */
-        .gk-hero::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, rgba(161,130,232,0.6), transparent 50%, rgba(161,130,232,0.2));
-            z-index: 0;
-            opacity: 0.5;
-        }
-        .gk-hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg,
-                rgba(11,14,20,0.92) 0%,
-                rgba(11,14,20,0.6) 50%,
-                transparent 100%);
-            z-index: 1;
+            align-items: center;
+            min-height: 360px;
+            margin-top: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(161,130,232,.24);
+            border-radius: 24px;
+            background: linear-gradient(125deg, var(--bg-panel), var(--bg-main) 68%);
         }
         .gk-hero-bg {
-            position: absolute; inset: 0;
+            position: absolute;
+            inset: 0 0 0 auto;
+            width: 55%;
+            height: 100%;
             object-fit: cover;
-            width: 100%; height: 100%;
-            opacity: 0.55;
-            z-index: 0;
-            transition: opacity 0.4s;
+            mask-image: linear-gradient(to right, transparent, #000 32%);
         }
+        .gk-hero-bg:not([src]) { display: none; }
         .gk-hero-content {
             position: relative;
-            z-index: 2;
-            padding: 2.5rem;
-            max-width: 560px;
+            z-index: 1;
+            width: 54%;
+            padding: clamp(24px, 5vw, 64px);
         }
         .gk-hero-tag {
-            background: linear-gradient(135deg, var(--accent-primary), #7c5cbf);
-            color: #fff;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 4px 14px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
             display: inline-flex;
+            gap: 8px;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 14px;
-            box-shadow: 0 0 20px rgba(161,130,232,0.4);
+            margin-bottom: 12px;
+            color: var(--accent-hover);
+            font-size: .9rem;
+            font-weight: 700;
         }
         .gk-hero h1 {
-            font-size: clamp(1.6rem, 5vw, 2.8rem);
-            font-weight: 900;
-            color: #fff;
-            margin: 0 0 10px;
-            line-height: 1.1;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.7);
-            letter-spacing: -0.5px;
+            margin: 0 0 12px;
+            color: var(--text-main);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -.035em;
+            overflow-wrap: anywhere;
         }
         .gk-hero-price {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--accent-primary);
-            margin: 0 0 1.4rem;
-            text-shadow: 0 0 30px rgba(161,130,232,0.5);
+            margin: 0 0 20px;
+            color: var(--accent-hover);
+            font-size: clamp(1.25rem, 3vw, 1.8rem);
+            font-weight: 700;
+        }
+        #hero-fallback .gk-hero-content { width: 100%; }
+        #hero-fallback p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
         .gk-hero-actions {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
+        .gk-hero .btn-primary,
+        .gk-hero .btn-ghost { min-height: 44px; box-shadow: none; }
+        .gk-hero .btn-primary {
+            background: var(--accent-primary);
+            color: var(--bg-main);
+        }
+        .gk-hero-dots:empty { display: none; }
         .gk-hero-dots {
             display: flex;
             gap: 8px;
@@ -467,22 +455,6 @@
             background: rgba(161,130,232,0.1);
             border-color: rgba(161,130,232,0.5);
         }
-
-        /* =========================================
-           HORIZONTAL PRODUCTS SCROLL
-        ========================================= */
-        .gk-hscroll {
-            display: flex;
-            gap: 14px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-primary) transparent;
-        }
-        .gk-hscroll::-webkit-scrollbar { height: 4px; }
-        .gk-hscroll::-webkit-scrollbar-track { background: transparent; }
-        .gk-hscroll::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 2px; }
 
         /* =========================================
            PRODUCT CARD
@@ -1245,119 +1217,89 @@
             color: #ffa723;
         }
 
-        /* =====================================================
-           UX MOVIL ESTILO ENEBA: Tarjetas Horizontales (Home)
-        ===================================================== */
-        @media (max-width: 768px) {
+        #products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 185px), 1fr));
+            overflow: visible;
+            gap: 16px;
+        }
+        #products-container > :not(.gk-card) { grid-column: 1 / -1; }
+        #products-container .gk-card {
+            display: flex;
+            flex-direction: column;
+            width: auto;
+            min-width: 0;
+            border-color: rgba(255,255,255,.1);
+            cursor: auto;
+            transition: border-color .2s;
+        }
+        #products-container .gk-card:hover,
+        #products-container .gk-card:focus-within {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--accent-primary);
+        }
+        #products-container .gk-card::before { display: none; }
+        #products-container .gk-card-img {
+            display: block;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            transform: none;
+        }
+        #products-container .gk-card-body {
+            display: grid;
+            gap: 8px;
+            align-content: start;
+            flex: 1;
+        }
+        #products-container .gk-card-badge {
+            width: fit-content;
+            margin: 0;
+            border: 1px solid currentColor;
+            background: transparent;
+            font-size: .75rem;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+        #products-container .gk-card-name {
+            display: block;
+            margin: 0;
+            font-size: 1rem;
+            overflow-wrap: anywhere;
+        }
+        .gk-card-name a { color: inherit; text-decoration: none; cursor: pointer; }
+        .gk-card-name a::after { content: ''; position: absolute; inset: 0; }
+        .gk-card-name a:hover { text-decoration: underline; }
+        #products-container .gk-card-price { color: var(--accent-hover); }
+        #products-container .gk-card-original { text-decoration: none; }
+        #products-container .gk-card-add-btn {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: var(--accent-primary);
+            color: var(--bg-main);
+            font-size: 1rem;
+            text-decoration: none;
+        }
+        @media (max-width: 680px) {
+            #hero-banner { flex-direction: column; align-items: stretch; }
+            .gk-hero-bg {
+                position: static;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 8;
+                mask-image: none;
+            }
+            .gk-hero-content { width: 100%; }
+            #hero-fallback { min-height: 240px; }
             #products-container {
-                display: flex !important;
-                flex-direction: column !important;
-                overflow-x: visible !important;
-                gap: 10px !important;
-                padding-bottom: 10px !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
             }
-
-            .gk-card {
-                width: 100% !important;
-                min-width: 100% !important;
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: stretch !important;
-                background: #151624 !important;
-                border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                border-radius: 12px !important;
-                overflow: hidden !important;
-                position: relative !important;
-                text-decoration: none !important;
-                color: #fff !important;
-                min-height: 115px !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-            }
-
-            .gk-card:active {
-                transform: scale(0.99) !important;
-                border-color: var(--accent-primary, #A182E8) !important;
-            }
-
-            /* Portada a la izquierda vertical 3:4 */
-            .gk-card-img-wrap {
-                width: 95px !important;
-                min-width: 95px !important;
-                max-width: 95px !important;
-                height: auto !important;
-                aspect-ratio: auto !important;
-                min-height: 115px !important;
-                position: relative !important;
-                flex-shrink: 0 !important;
-            }
-
-            .gk-card-img {
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: cover !important;
-            }
-
-            /* Contenido a la derecha */
-            .gk-card-body {
-                flex: 1 !important;
-                padding: 10px 12px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                min-width: 0 !important;
-                padding-right: 45px !important; /* Espacio para el boton directo */
-            }
-
-            .gk-card-badge {
-                position: absolute !important;
-                top: 8px !important;
-                left: 8px !important;
-                z-index: 3 !important;
-                font-size: 0.65rem !important;
-                margin-bottom: 0 !important;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
-            }
-
-            .gk-card-name {
-                font-size: 0.88rem !important;
-                font-weight: 700 !important;
-                line-height: 1.25 !important;
-                margin-bottom: 4px !important;
-                color: #f8fafc !important;
-                display: -webkit-box !important;
-                -webkit-line-clamp: 2 !important;
-                -webkit-box-orient: vertical !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-            }
-
-            .gk-card-stars {
-                font-size: 0.68rem !important;
-                margin-bottom: 4px !important;
-            }
-
-            .gk-card-footer {
-                margin-top: auto !important;
-            }
-
-            .gk-card-price {
-                font-size: 1.15rem !important;
-                font-weight: 900 !important;
-                color: #fff !important;
-            }
-
-            /* Boton de compra rapida en la esquina inferior derecha */
-            .gk-card-add-btn {
-                position: absolute !important;
-                bottom: 10px !important;
-                right: 10px !important;
-                width: 38px !important;
-                height: 36px !important;
-                border-radius: 8px !important;
-                font-size: 0.95rem !important;
-                background: linear-gradient(135deg, var(--accent-primary, #9333ea), #6366f1) !important;
-                box-shadow: 0 3px 10px rgba(147, 51, 234, 0.4) !important;
-            }
+            #products-container .gk-card-body { padding: 12px; }
+        }
+        @media (max-width: 355px) {
+            #products-container { grid-template-columns: minmax(0, 1fr); }
         }
     </style>
     <!-- PWA Settings -->
@@ -1443,10 +1385,10 @@
                 <p class="gk-hero-price" id="hero-price"></p>
                 <div class="gk-hero-actions">
                     <a href="#" id="hero-buy-btn" class="btn-primary">
-                        <i class="fa-solid fa-bolt"></i> Comprar Ahora
+                        <i class="fa-solid fa-bolt"></i> Comprar ahora
                     </a>
                     <a href="catalogo.html" class="btn-ghost">
-                        <i class="fa-solid fa-grid-2"></i> Ver Catálogo
+                        <i class="fa-solid fa-grid-2"></i> Ver catálogo
                     </a>
                 </div>
                 <div class="gk-hero-dots" id="hero-dots" role="group" aria-label="Seleccionar producto destacado"></div>
@@ -1455,54 +1397,23 @@
         <section class="gk-hero" id="hero-fallback">
             <div class="gk-hero-content">
                 <h1>Tienda GhostKey</h1>
+                <p>Juegos, claves digitales y cuentas premium.</p>
                 <a href="catalogo.html" class="btn-primary">Explorar catálogo</a>
             </div>
         </section>
 
-        <!-- ===================== FEATURES STRIP ===================== -->
-        <div class="gk-features-strip">
-            <div class="gk-feature-card">
-                <div class="gk-feature-icon"><i class="fa-solid fa-bolt"></i></div>
-                <div class="gk-feature-text">
-                    <h4>Entrega Instantánea</h4>
-                    <p>Recibe tu producto al instante tras el pago</p>
-                </div>
-            </div>
-            <div class="gk-feature-card">
-                <div class="gk-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <div class="gk-feature-text">
-                    <h4>100% Seguro</h4>
-                    <p>Pago cifrado y garantía en todas las compras</p>
-                </div>
-            </div>
-            <div class="gk-feature-card">
-                <div class="gk-feature-icon"><i class="fa-solid fa-tag"></i></div>
-                <div class="gk-feature-text">
-                    <h4>Mejor Precio</h4>
-                    <p>Garantizamos los precios más bajos del mercado</p>
-                </div>
-            </div>
-            <div class="gk-feature-card">
-                <div class="gk-feature-icon"><i class="fa-solid fa-headset"></i></div>
-                <div class="gk-feature-text">
-                    <h4>Soporte 24/7</h4>
-                    <p>Atención al cliente siempre disponible</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===================== BEST SELLERS ===================== -->
+        <!-- Productos de la tienda -->
         <section class="gk-section">
             <div class="gk-section-header">
                 <div class="gk-section-title-wrap">
                     <div class="gk-section-accent"></div>
-                    <h2><span>🔥</span> Más Vendidos</h2>
+                    <h2>Productos de la tienda</h2>
                 </div>
                 <a href="catalogo.html" class="gk-see-all">
                     Ver todos <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
-            <div class="gk-hscroll" id="products-container">
+            <div id="products-container">
                 <div class="loading-state">
                     <div class="ghost-loader" aria-hidden="true">
                         <div class="ghost-red">
@@ -1546,6 +1457,38 @@
                 </div>
             </div>
         </section>
+
+        <!-- ===================== FEATURES STRIP ===================== -->
+        <div class="gk-features-strip">
+            <div class="gk-feature-card">
+                <div class="gk-feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                <div class="gk-feature-text">
+                    <h4>Entrega Instantánea</h4>
+                    <p>Recibe tu producto al instante tras el pago</p>
+                </div>
+            </div>
+            <div class="gk-feature-card">
+                <div class="gk-feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="gk-feature-text">
+                    <h4>100% Seguro</h4>
+                    <p>Pago cifrado y garantía en todas las compras</p>
+                </div>
+            </div>
+            <div class="gk-feature-card">
+                <div class="gk-feature-icon"><i class="fa-solid fa-tag"></i></div>
+                <div class="gk-feature-text">
+                    <h4>Mejor Precio</h4>
+                    <p>Garantizamos los precios más bajos del mercado</p>
+                </div>
+            </div>
+            <div class="gk-feature-card">
+                <div class="gk-feature-icon"><i class="fa-solid fa-headset"></i></div>
+                <div class="gk-feature-text">
+                    <h4>Soporte 24/7</h4>
+                    <p>Atención al cliente siempre disponible</p>
+                </div>
+            </div>
+        </div>
 
         <!-- ===================== CATEGORIES ===================== -->
         <section class="gk-section">
